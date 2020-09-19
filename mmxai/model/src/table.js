@@ -55,6 +55,19 @@ export class Table {
   };
 
   /**
+   * Del row in table on index place
+   * 国良增加 2020/09/19
+   * @param {number} index - number in the array of columns
+   *
+  */
+  delRow(index = 0) {
+    if (index >= this._numberOfRows) return;
+    this._table.deleteRow(index);
+    this._numberOfRows--;
+  };
+
+
+  /**
    * get html element of table
    * @return {HTMLElement}
    */

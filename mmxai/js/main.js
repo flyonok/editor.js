@@ -64,7 +64,7 @@ const mmxai = function (module) {
 
             inlineCode: {
                 class: InlineCode,
-                shortcut: 'CMD+SHIFT+C'
+                shortcut: 'CMD+SHIFT+I'
             },
 
             // linkTool: LinkTool,
@@ -72,9 +72,9 @@ const mmxai = function (module) {
             embed: Embed,
 
             model: {
-                class: Table,
+                class: MmxModel,
                 inlineToolbar: true,
-                shortcut: 'CMD+ALT+T'
+                shortcut: 'CMD+ALT+M'
             },
 
             paramter: {

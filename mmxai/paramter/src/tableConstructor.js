@@ -173,7 +173,9 @@ export class TableConstructor {
     // add by xiaowy test double click event 2020/09/19
     this._container.addEventListener('dblclick', (event) => {
       clearTimeout(this._clickTimeId);
-      alert('doubleclick event!');
+      console.log('doubleclick event!');
+      this._dblclickToolbar(event);
+      // alert('doubleclick event!');
     });
 
     this._container.addEventListener('input', () => {
@@ -293,6 +295,46 @@ export class TableConstructor {
       // comment by xiaowy 2020/09/19 不需要处理列
       // this._addColumn();
       typeCoord = 'x';
+      // return; // added by xiaowy 2020/09/19
+    }
+    /** If event has transmitted data (coords of mouse) */
+    const detailHasData = isNaN(event.detail) && event.detail !== null;
+
+    if (detailHasData) {
+      const containerCoords = getCoords(this._table.htmlElement);
+      let coord;
+
+      if (typeCoord === 'x') {
+        coord = event.detail.x - containerCoords.x1;
+      } else {
+        coord = event.detail.y - containerCoords.y1;
+      }
+      this._delayAddButtonForMultiClickingNearMouse(coord);
+    } else {
+      this._hideToolBar();
+    }
+  }
+
+  /**
+   * @private
+   *
+   * handling double clicks on toolbars
+   * @param {MouseEvent} event
+   */
+  _dblclickToolbar(event) {
+    if (!this._isToolbar(event.target)) {
+      return;
+    }
+    let typeCoord;
+
+    if (this._activatedToolBar === this._horizontalToolBar) {
+      this._delRow();
+      typeCoord = 'y';
+    } else {
+      // comment by xiaowy 2020/09/19 不需要处理列
+      // this._addColumn();
+      typeCoord = 'x';
+      // return; // added by xiaowy 2020/09/19
     }
     /** If event has transmitted data (coords of mouse) */
     const detailHasData = isNaN(event.detail) && event.detail !== null;
@@ -379,6 +421,24 @@ export class TableConstructor {
     }
 
     this._table.addRow(index);
+  }
+
+  /**
+   * Del row in table
+   * @private
+   * 国良添加 2020/09/19
+   */
+  _delRow() {
+    const indicativeRow = this._hoveredCell.closest('TR');
+    let index = this._getHoveredSideOfContainer();
+
+    if (index === 1) {
+      index = indicativeRow.sectionRowIndex;
+      // if inserting after hovered cell
+      index = index + this._isBottomOrRight();
+    }
+
+    this._table.delRow(index);
   }
 
   /**

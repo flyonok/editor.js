@@ -10,7 +10,7 @@ const CSS = {
  *  @typedef {object} TableData - object with the data transferred to form a table
  *  @property {string[][]} content - two-dimensional array which contains table content
  */
-class MmxParameter {
+class MmxModel {
   /**
    * Allow to press Enter inside the CodeTool textarea
    * @returns {boolean}
@@ -30,7 +30,7 @@ class MmxParameter {
   static get toolbox() {
     return {
       icon: svgIcon,
-      title: 'Parameter'
+      title: 'Model'
     };
   }
 
@@ -94,4 +94,4 @@ class MmxParameter {
   }
 }
 
-module.exports = MmxParameter;
+module.exports = MmxModel;
