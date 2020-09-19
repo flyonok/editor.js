@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+  <meta charset="UTF-8">
+  <title>秒秒学人工智能</title>
+  <link href="https://fonts.googleapis.com/css?family=PT+Mono" rel="stylesheet">
+  <link href="css/demo.css" rel="stylesheet">
+  <script src="js/json-preview.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+</head>
+
+<body>
+  <div class="ce-example">
+    <div class="ce-example__header">
+      <a class="ce-example__header-logo" href="https://codex.so/editor">word编辑器</a>
+
+      <div class="ce-example__header-menu">
+        <a href="https://github.com/editor-js" target="_blank">Plugins</a>
+        <a href="https://editorjs.io/usage" target="_blank">Usage</a>
+        <a href="https://editorjs.io/configuration" target="_blank">Configuration</a>
+        <a href="https://editorjs.io/creating-a-block-tool" target="_blank">API</a>
+      </div>
+    </div>
+    <div class="ce-example__content _ce-example__content--small">
+      <div id="editorjs"></div>
+
+      <div class="ce-example__button" id="saveButton">
+        保存json数据
+      </div>
+      <div class="ce-example__button" id="refreshButton">
+        重新加载json数据
+      </div>
+    </div>
+    <div class="ce-example__output">
+      <pre class="ce-example__output-content" id="output"></pre>
+
+      <div class="ce-example__output-footer">
+        <a href="http://www.miaomiaoxue.com" style="font-weight: bold;">秒秒学</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Tools -->
+  <!--
+   You can upload Tools to your project's directory and use as in example below.
+
+   Also you can load each Tool from CDN or use NPM/Yarn packages.
+
+   Read more in Tool's README file. For example:
+   https://github.com/editor-js/header#installation
+   -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@latest"></script><!-- Header -->
+  <!-- Image -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/@editorjs/simple-image@latest"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/simple-image-editorjs@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@latest"></script><!-- Delimiter -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@latest"></script><!-- List -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/checklist@latest"></script><!-- Checklist -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@latest"></script><!-- Quote -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/code@latest"></script><!-- Code -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script><!-- Embed -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/table@latest"></script><!-- Table -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/link@latest"></script><!-- Link -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/warning@latest"></script><!-- Warning -->
+
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/marker@latest"></script><!-- Marker -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/inline-code@latest"></script><!-- Inline Code -->
+
+  <!-- Load Editor.js's Core -->
+  <!-- <script src="../dist/editor.js"></script> -->
+  <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@latest"></script>
+  <script src="js/main.js"></script>
+  <script src="paramter/dist/bundle.js"></script> <!-- parameter -->
+
+  <!-- Initialization -->
+  <script>
+    /**
+     * Saving button
+     */
+    const saveButton = document.getElementById('saveButton');
+    const refreshButton = document.getElementById('refreshButton');
+    mmxai.initEditor('editorjs');
+    /**
+     * Saving example
+     */
+    saveButton.addEventListener('click', function () {
+      mmxai.Global.editor.save().then((savedData) => {
+        cPreview.show(savedData, document.getElementById("output"));
+      });
+    });
+    refreshButton.addEventListener('click', function () {
+      mmxai.loadDemoJson();
+    });
+  </script>
+</body>
+
+</html>
