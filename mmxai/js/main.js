@@ -193,6 +193,7 @@ const mmxai = function (module) {
                 {
                     "type" : "paramter",
                     "data" : {
+                        "name": "【页面参数】",
                         "content" : [
                             [
                                 "高：",

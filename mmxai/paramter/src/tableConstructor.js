@@ -8,7 +8,8 @@ const CSS = {
   editor: 'tc-editor',
   toolBarHor: 'tc-toolbar--hor',
   toolBarVer: 'tc-toolbar--ver',
-  inputField: 'tc-table__inp'
+  inputField: 'tc-table__inp',
+  readOnlyTable_inputField: 'tc-readOnlyTable__inp'
 };
 
 /**
@@ -23,15 +24,28 @@ export class TableConstructor {
    */
   constructor(data, config, api) {
     /** creating table */
+    console.log('tableConstructor begin!');
     this._table = new Table();
     // add by xiaowy 增加参数说明 2020/09/19
     // if (data && data.title) {
     this._titleWrapper = document.createElement('div');
-    let descTitle = document.createElement('H3');
-    descTitle.innerHTML = '【参数】';
+    this._descTitle = document.createElement('H3');
+    if (data.name !== undefined )
+    {
+      // this._descTitle.innerHTML = '【' + data.name + '】';
+      this._descTitle.innerHTML = data.name;
+    }
+    else
+    {
+      this._descTitle.innerHTML = '【参数】';
+    }
+    this._descTitle.classList.add('mmxParameterDecsTitle');
+    console.log('_descTitle.classList.add');
     let desc = document.createElement('p');
     desc.innerHTML = '说明： 每个参数占一行， 左边是参数名称， 右边是其数值。 没有值的， 右边可以不填。';
-    this._titleWrapper.appendChild(descTitle);
+    desc.classList.add('mmxParameterDesc');
+    desc.appendChild(document.createElement('br'));
+    this._titleWrapper.appendChild(this._descTitle);
     this._titleWrapper.appendChild(desc);
     // }
     // end
@@ -45,9 +59,12 @@ export class TableConstructor {
     /** creating container around table */
     // modified by xiaowy
     // this._container = create('div', [CSS.editor, api.styles.block], null, [this._table.htmlElement]);
+    // added by xiaowy 2020/09/21
     this._readOnlyTable = new TableReadOnly();
     this._makeReadOnlyTable(config);
-    this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement]);
+    let tablebr = document.createElement('br');
+    // end
+    this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
     // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
 
     /** creating ToolBars */
@@ -124,7 +141,7 @@ export class TableConstructor {
       for (let i = 0; i < size.rows && i < data.content.length; i++) {
         for (let j = 0; j < size.cols && j < data.content[i].length; j++) {
           // get current cell and her editable part
-          const input = this._readOnlyTable.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
+          const input = this._readOnlyTable.body.rows[i].cells[j].querySelector('.' + CSS.readOnlyTable_inputField);
 
           input.innerHTML = data.content[i][j];
         }
@@ -336,6 +353,11 @@ export class TableConstructor {
    * @return {boolean}
    */
   _isToolbar(elem) {
+    // add by xiaowy 2020/09/21
+    if (elem === null)
+    {
+      return null;
+    }
     return !!(elem.closest('.' + CSS.toolBarHor) || elem.closest('.' + CSS.toolBarVer));
   }
 

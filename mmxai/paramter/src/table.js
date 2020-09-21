@@ -98,6 +98,8 @@ export class Table {
    * @return {HTMLElement} tbody - where rows will be
    */
   _createTableWrapper() {
+    // add by xiaowy 2020/09/21
+    // const brEle = document.createElement('br');
     return create('div', [CSS.wrapper], null, [create('table', [CSS.table])]);
   }
 

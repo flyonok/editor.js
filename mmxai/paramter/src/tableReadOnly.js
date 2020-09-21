@@ -1,12 +1,12 @@
 import {create, getCoords, getSideByCoords} from './documentUtils';
-import './styles/table.pcss';
+import './styles/tableReadOnly.pcss';
 
 const CSS = {
-  table: 'tc-table',
-  inputField: 'tc-table__inp',
-  cell: 'tc-table__cell',
-  wrapper: 'tc-table__wrap',
-  area: 'tc-table__area',
+  table: 'tc-readOnlyTable',
+  inputField: 'tc-readOnlyTable__inp',
+  cell: 'tc-readOnlyTable__cell',
+  wrapper: 'tc-readOnlyTable__wrap',
+  area: 'tc-readOnlyTable__area',
 };
 
 /**
@@ -22,7 +22,8 @@ export class TableReadOnly {
     this._element = this._createTableWrapper();
     this._table = this._element.querySelector('table');
 
-    this._hangEvents();
+    // comment by xiaowy 2020/09/21
+    // this._hangEvents();
   }
 
   /**
@@ -146,9 +147,11 @@ export class TableReadOnly {
    * hang necessary events
    */
   _hangEvents() {
+    
     this._table.addEventListener('focus', (event) => {
       this._focusEditField(event);
     }, true);
+    
 
     this._table.addEventListener('blur', (event) => {
       this._blurEditField(event);

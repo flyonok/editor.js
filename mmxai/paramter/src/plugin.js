@@ -61,7 +61,10 @@ class MmxParameter {
    * @public
    */
   save(toolsContent) {
-    const table = toolsContent.querySelector('table');
+    // modified by xiaowy 2020/09/21
+    // const table = toolsContent.querySelector('table');
+    const table = toolsContent.querySelector('table.tc-table');
+    console.log(table);
     const data = [];
     const rows = table.rows;
 
@@ -77,9 +80,19 @@ class MmxParameter {
       data.push(inputs.map(input => input.innerHTML));
     }
 
-    return {
-      content: data
-    };
+    // added by xiaowy 2020/09/21 for 板块名称
+    const blockName = toolsContent.querySelector('.mmxParameterDecsTitle');
+    if (blockName !== null) {
+      return {
+        name : blockName.innerHTML,
+        content: data
+      };
+    }
+    else {
+      return {
+        content: data
+      }
+    }
   }
 
   /**
