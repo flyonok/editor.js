@@ -2,6 +2,7 @@ import './styles/table-constructor.pcss';
 import { create, getCoords, getSideByCoords } from './documentUtils';
 import { HorizontalBorderToolBar, VerticalBorderToolBar } from './borderToolBar';
 import { Table } from './table';
+import { TableReadOnly } from './tableReadOnly'
 
 const CSS = {
   editor: 'tc-editor',
@@ -25,11 +26,16 @@ export class TableConstructor {
     this._table = new Table();
     // add by xiaowy 增加参数说明 2020/09/19
     // if (data && data.title) {
-    this._title = create('p', null, null, null);
-    this._title.innerHTML = '参数输入说明：参数的格式为"高：100"，每个参数占一行，属性和值各占一列，没有值的可空，记得属性后面要冒号，没有值的可省略。';
+    this._titleWrapper = document.createElement('div');
+    let descTitle = document.createElement('H3');
+    descTitle.innerHTML = '【参数】';
+    let desc = document.createElement('p');
+    desc.innerHTML = '说明： 每个参数占一行， 左边是参数名称， 右边是其数值。 没有值的， 右边可以不填。';
+    this._titleWrapper.appendChild(descTitle);
+    this._titleWrapper.appendChild(desc);
     // }
     // end
-    // add by xiaowy 同时融合单击和双击事件
+    // add by xiaowy 同时融合单击和双击事件 2020/09/19
     this._clickTimeId = -1;
     // end
     const size = this._resizeTable(data, config);
@@ -39,7 +45,10 @@ export class TableConstructor {
     /** creating container around table */
     // modified by xiaowy
     // this._container = create('div', [CSS.editor, api.styles.block], null, [this._table.htmlElement]);
-    this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
+    this._readOnlyTable = new TableReadOnly();
+    this._makeReadOnlyTable(config);
+    this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement]);
+    // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
 
     /** creating ToolBars */
     this._verticalToolBar = new VerticalBorderToolBar();
@@ -60,6 +69,20 @@ export class TableConstructor {
   }
 
   /**
+   * 构建只读的table，只有一行和两列，为了和后面构建的参数table兼容，改造了原有的Table类
+   */
+  _makeReadOnlyTable(config) {
+    // overwrite config
+    config = {rows:'1', cols:'2'};
+    this._readOnlyTable = new TableReadOnly();
+    let data = { content: [['参数名称', '参数值']] };
+    const size = this._resizeReadOnlyTable(data, config);
+
+    this._fillReadOnlyTable(data, size);
+
+  }
+
+  /**
    * returns html element of TableConstructor;
    * @return {HTMLElement}
    */
@@ -73,6 +96,7 @@ export class TableConstructor {
    *  Fill table data passed to the constructor
    * @param {TableData} data - data for insert in table
    * @param {{rows: number, cols: number}} size - contains number of rows and cols
+   * 
    */
   _fillTable(data, size) {
     if (data.content !== undefined) {
@@ -80,6 +104,27 @@ export class TableConstructor {
         for (let j = 0; j < size.cols && j < data.content[i].length; j++) {
           // get current cell and her editable part
           const input = this._table.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
+
+          input.innerHTML = data.content[i][j];
+        }
+      }
+    }
+  }
+
+  /**
+   * @private
+   *
+   *  Fill Read only table data passed to the constructor
+   * @param {TableData} data - data for insert in table
+   * @param {{rows: number, cols: number}} size - contains number of rows and cols
+   * 仿照_fillTable而来，只是换成了操作_readOnlyTable
+   */
+  _fillReadOnlyTable(data, size) {
+    if (data.content !== undefined) {
+      for (let i = 0; i < size.rows && i < data.content.length; i++) {
+        for (let j = 0; j < size.cols && j < data.content[i].length; j++) {
+          // get current cell and her editable part
+          const input = this._readOnlyTable.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
 
           input.innerHTML = data.content[i][j];
         }
@@ -107,8 +152,13 @@ export class TableConstructor {
     // value of config have to be positive number
     const configRows = !isNaN(parsedRows) && parsedRows > 0 ? parsedRows : undefined;
     const configCols = !isNaN(parsedCols) && parsedCols > 0 ? parsedCols : undefined;
+    /*
+    ** 默认只有一行 xiaowy 2020/09/21 **
     const defaultRows = 2;
     const defaultCols = 2;
+    */
+    const defaultRows = 1;
+    const defaultCols = 2; 
     const rows = contentRows || configRows || defaultRows;
     const cols = contentCols || configCols || defaultCols;
 
@@ -117,6 +167,50 @@ export class TableConstructor {
     }
     for (let i = 0; i < cols; i++) {
       this._table.addColumn();
+    }
+
+    return {
+      rows: rows,
+      cols: cols
+    };
+  }
+
+  /**
+   * @private
+   *
+   * resize to match config or transmitted data
+   * @param {TableData} data - data for inserting to the table
+   * @param {object} config - configuration of table
+   * @param {number|string} config.rows - number of rows in configuration
+   * @param {number|string} config.cols - number of cols in configuration
+   * @return {{rows: number, cols: number}} - number of cols and rows
+   * 构建table的标题头，参照_resizeTable，只是数据是固定的 xiaowy 2020/09/21
+   */
+  _resizeReadOnlyTable(data, config) {
+    const isValidArray = Array.isArray(data.content);
+    const isNotEmptyArray = isValidArray ? data.content.length : false;
+    const contentRows = isValidArray ? data.content.length : undefined;
+    const contentCols = isNotEmptyArray ? data.content[0].length : undefined;
+    const parsedRows = Number.parseInt(config.rows);
+    const parsedCols = Number.parseInt(config.cols);
+    // value of config have to be positive number
+    const configRows = !isNaN(parsedRows) && parsedRows > 0 ? parsedRows : undefined;
+    const configCols = !isNaN(parsedCols) && parsedCols > 0 ? parsedCols : undefined;
+    /*
+    ** 默认只有一行 xiaowy 2020/09/21 **
+    const defaultRows = 2;
+    const defaultCols = 2;
+    */
+    const defaultRows = 1;
+    const defaultCols = 2;
+    const rows = contentRows || configRows || defaultRows;
+    const cols = contentCols || configCols || defaultCols;
+
+    for (let i = 0; i < rows; i++) {
+      this._readOnlyTable.addRow();
+    }
+    for (let i = 0; i < cols; i++) {
+      this._readOnlyTable.addColumn();
     }
 
     return {
@@ -163,7 +257,7 @@ export class TableConstructor {
       // added by xiaowy 2020/09/19
       clearTimeout(this._clickTimeId);
       let that = this;
-      this._clickTimeId = setTimeout(function() {
+      this._clickTimeId = setTimeout(function () {
         that._clickToolbar(event);
       }, 250);
       // end

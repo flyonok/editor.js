@@ -189,6 +189,21 @@ const mmxai = function (module) {
                             ]
                         ]
                     }
+                },
+                {
+                    "type" : "paramter",
+                    "data" : {
+                        "content" : [
+                            [
+                                "高：",
+                                "10"
+                            ],
+                            [
+                                "宽：",
+                                "20"
+                            ]
+                        ]
+                    }
                 }
             ],
             "version": "2.18.0"

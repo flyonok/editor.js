@@ -107,8 +107,13 @@ export class TableConstructor {
     // value of config have to be positive number
     const configRows = !isNaN(parsedRows) && parsedRows > 0 ? parsedRows : undefined;
     const configCols = !isNaN(parsedCols) && parsedCols > 0 ? parsedCols : undefined;
+    /*
+    ** 默认只有一行2列 xiaowy 2020/09/21 **
     const defaultRows = 2;
     const defaultCols = 2;
+    */
+   const defaultRows = 1;
+   const defaultCols = 2;
     const rows = contentRows || configRows || defaultRows;
     const cols = contentCols || configCols || defaultCols;
 
