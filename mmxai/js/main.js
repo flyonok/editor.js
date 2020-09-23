@@ -60,7 +60,7 @@ const mmxai = function (module) {
                 shortcut: 'CMD+SHIFT+C'
             },
 
-            // delimiter: Delimiter,
+            delimiter: Delimiter,
 
             inlineCode: {
                 class: InlineCode,

@@ -478,7 +478,7 @@ export class TableConstructor {
    * @param {KeyboardEvent} event
    */
   _containerKeydown(event) {
-    let keycodes = [37, 38, 39, 40];
+    let keycodes = [37, 38, 39, 40, 9]; // 9 for tab key
     if (event.keyCode === 13) {
       this._containerEnterPressed(event);
     }
@@ -628,13 +628,15 @@ export class TableConstructor {
     }
     else{
       let table = this._table.body;
-      let row = table.rows[indicativeRow.sectionRowIndex + 1]
+      let row = table.rows[currentRowIndex + 1]
       // console.log(row);
       if (row !== null && row !== undefined) {
         row.cells[0].click();
       }
     }
   }
+    event.preventDefault();
+    event.stopPropagation();
     console.log('_containerEnterPressed finished!');
   }
 
@@ -650,21 +652,27 @@ export class TableConstructor {
     }
     switch(event.keyCode) {
       case 37: // left arrow key
-      this._processLeftArrowKey(event);
+        this._processLeftArrowKey(event);
         break;
       case 38: // up arrow key
-      this._processUpArrowKey(event);
+        this._processUpArrowKey(event);
         break;
       case 39: // right arrow key
-      this._processRightArrowKey(event);
+        this._processRightArrowKey(event);
         break;
       case 40: // down arrow key
-      this._processDownArrowKey(event);
+        this._processDownArrowKey(event);
+        break;
+      case 9: // tab key similar to right arrow key
+        this._processRightArrowKey(event);
         break;
       default:
         console.log('not implement!');
         break;
     }
+    // prevent default behavior
+    event.preventDefault();
+    event.stopPropagation();
   }
 
   /**
@@ -713,11 +721,12 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processLeftArrowKey(event) {
+    console.log('Enter _processLeftArrowKey');
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
-    console.log('currentRowIndex:' + currentRowIndex);
+    // console.log('currentRowIndex:' + currentRowIndex);
     const currentCellIndex = this._table.selectedCell.cellIndex;
-    console.log('currentCellIndex:' + currentCellIndex);
+    // console.log('currentCellIndex:' + currentCellIndex);
     const table = this._table.body;
     const table_rows = table.rows;
     if (currentRowIndex == 0) {// 在顶部行
@@ -733,15 +742,16 @@ export class TableConstructor {
     else{
       const cells = indicativeRow.cells;
       if (currentCellIndex == 0) { // 左边列
-        console.log('22');
+        console.log('move up');
         const previous_row = table_rows[currentRowIndex - 1];
         previous_row.cells[previous_row.cells.length - 1].click();
       }
       else{
-        console.log('11');
+        console.log('move left');
         cells[currentCellIndex - 1].click();
       }
     }
+    console.log('_processLeftArrowKey finished!');
   }
 
   /**
@@ -755,7 +765,24 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processDownArrowKey(event) {
-    
+    console.log('Enter _processDownArrowKey');
+    const indicativeRow = this._table.selectedCell.closest('TR');
+    const currentRowIndex = indicativeRow.sectionRowIndex;
+    console.log('currentRowIndex:' + currentRowIndex);
+    const currentCellIndex = this._table.selectedCell.cellIndex;
+    console.log('currentCellIndex:' + currentCellIndex);
+    const table = this._table.body;
+    const table_rows = table.rows;
+    if (currentRowIndex < table_rows.length - 1) { // not table bottom
+      const next_row = table_rows[currentRowIndex + 1];
+      console.log('nextRowIndex:', currentRowIndex + 1);
+      next_row.cells[currentCellIndex].click()
+    }
+    else {
+      const next_row = table_rows[0]
+      next_row.cells[currentCellIndex].click();
+    }
+    console.log('_processDownArrowKey finished!');
   }
 
   /**
@@ -769,7 +796,27 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processUpArrowKey(event) {
-    
+    console.log('Enter _processUpArrowKey');
+    const indicativeRow = this._table.selectedCell.closest('TR');
+    const currentRowIndex = indicativeRow.sectionRowIndex;
+    console.log('currentRowIndex:' + currentRowIndex);
+    const currentCellIndex = this._table.selectedCell.cellIndex;
+    console.log('currentCellIndex:' + currentCellIndex);
+    const table = this._table.body;
+    const table_rows = table.rows;
+    if (currentRowIndex != 0) { // not table top
+      const nextRowIndex = currentRowIndex - 1;
+      console.log('nextRowIndex:', nextRowIndex);
+      const nextRow = table_rows[nextRowIndex];
+      nextRow.cells[currentCellIndex].click();
+    }
+    else {
+      const nextRowIndex = table_rows.length - 1;
+      console.log('nextRowIndex:', nextRowIndex);
+      const nextRow = table_rows[nextRowIndex];
+      nextRow.cells[currentCellIndex].click();
+    }
+    console.log('_processUpArrowKey finished!');
   }
 
   /**

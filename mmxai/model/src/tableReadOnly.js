@@ -1,18 +1,18 @@
 import {create, getCoords, getSideByCoords} from './documentUtils';
-import './styles/table.pcss';
+import './styles/tableReadOnly.pcss';
 
 const CSS = {
-  table: 'tc-table',
-  inputField: 'tc-table__inp',
-  cell: 'tc-table__cell',
-  wrapper: 'tc-table__wrap',
-  area: 'tc-table__area',
+  table: 'tc-readOnlyTable',
+  inputField: 'tc-readOnlyTable__inp',
+  cell: 'tc-readOnlyTable__cell',
+  wrapper: 'tc-readOnlyTable__wrap',
+  area: 'tc-readOnlyTable__area',
 };
 
 /**
  * Generates and manages _table contents.
  */
-export class Table {
+export class TableReadOnly {
   /**
    * Creates
    */
@@ -22,7 +22,8 @@ export class Table {
     this._element = this._createTableWrapper();
     this._table = this._element.querySelector('table');
 
-    this._hangEvents();
+    // comment by xiaowy 2020/09/21
+    // this._hangEvents();
   }
 
   /**
@@ -98,8 +99,6 @@ export class Table {
    * @return {HTMLElement} tbody - where rows will be
    */
   _createTableWrapper() {
-    // add by xiaowy 2020/09/21
-    // const brEle = document.createElement('br');
     return create('div', [CSS.wrapper], null, [create('table', [CSS.table])]);
   }
 
@@ -110,7 +109,9 @@ export class Table {
    * @return {HTMLElement} - the area
    */
   _createContenteditableArea() {
-    return create('div', [CSS.inputField], {contenteditable: 'true'});
+    // comment and modify by xiaowy 2020/09/21
+    // return create('div', [CSS.inputField], {contenteditable: 'true'});
+    return create('div', [CSS.inputField], {contenteditable: 'false'});
   }
 
   /**
@@ -146,9 +147,11 @@ export class Table {
    * hang necessary events
    */
   _hangEvents() {
+    
     this._table.addEventListener('focus', (event) => {
       this._focusEditField(event);
     }, true);
+    
 
     this._table.addEventListener('blur', (event) => {
       this._blurEditField(event);
@@ -175,13 +178,10 @@ export class Table {
    * @param {FocusEvent} event
    */
   _focusEditField(event) {
-    console.log('Enter _focusEditField');
     if (!event.target.classList.contains(CSS.inputField)) {
       return;
     }
     this._selectedCell = event.target.closest('.' + CSS.cell);
-    console.log('selected cell index:', this._selectedCell.cellIndex);
-    console.log('_focusEditField finished!');
   }
 
   /**
@@ -204,18 +204,10 @@ export class Table {
    * @param {KeyboardEvent} event
    */
   _pressedEnterInEditField(event) {
-    let keycodes = [37, 38, 39, 40, 9]; // 9 is TAB
-    // console.log(event.keyCode);
     if (!event.target.classList.contains(CSS.inputField)) {
       return;
     }
     if (event.keyCode === 13 && !event.shiftKey) {
-      event.preventDefault();
-    }
-    // 处理新需求，单元格跳转 xiaowy 2020/09/22
-    else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey)
-    {
-      // console.log(event.keyCode);
       event.preventDefault();
     }
   }
