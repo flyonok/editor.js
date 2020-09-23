@@ -29,18 +29,17 @@ export class TableConstructor {
     // if (data && data.title) {
     this._titleWrapper = document.createElement('div');
     this._descTitle = document.createElement('H3');
-    if (data.name !== undefined )
-    {
+    if (data.name !== undefined) {
       // this._descTitle.innerHTML = '【' + data.name + '】';
       this._descTitle.innerHTML = data.name;
     }
-    else
-    {
+    else {
       this._descTitle.innerHTML = '【造型】';
     }
-    this._descTitle.classList.add('mmxParameterDecsTitle');
-    this._descTitle.appendChild(document.createElement('br'));
+    this._descTitle.classList.add('mmxModelDecsTitle');
+    // this._descTitle.appendChild(document.createElement('br'));
     this._titleWrapper.appendChild(this._descTitle);
+    this._titleWrapper.appendChild(document.createElement('br'));
     // }
     // end
     // add by xiaowy 同时融合单击和双击事件
@@ -85,7 +84,7 @@ export class TableConstructor {
    */
   _makeReadOnlyTable() {
     // overwrite config
-    let config = {rows:'1', cols:'2'};
+    let config = { rows: '1', cols: '2' };
     this._readOnlyTable = new TableReadOnly();
     let data = { content: [['元素名称', '内容']] };
     const size = this._resizeReadOnlyTable(data, config);
@@ -169,8 +168,8 @@ export class TableConstructor {
     const defaultRows = 2;
     const defaultCols = 2;
     */
-   const defaultRows = 1;
-   const defaultCols = 2;
+    const defaultRows = 1;
+    const defaultCols = 2;
     const rows = contentRows || configRows || defaultRows;
     const cols = contentCols || configCols || defaultCols;
 
@@ -269,7 +268,7 @@ export class TableConstructor {
       // added by xiaowy 2020/09/19
       clearTimeout(this._clickTimeId);
       let that = this;
-      this._clickTimeId = setTimeout(function() {
+      this._clickTimeId = setTimeout(function () {
         that._clickToolbar(event);
       }, 250);
       // end
@@ -349,8 +348,7 @@ export class TableConstructor {
    */
   _isToolbar(elem) {
     // add by xiaowy 2020/09/21
-    if (elem === null)
-    {
+    if (elem === null) {
       return null;
     }
     return !!(elem.closest('.' + CSS.toolBarHor) || elem.closest('.' + CSS.toolBarVer));
@@ -477,8 +475,7 @@ export class TableConstructor {
       this._containerEnterPressed(event);
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
-    else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey)
-    {
+    else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
       console.log(event.keyCode);
       this._containerArrowKeyPressed(event);
     }
@@ -580,9 +577,12 @@ export class TableConstructor {
    * @private
    *
    * if "cntrl + Eneter" is pressed then create new line under current and focus it
+   * 该方法不适合造型组件，因为造型组件表格主要是方便用户浏览修改，而不是增加行，所以enter的功能
+   * 和下箭头类似。xiaowy 2020/09/23
+   * _containerEnterPressed => _containerEnterPressedOld
    * @param {KeyboardEvent} event
    */
-  _containerEnterPressed(event) {
+  _containerEnterPressedOld(event) {
     console.log('Enter _containerEnterPressed');
     if (!(this._table.selectedCell !== null && !event.shiftKey)) {
       return;
@@ -603,7 +603,7 @@ export class TableConstructor {
     // 原有代码结束
     const currentRowIndex = indicativeRow.sectionRowIndex;
     const currentCellIndex = this._table.selectedCell.cellIndex;
-    if (currentRowIndex == this._table.body.rows.length - 1 && 
+    if (currentRowIndex == this._table.body.rows.length - 1 &&
       currentCellIndex == indicativeRow.cells.length - 1) { // table 的尾部且在最后一列
       // if (index === 1) {
       //   index = indicativeRow.sectionRowIndex + 1;
@@ -612,25 +612,40 @@ export class TableConstructor {
       const newstr = this._table.addRow(index);
 
       newstr.cells[0].click();
-  }
-  else {
-    if (currentCellIndex < indicativeRow.cells.length - 1) {
-      // let paraent = this._table.selectedCell.paraent;
-      // console.log(indicativeRow);
-      // paraent.cells[1].click();
-      indicativeRow.cells[currentCellIndex + 1].click();
     }
-    else{
-      let table = this._table.body;
-      let row = table.rows[currentRowIndex + 1]
-      // console.log(row);
-      if (row !== null && row !== undefined) {
-        row.cells[0].click();
+    else {
+      if (currentCellIndex < indicativeRow.cells.length - 1) {
+        // let paraent = this._table.selectedCell.paraent;
+        // console.log(indicativeRow);
+        // paraent.cells[1].click();
+        indicativeRow.cells[currentCellIndex + 1].click();
+      }
+      else {
+        let table = this._table.body;
+        let row = table.rows[currentRowIndex + 1]
+        // console.log(row);
+        if (row !== null && row !== undefined) {
+          row.cells[0].click();
+        }
       }
     }
-  }
     event.preventDefault();
     event.stopPropagation();
+    console.log('_containerEnterPressed finished!');
+  }
+
+  /**
+   * @private
+   * process Enter key function, see _containerEnterPressOld
+   * @param {KeyboardEvent} event
+   * added by xiaowy 2020/09/23
+   */
+  _containerEnterPressed(event) {
+    console.log('Enter _containerEnterPressed');
+    if (!(this._table.selectedCell !== null && !event.shiftKey)) {
+      return;
+    }
+    this._processDownArrowKey(event);
     console.log('_containerEnterPressed finished!');
   }
 
@@ -644,7 +659,7 @@ export class TableConstructor {
     if (!(this._table.selectedCell !== null && !event.shiftKey && !event.ctrlKey && !event.altKey)) {
       return;
     }
-    switch(event.keyCode) {
+    switch (event.keyCode) {
       case 37: // left arrow key
         this._processLeftArrowKey(event);
         break;
@@ -733,14 +748,14 @@ export class TableConstructor {
         cells[currentCellIndex - 1].click();
       }
     }
-    else{
+    else {
       const cells = indicativeRow.cells;
       if (currentCellIndex == 0) { // 左边列
         console.log('move up');
         const previous_row = table_rows[currentRowIndex - 1];
         previous_row.cells[previous_row.cells.length - 1].click();
       }
-      else{
+      else {
         console.log('move left');
         cells[currentCellIndex - 1].click();
       }
