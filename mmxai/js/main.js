@@ -145,6 +145,7 @@ const mmxai = function (module) {
                     "type": "model",
                     "data": {
                         "content": [
+
                             [
                                 "性别",
                                 "0"
@@ -161,6 +162,7 @@ const mmxai = function (module) {
                                 "地址",
                                 "4"
                             ]
+
                         ]
                     }
                 },
@@ -191,10 +193,10 @@ const mmxai = function (module) {
                     }
                 },
                 {
-                    "type" : "paramter",
-                    "data" : {
+                    "type": "paramter",
+                    "data": {
                         "name": "【页面参数】",
-                        "content" : [
+                        "content": [
                             [
                                 "高：",
                                 "10"
@@ -237,29 +239,29 @@ const mmxai = function (module) {
     背景和全局参数页面
     */
     function processOtherPage(obj) {
-        
+
     }
 
     /*
     分页板块:使用header--level 2
     */
-   function processPageBlock(obj) {
+    function processPageBlock(obj) {
 
-   }
+    }
 
-   /*
-   图片板块：使用simple-image-editorjs
-   */
-   function processImageBlock(obj) {
+    /*
+    图片板块：使用simple-image-editorjs
+    */
+    function processImageBlock(obj) {
 
-   }
+    }
 
-   /*
-   参数板块:在已有的Table插件上改造而成
-   */
-  function processParameterBlock(obj) {
+    /*
+    参数板块:在已有的Table插件上改造而成
+    */
+    function processParameterBlock(obj) {
 
-  }
+    }
 
     /*
     演示如何分析word版的json数据，构建block集合

@@ -3,13 +3,15 @@ import { create, getCoords, getSideByCoords } from './documentUtils';
 import { HorizontalBorderToolBar, VerticalBorderToolBar } from './borderToolBar';
 import { Table } from './table';
 import { TableReadOnly } from './tableReadOnly'
+import { ModelHeadTable } from './modelHeadTable'
 
 const CSS = {
   editor: 'tc-editor',
   toolBarHor: 'tc-toolbar--hor',
   toolBarVer: 'tc-toolbar--ver',
   inputField: 'tc-table__inp',
-  readOnlyTable_inputField: 'tc-readOnlyTable__inp' // for readOnlyTable
+  readOnlyTable_inputField: 'tc-readOnlyTable__inp', // for readOnlyTable
+  // headTable_inputField:'tc-headTable__inp'
 };
 
 /**
@@ -53,11 +55,14 @@ export class TableConstructor {
     // modified by xiaowy
     // this._container = create('div', [CSS.editor, api.styles.block], null, [this._table.htmlElement]);
     // added by xiaowy 2020/09/21
-    this._readOnlyTable = new TableReadOnly();
+    // this._readOnlyTable = new TableReadOnly();
     this._makeReadOnlyTable();
     let tablebr = document.createElement('br');
     // end
-    this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
+    this._makeModelHeadTable();
+    console.log('after _makeModelHeadTable');
+    this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
+    // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
     // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
 
     /** creating ToolBars */
@@ -90,6 +95,18 @@ export class TableConstructor {
     const size = this._resizeReadOnlyTable(data, config);
 
     this._fillReadOnlyTable(data, size);
+
+  }
+
+  /**
+   * @private
+   * 构建造型的表头
+   * xiaowy 2020/09/21
+   */
+  _makeModelHeadTable() {
+    // overwrite config
+    // let config = { rows: '1', cols: '2' };
+    this._modelHeadTable = new ModelHeadTable();
 
   }
 
@@ -143,7 +160,7 @@ export class TableConstructor {
     }
   }
 
-  /**
+   /**
    * @private
    *
    * resize to match config or transmitted data
@@ -154,6 +171,7 @@ export class TableConstructor {
    * @return {{rows: number, cols: number}} - number of cols and rows
    */
   _resizeTable(data, config) {
+    console.log(data);
     const isValidArray = Array.isArray(data.content);
     const isNotEmptyArray = isValidArray ? data.content.length : false;
     const contentRows = isValidArray ? data.content.length : undefined;
@@ -179,6 +197,11 @@ export class TableConstructor {
     for (let i = 0; i < cols; i++) {
       this._table.addColumn();
     }
+
+    console.log({
+      rows: rows,
+      cols: cols
+    });
 
     return {
       rows: rows,
