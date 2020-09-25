@@ -2,11 +2,11 @@ import {create, getCoords, getSideByCoords} from './documentUtils';
 import './styles/table.pcss';
 
 const CSS = {
-  table: 'tc-table',
-  inputField: 'tc-table__inp',
-  cell: 'tc-table__cell',
-  wrapper: 'tc-table__wrap',
-  area: 'tc-table__area',
+  table: 'tc-modelTable',
+  inputField: 'tc-modelTable__inp',
+  cell: 'tc-modelTable__cell',
+  wrapper: 'tc-modelTable__wrap',
+  area: 'tc-modelTable__area',
 };
 
 /**

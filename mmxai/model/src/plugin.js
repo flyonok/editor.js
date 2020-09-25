@@ -64,7 +64,7 @@ class MmxModel {
     // modified by xiaowy 2020/09/21
     // const table = toolsContent.querySelector('table');
     const table = toolsContent.querySelector('table.tc-table');
-    console.log(table);
+    // console.log(table);
     const data = [];
     const rows = table.rows;
 

@@ -19,13 +19,9 @@ export class ModelHeadTable {
   /**
    * Creates
    */
-  constructor() {
-    // this._numberOfColumns = 0;
-    // this._numberOfRows = 0;
-    this._element = this._createDivWrapper();
-    // this._table = this._element.querySelector('table');
-
-    // comment by xiaowy 2020/09/21
+  constructor(data, modelSelCallBack = undefined) {
+    this._modelSelCallBack = modelSelCallBack;
+    this._element = this._createDivWrapper(data);
     this._hangEvents();
   }
 
@@ -33,56 +29,62 @@ export class ModelHeadTable {
    * @private
    * 创建整个造型的表头
    */
-  _createDivWrapper()
+  _createDivWrapper(data)
   {
-    let divChild = create('div', [CSS.divHead], null, [ this._createDivType(), this._createDivTitle(), this._createDivAttributes()]);
-    return create('div', [CSS.article, CSS.group], null, [this._createImageAttr(), divChild]);
+    let divChild = create('div', [CSS.divHead], null, [ this._createDivType(data), this._createDivTitle(data), this._createDivAttributes(data)]);
+    return create('div', [CSS.article, CSS.group], null, [this._createImageAttr(data), divChild]);
   }
 
   /**
    * @private
    * 创建属性div元素
    */
-  _createDivAttributes(attrContent='属性用空格分开') {
+  _createDivAttributes(data) {
+    let attrContentDefault = !!data.Tags ? data.tags : '属性用空格分开';
     let labelEle = create('label', null);
     labelEle.innerHTML = '属性：';
-    let labelEle2 = create('label', null);
-    labelEle2.innerHTML = attrContent;
-    return create('div', [CSS.table, CSS.center], null, [labelEle, labelEle2]);
+    this._labelAttrEle = create('label', null);
+    this._labelAttrEle.innerHTML = attrContentDefault;
+    return create('div', [CSS.table, CSS.center], null, [labelEle, this._labelAttrEle]);
   }
 
   /**
    * @private
    * 创建造型缩略图
    */
-  _createImageAttr(img=null) {
-    let imgUrl = !!img || 'http://pics5.baidu.com/feed/37d12f2eb9389b501d36b813d8cd8ddbe5116ea0.jpeg?token=df7edb57e432ea574b33f3ac4e393f6d';
-    return create('img', [CSS.imageRight], {alt: 'img', src:imgUrl});
+  _createImageAttr(data) {
+    let imgUrl = !!data.Thumb ? data.Thumb : 'http://pics5.baidu.com/feed/37d12f2eb9389b501d36b813d8cd8ddbe5116ea0.jpeg?token=df7edb57e432ea574b33f3ac4e393f6d';
+    this._imgEle = create('img', [CSS.imageRight], {alt: 'img', src:imgUrl});
+    return this._imgEle;
   }
 
   /**
    * @private
    * 创建类型div元素
    */
-  _createDivType() {
-    console.log('enter _createDivType');
+  _createDivType(data) {
+    // console.log('enter _createDivType');
     let labelEle = create('label', null, {for:'modelType'});
+    let subName = !!data.Name ? data.Name : '';
     labelEle.innerHTML = '类型：';
-    let inputTxt = create('input', null, {type:'text', name:'modelType'});
-    let inputBtn = create('input', null, {type:'button', name:'selectModel', value:'选择模型...'});
+    this._inputTypeTxt = create('input', null, {type:'text', name:'modelType'});
+    this._inputTypeTxt.value = subName;
+    this._modelSelBtn = create('input', null, {type:'button', name:'selectModel', value:'选择模型...'});
+    // this._modelSelBtn = inputBtn;
     console.log('_createDivType finished!');
-    return create('div', [CSS.table], null, [labelEle, inputTxt, inputBtn]);
+    return create('div', [CSS.table], null, [labelEle, this._inputTypeTxt, this._modelSelBtn]);
     // return divEle;
   }
   /**
    * 创建标题div元素
    */
-  _createDivTitle() {
+  _createDivTitle(data) {
     let labelEle = create('label', null, {for:'modelTitle'});
     labelEle.innerHTML = '内部标题：';
-    let inputTxt = create('input', null, {type:'text', name:'modelTitle',
-                                          placeholder:'造型内部小标题，可空'});
-    return create('div', [CSS.table, CSS.center], null, [labelEle, inputTxt]);
+    let title = !!data.innerTilte ? data.innerTilte : '';
+    this._inputTitleTxt = create('input', null, {type:'text', name:'modelTitle',
+                                          placeholder:'造型内部小标题，可空', value:title});
+    return create('div', [CSS.table, CSS.center], null, [labelEle, this._inputTitleTxt]);
   }
   /**
    * get html element of table
@@ -98,5 +100,27 @@ export class ModelHeadTable {
    * hang necessary events
    */
   _hangEvents() {
+    this._modelSelBtn.addEventListener('click', (event) => {
+      if (this._modelSelCallBack !== undefined) {
+        let returnData = this._modelSelCallBack(event);
+        this._modifyHeadData(returnData);
+      }
+    });
+  }
+
+  /**
+   * @private
+   * 修改造型头的各项数据
+   */
+  _modifyHeadData(data) {
+    if (data.Name) {
+      this._inputTypeTxt.value = data.Name;
+    }
+    if (data.Tags) {
+      this._labelAttrEle.innerHTML = data.Tags;
+    }
+    if (data.Thumb) {
+      this._imgEle.src = data.Thumb;
+    }
   }
 }

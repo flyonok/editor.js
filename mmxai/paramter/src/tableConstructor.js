@@ -8,8 +8,8 @@ const CSS = {
   editor: 'tc-editor',
   toolBarHor: 'tc-toolbar--hor',
   toolBarVer: 'tc-toolbar--ver',
-  inputField: 'tc-table__inp',
-  readOnlyTable_inputField: 'tc-readOnlyTable__inp' // for readOnlyTable
+  inputField: 'tc-paraTable__inp',
+  readOnlyTable_inputField: 'tc-readOnlyParaTable__inp' // for readOnlyTable
 };
 
 /**

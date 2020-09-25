@@ -2,11 +2,11 @@ import {create, getCoords, getSideByCoords} from './documentUtils';
 import './styles/tableReadOnly.pcss';
 
 const CSS = {
-  table: 'tc-readOnlyTable',
-  inputField: 'tc-readOnlyTable__inp',
-  cell: 'tc-readOnlyTable__cell',
-  wrapper: 'tc-readOnlyTable__wrap',
-  area: 'tc-readOnlyTable__area',
+  table: 'tc-readOnlyParaTable',
+  inputField: 'tc-readOnlyParaTable__inp',
+  cell: 'tc-readOnlyParaTable__cell',
+  wrapper: 'tc-readOnlyParaTable__wrap',
+  area: 'tc-readOnlyParaTable__area',
 };
 
 /**

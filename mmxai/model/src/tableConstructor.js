@@ -9,7 +9,7 @@ const CSS = {
   editor: 'tc-editor',
   toolBarHor: 'tc-toolbar--hor',
   toolBarVer: 'tc-toolbar--ver',
-  inputField: 'tc-table__inp',
+  inputField: 'tc-modelTable__inp',
   readOnlyTable_inputField: 'tc-readOnlyTable__inp', // for readOnlyTable
   // headTable_inputField:'tc-headTable__inp'
 };
@@ -25,15 +25,214 @@ export class TableConstructor {
    * @param {object} api - Editor.js API
    */
   constructor(data, config, api) {
-    /** creating table */
-    this._table = new Table();
+    // /** creating table */
+    // this._table = new Table();
+
+    // // }
+    // // end
+    // // add by xiaowy 同时融合单击和双击事件
+    // this._clickTimeId = -1;
+    // // end
+    // const size = this._resizeTable(data, config);
+
+    // this._fillTable(data, size);
+
+    // this._makeModelNameTitle(data);
+
+    // /** creating container around table */
+    // // modified by xiaowy
+    // // this._container = create('div', [CSS.editor, api.styles.block], null, [this._table.htmlElement]);
+    // // added by xiaowy 2020/09/21
+    // // this._readOnlyTable = new TableReadOnly();
+    // this._makeReadOnlyTable();
+    // this._isReadOnlyTableVisible(data);
+    // let tablebr = document.createElement('br');
+    // // end
+    // this._makeModelHeadTable();
+    // // console.log('after _makeModelHeadTable');
+    // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
+    // // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
+    // // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
+
+    // /** creating ToolBars */
+    // this._verticalToolBar = new VerticalBorderToolBar();
+    // this._horizontalToolBar = new HorizontalBorderToolBar();
+    // this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
+    // this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
+
+    // /** Activated elements */
+    // this._hoveredCell = null;
+    // this._activatedToolBar = null;
+    // this._hoveredCellSide = null;
+
+    // /** Timers */
+    // this._plusButDelay = null;
+    // this._toolbarShowDelay = null;
+
+    // this._hangEvents();
+    this._api = api; // add by xiaowy
+    let _innerData = this._cdrJsonConvert(data);
+    console.log('config:',config);
+    this._makeModelTables(_innerData,config);
+  }
+
+  /**
+   * @private
+   * json数据转换
+   * 从cdr的json到内部json
+   */
+  _cdrJsonConvert(cdrData) {
+    // console.log('cdrData ', cdrData)
+    let _innerData = {};
+    if (cdrData.Name) {
+      _innerData.Name = cdrData.Name;
+    }
+    // console.log(cdrData['板块头']);
+    if (cdrData['板块头']) {
+      _innerData.innerTitle = cdrData['板块头']
+    }
+
+    // console.log(cdrData['列表']);
+    if (cdrData['列表']) {
+      _innerData['content'] = [];
+      let arr = cdrData['列表'];
+      if (Array.isArray(arr)) {
+        arr.forEach((item, index) => {
+          // console.log('item:', item);
+          for(let prop in item) {
+            if (item.hasOwnProperty(prop)) {
+              let rowArr = [];
+              console.log('prop:', item[prop])
+              rowArr.push(prop);
+              rowArr.push(item[prop]);
+              console.log('_cdrJsonConvert', rowArr);
+              _innerData['content'].push(rowArr);
+            }
+          }
+        });
+      }
+    }
+    console.log('_innerData content:', _innerData['content']);
+    return _innerData;
+  }
+
+  /**
+   * @private
+   * 生成造型组件的所有表格，包含造型头，readOnlyTable, para table 和 toolbar；
+   * 1、如果不是从构造函数调用来的，要先把this._contaier remove
+   * 然后再构建readOnlyTable, para table 和 toolbar，并依次append；
+   * todo:
+   * 1、实现json适配
+   * 2、实现用户选择
+   */
+
+  _makeModelTables(data, config = null, fromContructor = true) {
+    let dataNotEmpty = false;
+    // add by xiaowy 同时融合单击和双击事件
+    this._clickTimeId = -1;
+    if (config === null || config === undefined) {
+      config = { rows: '1', cols: '2' };
+    }
+    for (let prop in data) {
+      if (data.hasOwnProperty(prop)) {
+        dataNotEmpty = true;
+        break;
+      }
+    }
+    if (dataNotEmpty && fromContructor) {
+      this._makeModelNameTitle(data); // 造型标题
+      console.log('after _makeModelNameTitle');
+      this._makeModelHeadTable(data); // 造型头
+      console.log('after _makeModelHeadTable');
+      this._makeReadOnlyTable(); // 造型表格头
+      console.log('after _makeReadOnlyTable');
+      // 造型表格和其他组件的换行
+      // 具体的造型参数
+      this._table = new Table();
+      const size = this._resizeTable(data, config);
+
+      this._fillTable(data, size);
+      let tablebr = document.createElement('br'); 
+      // 构建造型容器
+      this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
+      // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
+      // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
+
+      /** creating ToolBars */
+      this._verticalToolBar = new VerticalBorderToolBar();
+      this._horizontalToolBar = new HorizontalBorderToolBar();
+      this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
+      this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
+
+      /** Activated elements */
+      this._hoveredCell = null;
+      this._activatedToolBar = null;
+      this._hoveredCellSide = null;
+
+      /** Timers */
+      this._plusButDelay = null;
+      this._toolbarShowDelay = null;
+
+      this._hangEvents();
+    }
+    else if(!dataNotEmpty && fromContructor) { // 如果没有具体的造型参数数据
+      this._makeModelNameTitle(data); // 造型标题
+      this._makeModelHeadTable(data); // 造型头
+      this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement]);
+    }
+    else if (dataNotEmpty && !fromContructor){
+      /**
+       * 这里要实现用户选择具体造型的情况
+       */
+    }
+    else {
+      console.log('not implemented!');
+    }
+  }
+
+  /**
+   * @private
+   * 设置参数表头readOnlyTable是否可见
+   * @param {Object} data: 造型参数数据集合
+   */
+  _isReadOnlyTableVisible(data) {
+    console.log("_isReadOnlyTableVisible:", data);
+    let dataNotEmpty = false;
+    for (let prop in data) {
+      if (data.hasOwnProperty(prop)) {
+        dataNotEmpty = true;
+        break;
+      }
+    }
+    if (!dataNotEmpty) {
+      this._readOnlyTable.htmlElement.classList.remove('mmxReadOnlyTableVisible');
+      this._readOnlyTable.htmlElement.classList.add('mmxReadOnlyTableInvisible');
+    }
+    else {
+      this._readOnlyTable.htmlElement.classList.remove('mmxReadOnlyTableInvisible');
+      this._readOnlyTable.htmlElement.classList.add('mmxReadOnlyTableVisible');
+    }
+  }
+
+  /**
+   * @private
+   * 构造造型大标题
+   */
+  _makeModelNameTitle(data) {
     // add by xiaowy 增加参数说明 2020/09/19,造型不需要增加注解
     // if (data && data.title) {
     this._titleWrapper = document.createElement('div');
     this._descTitle = document.createElement('H3');
-    if (data.name !== undefined) {
+    // let name = undefined;
+    // for (prop in data) {
+    //   if (data.hasOwnProperty(prop)){
+    //     name = prop;
+    //     break;
+    //   }
+    // }
+    if (data.Name !== undefined) {
       // this._descTitle.innerHTML = '【' + data.name + '】';
-      this._descTitle.innerHTML = data.name;
+      this._descTitle.innerHTML = data.Name;
     }
     else {
       this._descTitle.innerHTML = '【造型】';
@@ -42,45 +241,6 @@ export class TableConstructor {
     // this._descTitle.appendChild(document.createElement('br'));
     this._titleWrapper.appendChild(this._descTitle);
     this._titleWrapper.appendChild(document.createElement('br'));
-    // }
-    // end
-    // add by xiaowy 同时融合单击和双击事件
-    this._clickTimeId = -1;
-    // end
-    const size = this._resizeTable(data, config);
-
-    this._fillTable(data, size);
-
-    /** creating container around table */
-    // modified by xiaowy
-    // this._container = create('div', [CSS.editor, api.styles.block], null, [this._table.htmlElement]);
-    // added by xiaowy 2020/09/21
-    // this._readOnlyTable = new TableReadOnly();
-    this._makeReadOnlyTable();
-    let tablebr = document.createElement('br');
-    // end
-    this._makeModelHeadTable();
-    console.log('after _makeModelHeadTable');
-    this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
-    // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
-    // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
-
-    /** creating ToolBars */
-    this._verticalToolBar = new VerticalBorderToolBar();
-    this._horizontalToolBar = new HorizontalBorderToolBar();
-    this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
-    this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
-
-    /** Activated elements */
-    this._hoveredCell = null;
-    this._activatedToolBar = null;
-    this._hoveredCellSide = null;
-
-    /** Timers */
-    this._plusButDelay = null;
-    this._toolbarShowDelay = null;
-
-    this._hangEvents();
   }
 
   /**
@@ -103,10 +263,10 @@ export class TableConstructor {
    * 构建造型的表头
    * xiaowy 2020/09/21
    */
-  _makeModelHeadTable() {
+  _makeModelHeadTable(data) {
     // overwrite config
     // let config = { rows: '1', cols: '2' };
-    this._modelHeadTable = new ModelHeadTable();
+    this._modelHeadTable = new ModelHeadTable(data);
 
   }
 
@@ -160,18 +320,18 @@ export class TableConstructor {
     }
   }
 
-   /**
-   * @private
-   *
-   * resize to match config or transmitted data
-   * @param {TableData} data - data for inserting to the table
-   * @param {object} config - configuration of table
-   * @param {number|string} config.rows - number of rows in configuration
-   * @param {number|string} config.cols - number of cols in configuration
-   * @return {{rows: number, cols: number}} - number of cols and rows
-   */
+  /**
+  * @private
+  *
+  * resize to match config or transmitted data
+  * @param {TableData} data - data for inserting to the table
+  * @param {object} config - configuration of table
+  * @param {number|string} config.rows - number of rows in configuration
+  * @param {number|string} config.cols - number of cols in configuration
+  * @return {{rows: number, cols: number}} - number of cols and rows
+  */
   _resizeTable(data, config) {
-    console.log(data);
+    console.log(data.content);
     const isValidArray = Array.isArray(data.content);
     const isNotEmptyArray = isValidArray ? data.content.length : false;
     const contentRows = isValidArray ? data.content.length : undefined;
