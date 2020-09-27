@@ -19,9 +19,10 @@ export class ModelHeadTable {
   /**
    * Creates
    */
-  constructor(data, modelSelCallBack = undefined) {
+  constructor(data, modelSelCallBack = undefined, parent = null) {
     this._modelSelCallBack = modelSelCallBack;
     this._element = this._createDivWrapper(data);
+    this._parent = parent;
     this._hangEvents();
   }
 
@@ -53,7 +54,7 @@ export class ModelHeadTable {
    * 创建造型缩略图
    */
   _createImageAttr(data) {
-    let imgUrl = !!data.Thumb ? data.Thumb : 'http://pics5.baidu.com/feed/37d12f2eb9389b501d36b813d8cd8ddbe5116ea0.jpeg?token=df7edb57e432ea574b33f3ac4e393f6d';
+    let imgUrl = !!data.Thumb ? data.Thumb : './assets/dog1.jpg';
     this._imgEle = create('img', [CSS.imageRight], {alt: 'img', src:imgUrl});
     return this._imgEle;
   }
@@ -102,7 +103,7 @@ export class ModelHeadTable {
   _hangEvents() {
     this._modelSelBtn.addEventListener('click', (event) => {
       if (this._modelSelCallBack !== undefined) {
-        let returnData = this._modelSelCallBack(event);
+        let returnData = this._modelSelCallBack(event, this._parent);
         this._modifyHeadData(returnData);
       }
     });

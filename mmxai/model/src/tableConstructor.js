@@ -72,8 +72,8 @@ export class TableConstructor {
     // this._hangEvents();
     this._api = api; // add by xiaowy
     let _innerData = this._cdrJsonConvert(data);
-    console.log('config:',config);
-    this._makeModelTables(_innerData,config);
+    console.log('config:', config);
+    this._makeModelTables(_innerData, config);
   }
 
   /**
@@ -99,7 +99,7 @@ export class TableConstructor {
       if (Array.isArray(arr)) {
         arr.forEach((item, index) => {
           // console.log('item:', item);
-          for(let prop in item) {
+          for (let prop in item) {
             if (item.hasOwnProperty(prop)) {
               let rowArr = [];
               console.log('prop:', item[prop])
@@ -112,7 +112,7 @@ export class TableConstructor {
         });
       }
     }
-    console.log('_innerData content:', _innerData['content']);
+    console.log('_innerData:', _innerData);
     return _innerData;
   }
 
@@ -152,7 +152,7 @@ export class TableConstructor {
       const size = this._resizeTable(data, config);
 
       this._fillTable(data, size);
-      let tablebr = document.createElement('br'); 
+      let tablebr = document.createElement('br');
       // 构建造型容器
       this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
       // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
@@ -175,15 +175,20 @@ export class TableConstructor {
 
       this._hangEvents();
     }
-    else if(!dataNotEmpty && fromContructor) { // 如果没有具体的造型参数数据
+    else if (!dataNotEmpty && fromContructor) { // 如果没有具体的造型参数数据
       this._makeModelNameTitle(data); // 造型标题
       this._makeModelHeadTable(data); // 造型头
       this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement]);
     }
-    else if (dataNotEmpty && !fromContructor){
+    else if (dataNotEmpty && !fromContructor) {
       /**
        * 这里要实现用户选择具体造型的情况
        */
+      if (this._readOnlyTable === undefined) {
+        this._makeReadOnlyTable();
+        this._container.appendChild(this._readOnlyTable.htmlElement)
+      }
+      this._recontructParaTable(data);
     }
     else {
       console.log('not implemented!');
@@ -231,8 +236,8 @@ export class TableConstructor {
     //   }
     // }
     if (data.Name !== undefined) {
-      // this._descTitle.innerHTML = '【' + data.name + '】';
-      this._descTitle.innerHTML = data.Name;
+      this._descTitle.innerHTML = '【' + data.Name + '】';
+      // this._descTitle.innerHTML = data.Name;
     }
     else {
       this._descTitle.innerHTML = '【造型】';
@@ -266,7 +271,7 @@ export class TableConstructor {
   _makeModelHeadTable(data) {
     // overwrite config
     // let config = { rows: '1', cols: '2' };
-    this._modelHeadTable = new ModelHeadTable(data);
+    this._modelHeadTable = new ModelHeadTable(data, this._getModelDataFromDbDemo, this);
 
   }
 
@@ -331,7 +336,7 @@ export class TableConstructor {
   * @return {{rows: number, cols: number}} - number of cols and rows
   */
   _resizeTable(data, config) {
-    console.log(data.content);
+    console.log('_resizeTable',data.content);
     const isValidArray = Array.isArray(data.content);
     const isNotEmptyArray = isValidArray ? data.content.length : false;
     const contentRows = isValidArray ? data.content.length : undefined;
@@ -358,10 +363,10 @@ export class TableConstructor {
       this._table.addColumn();
     }
 
-    console.log({
-      rows: rows,
-      cols: cols
-    });
+    // console.log({
+    //   rows: rows,
+    //   cols: cols
+    // });
 
     return {
       rows: rows,
@@ -1027,5 +1032,183 @@ export class TableConstructor {
       },
       'bubbles': true
     }));
+  }
+
+  /**
+   * @private
+   * 模拟从华安那边获取造型数据
+   *  @param {ElementEvent} event:回调的惯用法
+   * @param {TableContructor} that:回调的惯用法
+   * added by xiaowy 2020/09/27
+   */
+  _getModelDataFromDbDemo(event, that) {
+    const modelDataObj = [
+      {
+        Name: '正文',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '正文',
+        Tags: '正文 智能 自动',
+        Thumb: './assets/dog1.jpg'
+      },
+      {
+        Name: '项目符号',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '正文',
+        Tags: '项目符号 编号 智能 自动',
+        Thumb: './assets/dog2.jpg'
+      },
+      {
+        Name: '页标题',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '标题 副标题 引标',
+        Tags: '页标题 标题 智能 自动',
+        Thumb: './assets/dog3.jpg'
+      },
+      {
+        Name: '封面标题',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '标题 副标题 口号 引标',
+        Tags: '封面标题 封面 标题 智能 自动',
+        Thumb: './assets/dog4.jpg'
+      },
+      {
+        Name: '小节',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '标题',
+        Tags: '小节 标题 智能 自动',
+        Thumb: './assets/dog4.jpg'
+      },
+      {
+        Name: '列表',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '标题 正文 图片',
+        Tags: '列表 特性 卖点 排列 智能 自动',
+        Thumb: './assets/dog5.jpg'
+      },
+      {
+        Name: '编号',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '标题 正文 图片',
+        Tags: '编号 排列 数字 智能 自动',
+        Thumb: './assets/dog6.jpg'
+      },
+      {
+        Name: '图片',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '图片',
+        Tags: '图片 智能 自动',
+        Thumb: './assets/dog6.jpg'
+      },
+      {
+        Name: 'logo',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '图片 标题 副标题 引标',
+        Tags: 'logo 公司名称 智能 自动',
+        Thumb: './assets/dog7.jpg'
+      },
+      {
+        Name: '二维码',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '图片',
+        Tags: '二维码 扫码 智能 自动',
+        Thumb: './assets/dog8.jpg'
+      },
+      {
+        Name: '地址',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '图片 正文',
+        Tags: '地址 联系方式 电话 公司地址 智能 自动',
+        Thumb: './assets/dog9.jpg'
+      },
+      {
+        Name: '强调',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '正文',
+        Tags: '强调 文字 智能 自动',
+        Thumb: './assets/dog9.jpg'
+      },
+      {
+        Name: '时间线',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '图片 标题 正文',
+        Tags: '时间线 智能 自动',
+        Thumb: './assets/dog10.jpg'
+      },
+      {
+        Name: '图片集',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '图片 标题 正文',
+        Tags: '图片集 图片 logo墙 人员介绍 合作伙伴 智能 自动',
+        Thumb: './assets/dog11.jpg'
+      }
+    ]
+    let rnd = Math.random() * 11
+    const index = Math.floor(rnd)
+    // demo select
+    alert('select ' + index);
+    const obj = modelDataObj[index];
+    console.log('_getModelDataFromDbDemo:', obj);
+    // that._recontructParaTable(obj);
+    that._makeModelTables(obj, null, false);
+    return obj;
+  }
+
+  /**
+   * @private
+   * 重构参数表格
+   * @param {modelObjectInformation} modelObj
+   */
+  _recontructParaTable(modelObj) {
+    if (modelObj.Name) {
+      this._descTitle.innerHTML = '【' + modelObj.Name + '】';
+    }
+    const fields = modelObj.Fields;
+    let fieldArr = fields.split(' ');
+    if (fieldArr.length > 0) {
+      // check table  is empty
+      if (this._table === undefined) {
+        this._table = new Table();
+        this._container.appendChild(this._table.htmlElement);
+      }
+      else {
+        // let paraRows = !!this._table.body.rows ? this._table.body.rows : []
+        // console.log('paraRows1:', paraRows);
+        // paraRows = !!paraRows? paraRows : []; 
+        // console.log('paraRows:', paraRows);
+        while (this._table.rows > 0) {
+          this._table.delRow();
+        }
+      }
+      let data = {};
+      data.content = [];
+      fieldArr.forEach((item, index) => {
+        let temp = item.trim();
+        if(temp.length === 0) {
+          return;
+        }
+        let objArr = [];
+        objArr.push(temp);
+        objArr.push(' ');
+        data.content.push(objArr);
+      });
+      let config = { rows: fieldArr.length, cols: 2 }
+      const size = this._resizeTable(data, config);
+      this._fillTable(data, size);
+
+    }
   }
 }

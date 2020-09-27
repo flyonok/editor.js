@@ -64,6 +64,10 @@ export class Table {
     if (index >= this._numberOfRows) return;
     this._table.deleteRow(index);
     this._numberOfRows--;
+    // add by xiaowy
+    if (this._numberOfRows === 0) {
+      this._numberOfColumns = 0;
+    }
   };
 
 
@@ -81,6 +85,14 @@ export class Table {
    */
   get body() {
     return this._table;
+  }
+
+  /**
+   * get rows of table
+   * @return number
+   */
+  get rows() {
+    return this._numberOfRows;
   }
 
   /**
@@ -114,10 +126,34 @@ export class Table {
   /**
    * @private
    *
+   * Create editable area of cell
+   * @return {HTMLElement} - the area
+   */
+  _createContentReadOnlyArea() {
+    return create('div', [CSS.inputField], {contenteditable: 'false'});
+  }
+
+  /**
+   * @private
+   *
    * Fills the empty cell of the editable area
    * @param {HTMLElement} cell - empty cell
    */
   _fillCell(cell) {
+    cell.classList.add(CSS.cell);
+    const content = this._createContenteditableArea();
+
+    cell.appendChild(create('div', [CSS.area], null, [content]));
+  }
+
+   /**
+   * @private
+   *
+   * Fills the empty cell of the readonly area
+   * @param {HTMLElement} cell - empty cell
+   * added by xiaowy 2020/09/27
+   */
+  _fillReadOnlyCell(cell) {
     cell.classList.add(CSS.cell);
     const content = this._createContenteditableArea();
 
@@ -131,6 +167,7 @@ export class Table {
    * @param row = the empty row
    */
   _fillRow(row) {
+    // console.log('_fillRow:', this._numberOfColumns);
     for (let i = 0; i < this._numberOfColumns; i++) {
       const cell = row.insertCell();
 
