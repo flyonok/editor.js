@@ -2,7 +2,7 @@ const TableConstructor = require('./tableConstructor').TableConstructor;
 const svgIcon = require('./img/toolboxIcon.svg');
 
 const CSS = {
-  input: 'tc-table__inp'
+  input: 'tc-paraTable__inp'
 };
 
 /**
@@ -63,7 +63,8 @@ class MmxParameter {
   save(toolsContent) {
     // modified by xiaowy 2020/09/21
     // const table = toolsContent.querySelector('table');
-    const table = toolsContent.querySelector('table.tc-table');
+    console.log(toolsContent);
+    const table = toolsContent.querySelector('table.tc-paraTable');
     console.log(table);
     const data = [];
     const rows = table.rows;

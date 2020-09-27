@@ -36,7 +36,10 @@ export class Table {
 
     for (let i = 0; i < rows.length; i++) {
       const cell = rows[i].insertCell(index);
-
+      if (this._numberOfColumns === 1) {
+        this._fillReadOnlyCell(cell);
+        continue;
+      }
       this._fillCell(cell);
     }
   };
@@ -154,8 +157,9 @@ export class Table {
    * added by xiaowy 2020/09/27
    */
   _fillReadOnlyCell(cell) {
+    console.log('call _fillReadOnlyCell');
     cell.classList.add(CSS.cell);
-    const content = this._createContenteditableArea();
+    const content = this._createContentReadOnlyArea();
 
     cell.appendChild(create('div', [CSS.area], null, [content]));
   }
@@ -170,7 +174,10 @@ export class Table {
     // console.log('_fillRow:', this._numberOfColumns);
     for (let i = 0; i < this._numberOfColumns; i++) {
       const cell = row.insertCell();
-
+      if (i === 0) {
+        this._fillReadOnlyCell(cell);
+        continue;
+      }
       this._fillCell(cell);
     }
   }

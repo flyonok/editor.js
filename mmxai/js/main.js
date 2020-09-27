@@ -77,7 +77,7 @@ const mmxai = function (module) {
                 shortcut: 'CMD+ALT+M'
             },
 
-            paramter: {
+            parameter: {
                 class: MmxParameter,
                 inlineToolbar: true,
                 shortcut: 'CMD+ALT+P'
@@ -178,7 +178,7 @@ const mmxai = function (module) {
                     }
                 },
                 {
-                    "type": "paramter",
+                    "type": "parameter",
                     "data": {
                         "name": "【页面参数】",
                         "content": [
