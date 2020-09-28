@@ -95,10 +95,17 @@ export class TableConstructor {
     // console.log(cdrData['列表']);
     if (cdrData['列表']) {
       _innerData['content'] = [];
+      // 对象分隔符，要对应具体的行号
+      _innerData['contentSeprateIndex'] = [];
       let arr = cdrData['列表'];
+      // todo:处理列表中有多个对象的问题
       if (Array.isArray(arr)) {
+        let repeatRowIndex = 0;
         arr.forEach((item, index) => {
           // console.log('item:', item);
+          if (repeatRowIndex > 0) {
+            _innerData['contentSeprateIndex'].push(repeatRowIndex);
+          }
           for (let prop in item) {
             if (item.hasOwnProperty(prop)) {
               let rowArr = [];
@@ -109,6 +116,7 @@ export class TableConstructor {
               _innerData['content'].push(rowArr);
             }
           }
+          repeatRowIndex++;
         });
       }
     }
@@ -336,7 +344,7 @@ export class TableConstructor {
   * @return {{rows: number, cols: number}} - number of cols and rows
   */
   _resizeTable(data, config) {
-    console.log('_resizeTable',data.content);
+    console.log('_resizeTable', data.contentSeprateIndex);
     const isValidArray = Array.isArray(data.content);
     const isNotEmptyArray = isValidArray ? data.content.length : false;
     const contentRows = isValidArray ? data.content.length : undefined;
@@ -355,8 +363,17 @@ export class TableConstructor {
     const defaultCols = 2;
     const rows = contentRows || configRows || defaultRows;
     const cols = contentCols || configCols || defaultCols;
+    // contentSeprateIndexColl = data.contentSeprateIndex;
+    console.log('set objSepIndexColl');
+    this._table.objSepIndexColl = data.contentSeprateIndex;
 
     for (let i = 0; i < rows; i++) {
+      // if (contentSeprateIndexColl.indexOf() > -1) {
+      //   this._table.addRow(-1, true);
+      // }
+      // else {
+      //   this._table.addRow();
+      // }
       this._table.addRow();
     }
     for (let i = 0; i < cols; i++) {
@@ -748,6 +765,7 @@ export class TableConstructor {
    * @private
    *
    * Adds column in table
+   * 暂时不用该功能
    */
   _addColumn() {
     let index = this._getHoveredSideOfContainer();
@@ -1151,7 +1169,7 @@ export class TableConstructor {
         Name: '图片集',
         SubName: '智能选择',
         Info: '自动选择造型',
-        Fields: '图片 标题 正文',
+        Fields: '图片 标题 正文 图片 标题 正文',
         Tags: '图片集 图片 logo墙 人员介绍 合作伙伴 智能 自动',
         Thumb: './assets/dog11.jpg'
       }
@@ -1160,7 +1178,9 @@ export class TableConstructor {
     const index = Math.floor(rnd)
     // demo select
     alert('select ' + index);
-    const obj = modelDataObj[index];
+    // for debug
+    // const obj = modelDataObj[index];
+    const obj = modelDataObj[modelDataObj.length - 1];
     console.log('_getModelDataFromDbDemo:', obj);
     // that._recontructParaTable(obj);
     that._makeModelTables(obj, null, false);
@@ -1195,20 +1215,136 @@ export class TableConstructor {
       }
       let data = {};
       data.content = [];
+      data.contentSeprateIndex = [];
+      let isFielsRepeat = this._checkFiledsIsRepeat(modelObj.Fields);
+      let objSepIndex = 0;
       fieldArr.forEach((item, index) => {
         let temp = item.trim();
-        if(temp.length === 0) {
+        if (temp.length === 0) {
           return;
         }
         let objArr = [];
         objArr.push(temp);
         objArr.push(' ');
         data.content.push(objArr);
+        // fields is repeat
+        if (isFielsRepeat.isRepeat && temp === isFielsRepeat.repeatWords) {
+          data.contentSeprateIndex.push(objSepIndex);
+        }
+        objSepIndex++;
       });
       let config = { rows: fieldArr.length, cols: 2 }
       const size = this._resizeTable(data, config);
       this._fillTable(data, size);
 
+    }
+  }
+
+  /**
+   * @private
+   * check selected model object fileds is all repeat
+   * 检查整个字符串是否完全重复
+   */
+  _checkFiledsIsRepeat(fields) {
+    let fieldsArr = fields.split(' ');
+    // find first words(not empty)
+    let firstsub = undefined;
+    for (let i = 0; i < fieldsArr.length; i++) {
+      if (fieldsArr[i].trim().length != 0) {
+        firstsub = fieldsArr[i];
+        break;
+      }
+    }
+    if (firstsub !== undefined) {
+      let findIndexColl = [];
+      let findIndex = fields.indexOf(firstsub);
+      // collect all find index
+      while (findIndex != -1) {
+        findIndexColl.push(findIndex);
+        findIndex = fields.indexOf(firstsub, findIndex + 1);
+      }
+      // check find collect substring
+      if (findIndexColl.length >= 2 && findIndexColl[0] === 0) {
+        let firstSubIndex = findIndexColl[0];
+        let subStringColl = [];
+        let subStringLenth = 0;
+        let firstSubString = ' ';
+        // let secondSubStringLength = 0;
+        for (let j = 1; j < findIndexColl.length; j++) {
+          if (j == 1 && j == findIndexColl.length - 1) {
+            subStringLenth = findIndexColl[j] - firstSubIndex;
+            firstSubString = fields.substring(firstSubIndex, findIndexColl[j]);
+            let last = fields.substring(findIndexColl[j]);
+            if (last.trim() != firstSubString.trim()) {
+              return {
+                isRepeat: false,
+                repeatWords: firstsub
+              };
+            }
+            else {
+              return {
+                isRepeat: true,
+                repeatWords: firstsub
+              };
+            }
+            // firstSubIndex = findIndexColl[j];
+            // subStringColl.push(firstSubString);
+          }
+          else if (j == 1) {
+            subStringLenth = findIndexColl[j] - firstSubIndex;
+            firstSubString = fields.substring(firstSubIndex, findIndexColl[j]);
+          }
+          else {
+            if ((findIndexColl[j] - firstSubIndex) != subStringLenth) {
+              return {
+                isRepeat: false,
+                repeatWords: firstsub
+              };
+            }
+            let temp = firstSubString;
+            firstSubString = fields.substring(firstSubIndex, findIndexColl[j])
+            // if (j == length - 1) {
+            //   firstSubString = fields.substring(findIndexColl[j]);
+            // }
+            // else {
+            //   firstSubString = fields.substring(firstSubIndex, findIndexColl[j])
+            // }
+            if (temp.trim() != firstSubString.trim()) {
+              return {
+                isRepeat: false,
+                repeatWords: firstsub
+              };
+            }
+          }
+          firstSubIndex = findIndexColl[j];
+        }
+        // last index process
+        let final = fields.substring(firstSubIndex);
+        if (final.trim() != firstSubString.trim()) {
+          return {
+            isRepeat: false,
+            repeatWords: firstsub
+          };
+        }
+        else {
+          return {
+            isRepeat: true,
+            repeatWords: firstsub
+          };
+        }
+      }
+      else {
+        return {
+          isRepeat: false,
+          repeatWords: firstsub
+        };
+      }
+    }
+    else {
+      return {
+        isRepeat: false,
+        repeatWords: firstsub
+      };
     }
   }
 }

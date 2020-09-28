@@ -5,6 +5,7 @@ const CSS = {
   table: 'tc-modelTable',
   inputField: 'tc-modelTable__inp',
   cell: 'tc-modelTable__cell',
+  cellWithBorder: 'tc-modelTable__cellWithBorder',
   wrapper: 'tc-modelTable__wrap',
   area: 'tc-modelTable__area',
 };
@@ -21,6 +22,7 @@ export class Table {
     this._numberOfRows = 0;
     this._element = this._createTableWrapper();
     this._table = this._element.querySelector('table');
+    this._objSepIndexColl = [];
 
     this._hangEvents();
   }
@@ -31,16 +33,23 @@ export class Table {
    */
   addColumn(index = -1) {
     this._numberOfColumns++;
+    console.log('this._objSepIndexColl', this._objSepIndexColl);
     /** Add cell in each row */
     const rows = this._table.rows;
 
     for (let i = 0; i < rows.length; i++) {
       const cell = rows[i].insertCell(index);
-      if (this._numberOfColumns === 1) {
-        this._fillReadOnlyCell(cell);
-        continue;
+      // if (this._numberOfColumns === 1) {
+      //   this._fillReadOnlyCell(cell);
+      //   continue;
+      // }
+      if (this._objSepIndexColl.indexOf(i) >= 0 ) {
+        console.log('find!!!');
+        this._fillCell(cell, true)
       }
-      this._fillCell(cell);
+      else {
+        this._fillCell(cell);
+      }
     }
   };
 
@@ -80,6 +89,16 @@ export class Table {
    */
   get htmlElement() {
     return this._element;
+  }
+
+  /**
+   * set object reprate index collect
+   * 设置造型列表对象的分隔行集合
+   */
+  set objSepIndexColl(value) {
+    // console.log('enter objSepIndexColl:', value, this._objSepIndexColl);
+    this._objSepIndexColl = value;
+    // console.log('after objSepIndexColl:', this._objSepIndexColl);
   }
 
   /**
@@ -142,8 +161,13 @@ export class Table {
    * Fills the empty cell of the editable area
    * @param {HTMLElement} cell - empty cell
    */
-  _fillCell(cell) {
-    cell.classList.add(CSS.cell);
+  _fillCell(cell, isObjSep = false) {
+    if (isObjSep) {
+      cell.classList.add(CSS.cellWithBorder);
+    }
+    else {
+      cell.classList.add(CSS.cell);
+    }
     const content = this._createContenteditableArea();
 
     cell.appendChild(create('div', [CSS.area], null, [content]));
@@ -172,13 +196,20 @@ export class Table {
    */
   _fillRow(row) {
     // console.log('_fillRow:', this._numberOfColumns);
+    console.log('this._objSepIndexColl', this._objSepIndexColl);
     for (let i = 0; i < this._numberOfColumns; i++) {
       const cell = row.insertCell();
-      if (i === 0) {
-        this._fillReadOnlyCell(cell);
-        continue;
+      // if (i === 0) {
+      //   this._fillReadOnlyCell(cell);
+      //   continue;
+      // }
+      if (this._objSepIndexColl.indexOf(i) >= 0) {
+        console.log('find!!!!!!---');
+        this._fillCell(cell, true);
       }
-      this._fillCell(cell);
+      else {
+        this._fillCell(cell);
+      }
     }
   }
 
@@ -294,4 +325,10 @@ export class Table {
       'bubbles': true
     }));
   }
+
+  /**
+   * @public
+   * Get the json object for this table
+   * column 0 is the key and column 1 is the value
+   */
 }
