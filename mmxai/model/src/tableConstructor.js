@@ -1229,7 +1229,8 @@ export class TableConstructor {
         data.content.push(objArr);
         // fields is repeat
         if (isFielsRepeat.isRepeat && temp === isFielsRepeat.repeatWords) {
-          data.contentSeprateIndex.push(objSepIndex);
+          if (objSepIndex > 0)
+          data.contentSeprateIndex.push(objSepIndex - 1); // 上一行！！！
         }
         objSepIndex++;
       });
