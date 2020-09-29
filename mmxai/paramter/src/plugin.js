@@ -88,18 +88,9 @@ class MmxParameter {
     let leftIndex = paraName.indexOf('【');
     let rightIndex = paraName.indexOf('】');
     let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
-    if (realName !== null) {
-      return {
-        // name : blockName.innerHTML,
-        name : realName,
-        content: data
-      };
-    }
-    else {
-      return {
-        content: data
-      }
-    }
+    let ret = {};
+    ret[realName] = data;
+    return ret;
   }
 
   /**

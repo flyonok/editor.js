@@ -30,13 +30,11 @@ export class TableConstructor {
     // if (data && data.title) {
     this._titleWrapper = document.createElement('div');
     this._descTitle = document.createElement('H3');
-    if (data.name !== undefined )
-    {
+    if (data.name !== undefined) {
       this._descTitle.innerHTML = '【' + data.name + '】';
       // this._descTitle.innerHTML = data.name;
     }
-    else
-    {
+    else {
       this._descTitle.innerHTML = '【参数】';
     }
     this._descTitle.classList.add('mmxParameterDecsTitle');
@@ -91,30 +89,36 @@ export class TableConstructor {
    * json数据转换
    * 从cdr的json到内部json
    */
-  _cdrJsonConvert(cdrData) {
-    // console.log('cdrData ', cdrData)
+  _cdrJsonConvert(data) {
+    console.log('cdrData ', data)
+    let cdrData = undefined;
     let _innerData = {};
-    if (cdrData.name) {
-      _innerData.name = cdrData.name;
+    for (let prop in data) {
+      if (data.hasOwnProperty(prop)) {
+        console.log('first cdrData1', data[prop]);
+        cdrData = Object.assign({}, data[prop]);
+        console.log('first cdrData', cdrData);
+        _innerData.name = prop;
+        break;
+      }
     }
-    // console.log(cdrData['板块头']);
-    // if (cdrData['板块头']) {
-    //   _innerData.innerTitle = cdrData['板块头']
-    // }
 
-    // console.log(cdrData['列表']);
-    if (cdrData['content']) {
-      _innerData['content'] = [];
-      let item = cdrData['content'];
-      for (let prop in item) {
-        if (item.hasOwnProperty(prop)) {
-          let rowArr = [];
-          // console.log('prop:', item[prop])
-          rowArr.push(prop);
-          rowArr.push(item[prop]);
-          console.log('parameter _cdrJsonConvert rowArr', rowArr);
-          _innerData['content'].push(rowArr);
-        }
+    // if (cdrData.name) {
+    //   _innerData.name = cdrData.name;
+    // }
+    // console.log(cdrData['板块头']);
+    if (cdrData === undefined) {
+      return _innerData;
+    }
+    _innerData['content'] = [];
+    for (let prop in cdrData) {
+      if (cdrData.hasOwnProperty(prop)) {
+        let rowArr = [];
+        // console.log('prop:', item[prop])
+        rowArr.push(prop);
+        rowArr.push(cdrData[prop]);
+        // console.log('parameter _cdrJsonConvert rowArr', rowArr);
+        _innerData['content'].push(rowArr);
       }
     }
     console.log('parameter _innerData:', _innerData);
@@ -127,7 +131,7 @@ export class TableConstructor {
    */
   _makeReadOnlyTable() {
     // overwrite config
-    let config = {rows:'1', cols:'2'};
+    let config = { rows: '1', cols: '2' };
     this._readOnlyTable = new TableReadOnly();
     let data = { content: [['参数名称', '参数值']] };
     const size = this._resizeReadOnlyTable(data, config);
@@ -212,7 +216,7 @@ export class TableConstructor {
     const defaultCols = 2;
     */
     const defaultRows = 1;
-    const defaultCols = 2; 
+    const defaultCols = 2;
     const rows = contentRows || configRows || defaultRows;
     const cols = contentCols || configCols || defaultCols;
 
@@ -391,8 +395,7 @@ export class TableConstructor {
    */
   _isToolbar(elem) {
     // add by xiaowy 2020/09/21
-    if (elem === null)
-    {
+    if (elem === null) {
       return null;
     }
     return !!(elem.closest('.' + CSS.toolBarHor) || elem.closest('.' + CSS.toolBarVer));
@@ -519,8 +522,7 @@ export class TableConstructor {
       this._containerEnterPressed(event);
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
-    else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey)
-    {
+    else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
       console.log(event.keyCode);
       this._containerArrowKeyPressed(event);
     }
@@ -645,7 +647,7 @@ export class TableConstructor {
     // 原有代码结束
     const currentRowIndex = indicativeRow.sectionRowIndex;
     const currentCellIndex = this._table.selectedCell.cellIndex;
-    if (currentRowIndex == this._table.body.rows.length - 1 && 
+    if (currentRowIndex == this._table.body.rows.length - 1 &&
       currentCellIndex == indicativeRow.cells.length - 1) { // table 的尾部且在最后一列
       // if (index === 1) {
       //   index = indicativeRow.sectionRowIndex + 1;
@@ -654,23 +656,23 @@ export class TableConstructor {
       const newstr = this._table.addRow(index);
 
       newstr.cells[0].click();
-  }
-  else {
-    if (currentCellIndex < indicativeRow.cells.length - 1) {
-      // let paraent = this._table.selectedCell.paraent;
-      // console.log(indicativeRow);
-      // paraent.cells[1].click();
-      indicativeRow.cells[currentCellIndex + 1].click();
     }
-    else{
-      let table = this._table.body;
-      let row = table.rows[currentRowIndex + 1]
-      // console.log(row);
-      if (row !== null && row !== undefined) {
-        row.cells[0].click();
+    else {
+      if (currentCellIndex < indicativeRow.cells.length - 1) {
+        // let paraent = this._table.selectedCell.paraent;
+        // console.log(indicativeRow);
+        // paraent.cells[1].click();
+        indicativeRow.cells[currentCellIndex + 1].click();
+      }
+      else {
+        let table = this._table.body;
+        let row = table.rows[currentRowIndex + 1]
+        // console.log(row);
+        if (row !== null && row !== undefined) {
+          row.cells[0].click();
+        }
       }
     }
-  }
     event.preventDefault();
     event.stopPropagation();
     console.log('_containerEnterPressed finished!');
@@ -686,7 +688,7 @@ export class TableConstructor {
     if (!(this._table.selectedCell !== null && !event.shiftKey && !event.ctrlKey && !event.altKey)) {
       return;
     }
-    switch(event.keyCode) {
+    switch (event.keyCode) {
       case 37: // left arrow key
         this._processLeftArrowKey(event);
         break;
@@ -775,14 +777,14 @@ export class TableConstructor {
         cells[currentCellIndex - 1].click();
       }
     }
-    else{
+    else {
       const cells = indicativeRow.cells;
       if (currentCellIndex == 0) { // 左边列
         console.log('move up');
         const previous_row = table_rows[currentRowIndex - 1];
         previous_row.cells[previous_row.cells.length - 1].click();
       }
-      else{
+      else {
         console.log('move left');
         cells[currentCellIndex - 1].click();
       }

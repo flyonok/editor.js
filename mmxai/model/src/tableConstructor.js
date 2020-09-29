@@ -81,13 +81,27 @@ export class TableConstructor {
    * json数据转换
    * 从cdr的json到内部json
    */
-  _cdrJsonConvert(cdrData) {
-    // console.log('cdrData ', cdrData)
+  _cdrJsonConvert(data) {
+    console.log('cdrData ', data)
+    let cdrData = undefined;
     let _innerData = {};
-    if (cdrData.name) {
-      _innerData.name = cdrData.name;
+    for (let prop in data) {
+      if (data.hasOwnProperty(prop)) {
+        console.log('first cdrData1', data[prop]);
+        cdrData = Object.assign({}, data[prop]);
+        console.log('first cdrData', cdrData);
+        _innerData.name = prop;
+        break;
+      }
     }
+    
+    // if (cdrData.name) {
+    //   _innerData.name = cdrData.name;
+    // }
     // console.log(cdrData['板块头']);
+    if (cdrData === undefined){
+      return _innerData;
+    }
     if (cdrData['板块头'] && cdrData['板块头']['标题']) {
       _innerData.innerTitle = cdrData['板块头']['标题'];
     }
@@ -104,7 +118,7 @@ export class TableConstructor {
         arr.forEach((item, index) => {
           // console.log('item:', item);
           if (repeatRowIndex > 0) {
-            _innerData['contentSeprateIndex'].push(repeatRowIndex);
+            _innerData['contentSeprateIndex'].push(--repeatRowIndex);
           }
           for (let prop in item) {
             if (item.hasOwnProperty(prop)) {
@@ -254,7 +268,7 @@ export class TableConstructor {
     //   }
     // }
     if (data.name !== undefined) {
-      this._descTitle.innerHTML = '【' + data.name + '】';
+      this._descTitle.innerHTML = '【' + '造型-' + data.name + '】';
       // this._descTitle.innerHTML = data.name;
     }
     else {
@@ -1240,7 +1254,7 @@ export class TableConstructor {
   _recontructParaTable(modelObj) {
     if (modelObj.Name) {
       console.log("modelObj.Name", modelObj.Name);
-      this._descTitle.innerHTML = '【' + modelObj.Name + '】';
+      this._descTitle.innerHTML = '【' + '造型-' + modelObj.Name + '】';
     }
     const fields = modelObj.Fields;
     let fieldArr = fields.split(' ');
@@ -1405,7 +1419,9 @@ export class TableConstructor {
     console.log('enter getJsonResult');
     let temp = this._modelHeadTable.getHeadParam();
     // console.log('temp:', temp);
-    let obj = Object.assign({}, temp);
+    let obj = {};
+    obj['板块头'] = temp['板块头'];
+    // let obj = Object.assign({}, temp['板块头']);
     // console.log("tableConstructor getJsonResult11", obj);
     if (this._table !== undefined) {
       obj['列表'] = this._table.getJsonResult();
@@ -1413,13 +1429,15 @@ export class TableConstructor {
     else {
       obj['列表'] = [];
     }
-    let paraName = this._descTitle.innerHTML;
-    let leftIndex = paraName.indexOf('【');
-    let rightIndex = paraName.indexOf('】');
-    let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
+    let ret = {};
+    ret[temp.name] = obj;
+    
+    // let paraName = this._descTitle.innerHTML;
+    // let leftIndex = paraName.indexOf('【');
+    // let rightIndex = paraName.indexOf('】');
+    // let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
     // obj['name'] = this._descTitle.innerHTML;
-    obj['name'] = realName;
     // console.log("tableConstructor getJsonResult", obj);
-    return obj;
+    return ret;
   }
 }

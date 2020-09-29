@@ -10,6 +10,7 @@ const CSS = {
   center: 'mmxModelCenter',
   group: 'mmxModelGroup',
   divHead: 'mmxModelHead',
+  imageParentDiv: 'mmxModelImageDiv',
 };
 
 /**
@@ -60,7 +61,8 @@ export class ModelHeadTable {
     let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : !!data.Thumb? data.Thumb : './assets/dog1.jpg';
     // let imgUrl = !!data.Thumb ? data.Thumb : './assets/dog1.jpg';
     this._imgEle = create('img', [CSS.imageRight], { alt: 'img', src: imgUrl });
-    return this._imgEle;
+    let divImg = create('div', [CSS.imageParentDiv], null, [this._imgEle]);
+    return divImg;
   }
 
   /**
@@ -72,7 +74,7 @@ export class ModelHeadTable {
     let labelEle = create('label', null, { for: 'modelType' });
     let subName = !!data.name ? data.name : '';
     labelEle.innerHTML = '类型：';
-    this._inputTypeTxt = create('input', null, { type: 'text', name: 'modelType' });
+    this._inputTypeTxt = create('input', null, { type: 'text', name: 'modelType', readonly:'true' });
     this._inputTypeTxt.value = subName;
     this._modelSelBtn = create('input', null, { type: 'button', name: 'selectModel', value: '选择模型...' });
     // this._modelSelBtn = inputBtn;
@@ -152,6 +154,7 @@ export class ModelHeadTable {
     let obj = {};
     obj['板块头'] = {};
     obj['板块头']['标题'] = this._inputTitleTxt.value;
+    obj.name = this._inputTypeTxt.value;
     // obj['属性'] = this._labelAttrEle.innerHTML;
     console.log('getHeadParam', obj);
     return obj;

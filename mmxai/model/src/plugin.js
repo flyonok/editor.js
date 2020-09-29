@@ -93,9 +93,10 @@ class MmxModel {
     //     content: data
     //   }
     // }
-    return {
-          content: this._tableConstructor.getJsonResult()
-        };
+    // return {
+    //       content: this._tableConstructor.getJsonResult()
+    //     };
+    return this._tableConstructor.getJsonResult();
   }
 
   /**
