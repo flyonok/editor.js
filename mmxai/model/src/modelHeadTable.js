@@ -66,7 +66,7 @@ export class ModelHeadTable {
   _createDivType(data) {
     // console.log('enter _createDivType');
     let labelEle = create('label', null, {for:'modelType'});
-    let subName = !!data.Name ? data.Name : '';
+    let subName = !!data.name ? data.name : '';
     labelEle.innerHTML = '类型：';
     this._inputTypeTxt = create('input', null, {type:'text', name:'modelType'});
     this._inputTypeTxt.value = subName;
@@ -114,8 +114,8 @@ export class ModelHeadTable {
    * 修改造型头的各项数据
    */
   _modifyHeadData(data) {
-    if (data.Name) {
-      this._inputTypeTxt.value = data.Name;
+    if (data.name) {
+      this._inputTypeTxt.value = data.name;
     }
     if (data.Tags) {
       this._labelAttrEle.innerHTML = data.Tags;

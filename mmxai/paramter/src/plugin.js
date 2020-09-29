@@ -84,9 +84,14 @@ class MmxParameter {
 
     // added by xiaowy 2020/09/21 for  参数名称
     const blockName = toolsContent.querySelector('.mmxParameterDecsTitle');
-    if (blockName !== null) {
+    let paraName = blockName.innerHTML;
+    let leftIndex = paraName.indexOf('【');
+    let rightIndex = paraName.indexOf('】');
+    let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
+    if (realName !== null) {
       return {
-        name : blockName.innerHTML,
+        // name : blockName.innerHTML,
+        name : realName,
         content: data
       };
     }

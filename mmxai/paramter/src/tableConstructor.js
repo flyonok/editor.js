@@ -30,10 +30,10 @@ export class TableConstructor {
     // if (data && data.title) {
     this._titleWrapper = document.createElement('div');
     this._descTitle = document.createElement('H3');
-    if (data.Name !== undefined )
+    if (data.name !== undefined )
     {
       // this._descTitle.innerHTML = '【' + data.name + '】';
-      this._descTitle.innerHTML = data.Name;
+      this._descTitle.innerHTML = data.name;
     }
     else
     {
@@ -94,8 +94,8 @@ export class TableConstructor {
   _cdrJsonConvert(cdrData) {
     // console.log('cdrData ', cdrData)
     let _innerData = {};
-    if (cdrData.Name) {
-      _innerData.Name = cdrData.Name;
+    if (cdrData.name) {
+      _innerData.name = cdrData.name;
     }
     // console.log(cdrData['板块头']);
     // if (cdrData['板块头']) {

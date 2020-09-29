@@ -84,8 +84,8 @@ export class TableConstructor {
   _cdrJsonConvert(cdrData) {
     // console.log('cdrData ', cdrData)
     let _innerData = {};
-    if (cdrData.Name) {
-      _innerData.Name = cdrData.Name;
+    if (cdrData.name) {
+      _innerData.name = cdrData.name;
     }
     // console.log(cdrData['板块头']);
     if (cdrData['板块头']) {
@@ -253,9 +253,9 @@ export class TableConstructor {
     //     break;
     //   }
     // }
-    if (data.Name !== undefined) {
-      this._descTitle.innerHTML = '【' + data.Name + '】';
-      // this._descTitle.innerHTML = data.Name;
+    if (data.name !== undefined) {
+      this._descTitle.innerHTML = '【' + data.name + '】';
+      // this._descTitle.innerHTML = data.name;
     }
     else {
       this._descTitle.innerHTML = '【造型】';
@@ -1378,7 +1378,12 @@ export class TableConstructor {
     else {
       obj['列表'] = [];
     }
-    obj['Name'] = this._descTitle.innerHTML;
+    let paraName = this._descTitle.innerHTML;
+    let leftIndex = paraName.indexOf('【');
+    let rightIndex = paraName.indexOf('】');
+    let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
+    // obj['name'] = this._descTitle.innerHTML;
+    obj['name'] = realName;
     // console.log("tableConstructor getJsonResult", obj);
     return obj;   
   }

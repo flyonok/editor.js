@@ -112,7 +112,7 @@ const mmxai = function (module) {
                {
                     "type": "model",
                     "data": {
-                        "Name": "编号",
+                        "name": "编号",
                         "板块头": "2种模型",
                         "列表": [
                             {
@@ -129,7 +129,7 @@ const mmxai = function (module) {
                {
                     "type": "model",
                     "data": {
-                        "Name": "正文",
+                        "name": "正文",
                         "板块头": "",
                         "列表": [
                             {
@@ -141,7 +141,7 @@ const mmxai = function (module) {
                 {
                     "type": "parameter",
                     "data": {
-                        "Name": "【页面参数】",
+                        "name": "【页面参数】",
                         "content": {
                             "高度": "70cm",
                             "长度": "8米"
