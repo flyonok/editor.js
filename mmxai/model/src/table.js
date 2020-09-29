@@ -181,7 +181,7 @@ export class Table {
   * added by xiaowy 2020/09/27
   */
   _fillReadOnlyCell(cell) {
-    console.log('call _fillReadOnlyCell');
+    // console.log('call _fillReadOnlyCell');
     cell.classList.add(CSS.cell);
     const content = this._createContentReadOnlyArea();
 

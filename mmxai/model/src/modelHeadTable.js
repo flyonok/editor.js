@@ -53,11 +53,12 @@ export class ModelHeadTable {
    * 创建造型缩略图
    */
   _createImageAttr(data) {
-    if (data.Thumb === undefined) {
+    if (data.Thumb === undefined && data.imgByteStr === undefined) {
       this._imgEle = undefined;
       return undefined;
     }
-    let imgUrl = !!data.Thumb ? data.Thumb : './assets/dog1.jpg';
+    let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : !!data.Thumb? data.Thumb : './assets/dog1.jpg';
+    // let imgUrl = !!data.Thumb ? data.Thumb : './assets/dog1.jpg';
     this._imgEle = create('img', [CSS.imageRight], { alt: 'img', src: imgUrl });
     return this._imgEle;
   }
@@ -128,9 +129,10 @@ export class ModelHeadTable {
       if (data.Tags) {
         that._labelAttrEle.innerHTML = data.Tags;
       }
-      if (data.Thumb) {
+      if (data.Thumb !== undefined || data.imgByteStr !== undefined) {
         if (that._imgEle !== undefined) {
-          that._imgEle.src = data.Thumb;
+          let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : data.Thumb;
+          that._imgEle.src = imgUrl;
         }
         else {
           let img = that._createImageAttr(data);

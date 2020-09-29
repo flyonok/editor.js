@@ -1189,7 +1189,7 @@ export class TableConstructor {
     let processModelSel = function (modelHeadCallBack = undefined) {
       if (window.mmxaiModelList !== undefined) {
         that._modelHeadCallBack = modelHeadCallBack;
-        window.mmxaiModelList(that._processParentUiResult);
+        window.mmxaiModelList(that._processParentUiResultCall());
       }
       else {
         let rnd = Math.random() * 11
@@ -1218,14 +1218,18 @@ export class TableConstructor {
    * 处理华安那边的ui结果数据
    * @param {jsonObject} obj
    */
-  _processParentUiResult(obj) {
-    console.log('enter _processParentUiResult');
-    console.log('_processParentUiResult obj', obj);
-    this._makeModelTables(obj, null, false);
-    if (this._modelHeadCallBack !== undefined) {
-      this._modelHeadCallBack(obj);
-    }
-    console.log('exit _processParentUiResult');
+  _processParentUiResultCall() {
+    let that = this;
+    let _processParentUiResult = function(obj) {
+      console.log('enter _processParentUiResult');
+      console.log('_processParentUiResult obj', obj);
+      that._makeModelTables(obj, null, false);
+      if (that._modelHeadCallBack !== undefined) {
+        that._modelHeadCallBack(obj);
+      }
+      console.log('exit _processParentUiResult');
+    };
+    return _processParentUiResult;
   }
 
   /**
