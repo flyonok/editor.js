@@ -88,8 +88,8 @@ export class TableConstructor {
       _innerData.name = cdrData.name;
     }
     // console.log(cdrData['板块头']);
-    if (cdrData['板块头']) {
-      _innerData.innerTitle = cdrData['板块头']
+    if (cdrData['板块头'] && cdrData['板块头']['标题']) {
+      _innerData.innerTitle = cdrData['板块头']['标题'];
     }
 
     // console.log(cdrData['列表']);
@@ -130,22 +130,22 @@ export class TableConstructor {
    * @returns {none}
    */
   _initToolBarAndEvent() {
-     /** creating ToolBars */
-     this._verticalToolBar = new VerticalBorderToolBar();
-     this._horizontalToolBar = new HorizontalBorderToolBar();
-     this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
-     this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
+    /** creating ToolBars */
+    this._verticalToolBar = new VerticalBorderToolBar();
+    this._horizontalToolBar = new HorizontalBorderToolBar();
+    this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
+    this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
 
-     /** Activated elements */
-     this._hoveredCell = null;
-     this._activatedToolBar = null;
-     this._hoveredCellSide = null;
+    /** Activated elements */
+    this._hoveredCell = null;
+    this._activatedToolBar = null;
+    this._hoveredCellSide = null;
 
-     /** Timers */
-     this._plusButDelay = null;
-     this._toolbarShowDelay = null;
+    /** Timers */
+    this._plusButDelay = null;
+    this._toolbarShowDelay = null;
 
-     this._hangEvents();
+    this._hangEvents();
   }
 
   /**
@@ -190,7 +190,7 @@ export class TableConstructor {
       // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
       // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
       this._initToolBarAndEvent();
-     
+
     }
     else if (!dataNotEmpty && fromContructor) { // 如果没有具体的造型参数数据
       this._makeModelNameTitle(data); // 造型标题
@@ -289,7 +289,7 @@ export class TableConstructor {
   _makeModelHeadTable(data) {
     // overwrite config
     // let config = { rows: '1', cols: '2' };
-    this._modelHeadTable = new ModelHeadTable(data, this._getModelDataFromDbDemo, this);
+    this._modelHeadTable = new ModelHeadTable(data, this._getModelDataFromDbDemo());
 
   }
 
@@ -1068,8 +1068,10 @@ export class TableConstructor {
    *  @param {ElementEvent} event:回调的惯用法
    * @param {TableContructor} that:回调的惯用法
    * added by xiaowy 2020/09/27
+   * todo:使用华安的方法
    */
-  _getModelDataFromDbDemo(event, that) {
+  _getModelDataFromDbDemo() {
+    let that = this;
     const modelDataObj = [
       {
         Name: '正文',
@@ -1184,18 +1186,46 @@ export class TableConstructor {
         Thumb: './assets/dog11.jpg'
       }
     ]
-    let rnd = Math.random() * 11
-    const index = Math.floor(rnd)
-    // demo select
-    alert('select ' + index);
-    
-    const obj = modelDataObj[index];
-    // for debug
-    // const obj = modelDataObj[modelDataObj.length - 1];
-    console.log('_getModelDataFromDbDemo:', obj);
-    // that._recontructParaTable(obj);
-    that._makeModelTables(obj, null, false);
-    return obj;
+    let processModelSel = function (modelHeadCallBack = undefined) {
+      if (window.mmxaiModelList !== undefined) {
+        that._modelHeadCallBack = modelHeadCallBack;
+        window.mmxaiModelList(that._processParentUiResult);
+      }
+      else {
+        let rnd = Math.random() * 11
+        const index = Math.floor(rnd)
+        // demo select
+        alert('select ' + index);
+
+        const obj = modelDataObj[index];
+        // for debug
+        // const obj = modelDataObj[modelDataObj.length - 1];
+        // console.log('_getModelDataFromDbDemo:', obj);
+        // that._recontructParaTable(obj);
+        that._makeModelTables(obj, null, false);
+        if (modelHeadCallBack !== undefined) {
+          modelHeadCallBack(obj);
+        }
+        // return obj;
+      }
+    }
+    return processModelSel;
+  }
+
+  /**
+   * @private
+   * 回调函数
+   * 处理华安那边的ui结果数据
+   * @param {jsonObject} obj
+   */
+  _processParentUiResult(obj) {
+    console.log('enter _processParentUiResult');
+    console.log('_processParentUiResult obj', obj);
+    this._makeModelTables(obj, null, false);
+    if (this._modelHeadCallBack !== undefined) {
+      this._modelHeadCallBack(obj);
+    }
+    console.log('exit _processParentUiResult');
   }
 
   /**
@@ -1205,6 +1235,7 @@ export class TableConstructor {
    */
   _recontructParaTable(modelObj) {
     if (modelObj.Name) {
+      console.log("modelObj.Name", modelObj.Name);
       this._descTitle.innerHTML = '【' + modelObj.Name + '】';
     }
     const fields = modelObj.Fields;
@@ -1241,7 +1272,7 @@ export class TableConstructor {
         // fields is repeat
         if (isFielsRepeat.isRepeat && temp === isFielsRepeat.repeatWords) {
           if (objSepIndex > 0)
-          data.contentSeprateIndex.push(objSepIndex - 1); // 上一行！！！
+            data.contentSeprateIndex.push(objSepIndex - 1); // 上一行！！！
         }
         objSepIndex++;
       });
@@ -1385,6 +1416,6 @@ export class TableConstructor {
     // obj['name'] = this._descTitle.innerHTML;
     obj['name'] = realName;
     // console.log("tableConstructor getJsonResult", obj);
-    return obj;   
+    return obj;
   }
 }

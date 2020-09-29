@@ -109,11 +109,13 @@ const mmxai = function (module) {
         let data = {
             // "time": 1600400191475,
             "blocks": [
-               {
+                {
                     "type": "model",
                     "data": {
                         "name": "编号",
-                        "板块头": "2种模型",
+                        "板块头": {
+                            "标题": "2种模型"
+                        },
                         "列表": [
                             {
                                 "标题": "模型一",
@@ -126,11 +128,13 @@ const mmxai = function (module) {
                         ]
                     }
                 },
-               {
+                {
                     "type": "model",
                     "data": {
                         "name": "正文",
-                        "板块头": "",
+                        "板块头": {
+                            "标题": ""
+                        },
                         "列表": [
                             {
                                 "正文": "这是测试用的Json\n第2段"
@@ -145,7 +149,7 @@ const mmxai = function (module) {
                         "content": {
                             "高度": "70cm",
                             "长度": "8米"
-                          }
+                        }
                     }
                 }
             ],
