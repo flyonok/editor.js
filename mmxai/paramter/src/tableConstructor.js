@@ -24,7 +24,7 @@ export class TableConstructor {
    */
   constructor(data, config, api) {
     /** creating table */
-    console.log('tableConstructor begin!');
+    console.log('parameter tableConstructor begin!');
     this._table = new Table();
     // add by xiaowy 增加参数说明 2020/09/19
     // if (data && data.title) {
@@ -32,8 +32,8 @@ export class TableConstructor {
     this._descTitle = document.createElement('H3');
     if (data.name !== undefined )
     {
-      // this._descTitle.innerHTML = '【' + data.name + '】';
-      this._descTitle.innerHTML = data.name;
+      this._descTitle.innerHTML = '【' + data.name + '】';
+      // this._descTitle.innerHTML = data.name;
     }
     else
     {

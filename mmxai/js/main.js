@@ -145,7 +145,7 @@ const mmxai = function (module) {
                 {
                     "type": "parameter",
                     "data": {
-                        "name": "【页面参数】",
+                        "name": "页面参数",
                         "content": {
                             "高度": "70cm",
                             "长度": "8米"
