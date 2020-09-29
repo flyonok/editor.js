@@ -63,36 +63,39 @@ class MmxModel {
   save(toolsContent) {
     // modified by xiaowy 2020/09/21
     // const table = toolsContent.querySelector('table');
-    const table = toolsContent.querySelector('table.tc-table');
-    // console.log(table);
-    const data = [];
-    const rows = table.rows;
+    // const table = toolsContent.querySelector('table.tc-table');
+    // // console.log(table);
+    // const data = [];
+    // const rows = table.rows;
 
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      const cols = Array.from(row.cells);
-      const inputs = cols.map(cell => cell.querySelector('.' + CSS.input));
-      const isWorthless = inputs.every(this._isEmpty);
+    // for (let i = 0; i < rows.length; i++) {
+    //   const row = rows[i];
+    //   const cols = Array.from(row.cells);
+    //   const inputs = cols.map(cell => cell.querySelector('.' + CSS.input));
+    //   const isWorthless = inputs.every(this._isEmpty);
 
-      if (isWorthless) {
-        continue;
-      }
-      data.push(inputs.map(input => input.innerHTML));
-    }
+    //   if (isWorthless) {
+    //     continue;
+    //   }
+    //   data.push(inputs.map(input => input.innerHTML));
+    // }
 
-    // added by xiaowy 2020/09/21 for 板块名称
-    const blockName = toolsContent.querySelector('.mmxModelDecsTitle');
-    if (blockName !== null) {
-      return {
-        name : blockName.innerHTML,
-        content: data
-      };
-    }
-    else {
-      return {
-        content: data
-      }
-    }
+    // // added by xiaowy 2020/09/21 for 板块名称
+    // const blockName = toolsContent.querySelector('.mmxModelDecsTitle');
+    // if (blockName !== null) {
+    //   return {
+    //     name : blockName.innerHTML,
+    //     content: data
+    //   };
+    // }
+    // else {
+    //   return {
+    //     content: data
+    //   }
+    // }
+    return {
+          content: this._tableConstructor.getJsonResult()
+        };
   }
 
   /**

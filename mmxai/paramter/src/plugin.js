@@ -66,7 +66,7 @@ class MmxParameter {
     console.log(toolsContent);
     const table = toolsContent.querySelector('table.tc-paraTable');
     console.log(table);
-    const data = [];
+    const data = {};
     const rows = table.rows;
 
     for (let i = 0; i < rows.length; i++) {
@@ -78,10 +78,11 @@ class MmxParameter {
       if (isWorthless) {
         continue;
       }
-      data.push(inputs.map(input => input.innerHTML));
+      // data.push(inputs.map(input => input.innerHTML));
+      data[inputs[0].innerHTML] = inputs[1].innerHTML;
     }
 
-    // added by xiaowy 2020/09/21 for 板块名称
+    // added by xiaowy 2020/09/21 for  参数名称
     const blockName = toolsContent.querySelector('.mmxParameterDecsTitle');
     if (blockName !== null) {
       return {

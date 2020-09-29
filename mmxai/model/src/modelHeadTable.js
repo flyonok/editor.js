@@ -124,4 +124,17 @@ export class ModelHeadTable {
       this._imgEle.src = data.Thumb;
     }
   }
+
+  /**
+   * @public
+   * get model head parameter json object
+   */
+  getHeadParam()
+  {
+    let obj = {};
+    obj['板块头'] = this._inputTitleTxt.value;
+    obj['属性'] = this._labelAttrEle.innerHTML;
+    console.log('getHeadParam', obj);
+    return obj;
+  }
 }

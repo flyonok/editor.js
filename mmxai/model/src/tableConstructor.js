@@ -109,10 +109,10 @@ export class TableConstructor {
           for (let prop in item) {
             if (item.hasOwnProperty(prop)) {
               let rowArr = [];
-              console.log('prop:', item[prop])
+              // console.log('prop:', item[prop])
               rowArr.push(prop);
               rowArr.push(item[prop]);
-              console.log('_cdrJsonConvert', rowArr);
+              // console.log('_cdrJsonConvert', rowArr);
               _innerData['content'].push(rowArr);
             }
           }
@@ -120,8 +120,32 @@ export class TableConstructor {
         });
       }
     }
-    console.log('_innerData:', _innerData);
+    // console.log('_innerData:', _innerData);
     return _innerData;
+  }
+
+  /**
+   * @private
+   * Initial para table toolbar and event process
+   * @returns {none}
+   */
+  _initToolBarAndEvent() {
+     /** creating ToolBars */
+     this._verticalToolBar = new VerticalBorderToolBar();
+     this._horizontalToolBar = new HorizontalBorderToolBar();
+     this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
+     this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
+
+     /** Activated elements */
+     this._hoveredCell = null;
+     this._activatedToolBar = null;
+     this._hoveredCellSide = null;
+
+     /** Timers */
+     this._plusButDelay = null;
+     this._toolbarShowDelay = null;
+
+     this._hangEvents();
   }
 
   /**
@@ -165,23 +189,8 @@ export class TableConstructor {
       this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
       // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
       // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
-
-      /** creating ToolBars */
-      this._verticalToolBar = new VerticalBorderToolBar();
-      this._horizontalToolBar = new HorizontalBorderToolBar();
-      this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
-      this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
-
-      /** Activated elements */
-      this._hoveredCell = null;
-      this._activatedToolBar = null;
-      this._hoveredCellSide = null;
-
-      /** Timers */
-      this._plusButDelay = null;
-      this._toolbarShowDelay = null;
-
-      this._hangEvents();
+      this._initToolBarAndEvent();
+     
     }
     else if (!dataNotEmpty && fromContructor) { // 如果没有具体的造型参数数据
       this._makeModelNameTitle(data); // 造型标题
@@ -197,6 +206,7 @@ export class TableConstructor {
         this._container.appendChild(this._readOnlyTable.htmlElement)
       }
       this._recontructParaTable(data);
+      this._initToolBarAndEvent();
     }
     else {
       console.log('not implemented!');
@@ -1178,9 +1188,10 @@ export class TableConstructor {
     const index = Math.floor(rnd)
     // demo select
     alert('select ' + index);
+    
+    const obj = modelDataObj[index];
     // for debug
-    // const obj = modelDataObj[index];
-    const obj = modelDataObj[modelDataObj.length - 1];
+    // const obj = modelDataObj[modelDataObj.length - 1];
     console.log('_getModelDataFromDbDemo:', obj);
     // that._recontructParaTable(obj);
     that._makeModelTables(obj, null, false);
@@ -1347,5 +1358,28 @@ export class TableConstructor {
         repeatWords: firstsub
       };
     }
+  }
+
+  /**
+   * @public
+   * get model json object
+   * @returns {JsonResult}
+   */
+  getJsonResult() {
+    // let obj = {};
+    console.log('enter getJsonResult');
+    let temp = this._modelHeadTable.getHeadParam();
+    // console.log('temp:', temp);
+    let obj = Object.assign({}, temp);
+    // console.log("tableConstructor getJsonResult11", obj);
+    if (this._table !== undefined) {
+      obj['列表'] = this._table.getJsonResult();
+    }
+    else {
+      obj['列表'] = [];
+    }
+    obj['Name'] = this._descTitle.innerHTML;
+    // console.log("tableConstructor getJsonResult", obj);
+    return obj;   
   }
 }

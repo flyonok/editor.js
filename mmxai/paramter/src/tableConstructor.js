@@ -30,10 +30,10 @@ export class TableConstructor {
     // if (data && data.title) {
     this._titleWrapper = document.createElement('div');
     this._descTitle = document.createElement('H3');
-    if (data.name !== undefined )
+    if (data.Name !== undefined )
     {
       // this._descTitle.innerHTML = '【' + data.name + '】';
-      this._descTitle.innerHTML = data.name;
+      this._descTitle.innerHTML = data.Name;
     }
     else
     {
@@ -52,9 +52,10 @@ export class TableConstructor {
     // add by xiaowy 同时融合单击和双击事件 2020/09/19
     this._clickTimeId = -1;
     // end
-    const size = this._resizeTable(data, config);
+    let _innerData = this._cdrJsonConvert(data);
+    const size = this._resizeTable(_innerData, config);
 
-    this._fillTable(data, size);
+    this._fillTable(_innerData, size);
 
     /** creating container around table */
     // modified by xiaowy
@@ -83,6 +84,41 @@ export class TableConstructor {
     this._toolbarShowDelay = null;
 
     this._hangEvents();
+  }
+
+  /**
+   * @private
+   * json数据转换
+   * 从cdr的json到内部json
+   */
+  _cdrJsonConvert(cdrData) {
+    // console.log('cdrData ', cdrData)
+    let _innerData = {};
+    if (cdrData.Name) {
+      _innerData.Name = cdrData.Name;
+    }
+    // console.log(cdrData['板块头']);
+    // if (cdrData['板块头']) {
+    //   _innerData.innerTitle = cdrData['板块头']
+    // }
+
+    // console.log(cdrData['列表']);
+    if (cdrData['content']) {
+      _innerData['content'] = [];
+      let item = cdrData['content'];
+      for (let prop in item) {
+        if (item.hasOwnProperty(prop)) {
+          let rowArr = [];
+          // console.log('prop:', item[prop])
+          rowArr.push(prop);
+          rowArr.push(item[prop]);
+          console.log('parameter _cdrJsonConvert rowArr', rowArr);
+          _innerData['content'].push(rowArr);
+        }
+      }
+    }
+    console.log('parameter _innerData:', _innerData);
+    return _innerData;
   }
 
   /**

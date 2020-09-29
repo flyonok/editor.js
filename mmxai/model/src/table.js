@@ -1,4 +1,4 @@
-import {create, getCoords, getSideByCoords} from './documentUtils';
+import { create, getCoords, getSideByCoords } from './documentUtils';
 import './styles/table.pcss';
 
 const CSS = {
@@ -43,7 +43,7 @@ export class Table {
       //   this._fillReadOnlyCell(cell);
       //   continue;
       // }
-      if (this._objSepIndexColl.indexOf(i) >= 0 ) {
+      if (this._objSepIndexColl.indexOf(i) >= 0) {
         console.log('find!!!');
         this._fillCell(cell, true)
       }
@@ -142,7 +142,7 @@ export class Table {
    * @return {HTMLElement} - the area
    */
   _createContenteditableArea() {
-    return create('div', [CSS.inputField], {contenteditable: 'true'});
+    return create('div', [CSS.inputField], { contenteditable: 'true' });
   }
 
   /**
@@ -152,7 +152,7 @@ export class Table {
    * @return {HTMLElement} - the area
    */
   _createContentReadOnlyArea() {
-    return create('div', [CSS.inputField], {contenteditable: 'false'});
+    return create('div', [CSS.inputField], { contenteditable: 'false' });
   }
 
   /**
@@ -173,13 +173,13 @@ export class Table {
     cell.appendChild(create('div', [CSS.area], null, [content]));
   }
 
-   /**
-   * @private
-   *
-   * Fills the empty cell of the readonly area
-   * @param {HTMLElement} cell - empty cell
-   * added by xiaowy 2020/09/27
-   */
+  /**
+  * @private
+  *
+  * Fills the empty cell of the readonly area
+  * @param {HTMLElement} cell - empty cell
+  * added by xiaowy 2020/09/27
+  */
   _fillReadOnlyCell(cell) {
     console.log('call _fillReadOnlyCell');
     cell.classList.add(CSS.cell);
@@ -283,8 +283,7 @@ export class Table {
       event.preventDefault();
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
-    else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey)
-    {
+    else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
       // console.log(event.keyCode);
       event.preventDefault();
     }
@@ -331,4 +330,31 @@ export class Table {
    * Get the json object for this table
    * column 0 is the key and column 1 is the value
    */
+  getJsonResult() {
+    let rows = this._table.rows;
+    let listResults = [];
+    let modelParaObj = {};
+    for (let i = 0; i < rows.length; i++) {
+      let cells = rows[i].cells;
+      // console.log(cells);
+      const cols = Array.from(cells);
+      const inputs = cols.map(cell => cell.querySelector('.' + CSS.inputField));
+      // console.log('getJsonResult inputs:', inputs);
+      if (cells[0].classList.contains(CSS.cellWithBorder)) {
+        // const inputs1 = cell[0].querySelector('.' + CSS.input);
+        // const inputs2 = cell[0].querySelector('.' + CSS.input);
+        modelParaObj[inputs[0].innerHTML] = inputs[1].innerHTML;
+        // console.log('getJsonResult:', modelParaObj);
+        listResults.push(modelParaObj);
+        modelParaObj = {};
+      }
+      else {
+        modelParaObj[inputs[0].innerHTML] = inputs[1].innerHTML;
+        // console.log('getJsonResult1:', modelParaObj);
+      }
+    }
+    listResults.push(modelParaObj);
+    // console.log('getJsonResult2:', listResults);
+    return listResults;
+  }
 }

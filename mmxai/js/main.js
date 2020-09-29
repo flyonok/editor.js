@@ -109,39 +109,7 @@ const mmxai = function (module) {
         let data = {
             // "time": 1600400191475,
             "blocks": [
-                {
-                    "type": "header",
-                    "data": {
-                        "text": "背景图片及文字",
-                        "level": 2
-                    }
-                },
-                {
-                    "type": "model",
-                    "data": {
-                        "content": [
-                            [
-                                "背景图片",
-                                "&lt;img src=\"deco.png\"/&gt;"
-                            ]
-                        ]
-                    }
-                },
-                {
-                    "type": "header",
-                    "data": {
-                        "text": "正面",
-                        "level": 2
-                    }
-                },
-                {
-                    "type": "header",
-                    "data": {
-                        "text": "姓名",
-                        "level": 3
-                    }
-                },
-                {
+               {
                     "type": "model",
                     "data": {
                         "Name": "编号",
@@ -158,14 +126,7 @@ const mmxai = function (module) {
                         ]
                     }
                 },
-                {
-                    "type": "header",
-                    "data": {
-                        "text": "logo",
-                        "level": 3
-                    }
-                },
-                {
+               {
                     "type": "model",
                     "data": {
                         "Name": "正文",
@@ -180,17 +141,11 @@ const mmxai = function (module) {
                 {
                     "type": "parameter",
                     "data": {
-                        "name": "【页面参数】",
-                        "content": [
-                            [
-                                "高：",
-                                "10"
-                            ],
-                            [
-                                "宽：",
-                                "20"
-                            ]
-                        ]
+                        "Name": "【页面参数】",
+                        "content": {
+                            "高度": "70cm",
+                            "长度": "8米"
+                          }
                     }
                 }
             ],
