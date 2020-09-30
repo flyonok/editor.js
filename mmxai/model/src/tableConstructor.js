@@ -78,6 +78,43 @@ export class TableConstructor {
 
   /**
    * @private
+   * find model thumb from chenhuaan interface
+   * 
+   */
+  _getModelThumbFromParent(data) {
+    if (window.mmxaiGetAllModelList !== undefined) {
+      try {
+        console.log('enter _getModelThumbFromParent');
+        let retArr = window.mmxaiGetAllModelList();
+        console.log('mmxaiGetAllModelList', retArr);
+        let find = retArr.find((item) => {
+          return item.Name === data.name;
+        })
+        if (find !== undefined) {
+          console.log('find model thumb', data.name);
+          data.imgByteStr = find.imgByteStr;
+        }
+        else {
+          console.log('not find model thumb', data.name);
+        }
+      }
+      catch (e) {
+        console.log('error', e);
+      }
+      console.log('exit _getModelThumbFromParent');
+      // retArr.forEach((item, index) => {
+      //   if (item.Name === data.name) {
+      //     console.log('find model thumb', data.name);
+      //     data.imgByteStr = item.imgByteStr;
+      //     console.log('after ')
+      //     return;
+      //   }
+      // });
+    }
+  }
+
+  /**
+   * @private
    * json数据转换
    * 从cdr的json到内部json
    */
@@ -94,14 +131,18 @@ export class TableConstructor {
         break;
       }
     }
-    
+
+
+
     // if (cdrData.name) {
     //   _innerData.name = cdrData.name;
     // }
     // console.log(cdrData['板块头']);
-    if (cdrData === undefined){
+    if (cdrData === undefined) {
       return _innerData;
     }
+    this._getModelThumbFromParent(_innerData);
+    console.log('after _getModelThumbFromParent', _innerData);
     if (cdrData['板块头'] && cdrData['板块头']['标题']) {
       _innerData.innerTitle = cdrData['板块头']['标题'];
     }
@@ -134,7 +175,7 @@ export class TableConstructor {
         });
       }
     }
-    // console.log('_innerData:', _innerData);
+    console.log('_innerData:', _innerData);
     return _innerData;
   }
 
@@ -185,45 +226,50 @@ export class TableConstructor {
         break;
       }
     }
-    if (dataNotEmpty && fromContructor) {
-      this._makeModelNameTitle(data); // 造型标题
-      console.log('after _makeModelNameTitle');
-      this._makeModelHeadTable(data); // 造型头
-      console.log('after _makeModelHeadTable');
-      this._makeReadOnlyTable(); // 造型表格头
-      console.log('after _makeReadOnlyTable');
-      // 造型表格和其他组件的换行
-      // 具体的造型参数
-      this._table = new Table();
-      const size = this._resizeTable(data, config);
+    try {
+      if (dataNotEmpty && fromContructor) {
+        this._makeModelNameTitle(data); // 造型标题
+        console.log('after _makeModelNameTitle');
+        this._makeModelHeadTable(data); // 造型头
+        console.log('after _makeModelHeadTable');
+        this._makeReadOnlyTable(); // 造型表格头
+        console.log('after _makeReadOnlyTable');
+        // 造型表格和其他组件的换行
+        // 具体的造型参数
+        this._table = new Table();
+        const size = this._resizeTable(data, config);
 
-      this._fillTable(data, size);
-      let tablebr = document.createElement('br');
-      // 构建造型容器
-      this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
-      // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
-      // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
-      this._initToolBarAndEvent();
+        this._fillTable(data, size);
+        let tablebr = document.createElement('br');
+        // 构建造型容器
+        this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
+        // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
+        // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
+        this._initToolBarAndEvent();
 
-    }
-    else if (!dataNotEmpty && fromContructor) { // 如果没有具体的造型参数数据
-      this._makeModelNameTitle(data); // 造型标题
-      this._makeModelHeadTable(data); // 造型头
-      this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement]);
-    }
-    else if (dataNotEmpty && !fromContructor) {
-      /**
-       * 这里要实现用户选择具体造型的情况
-       */
-      if (this._readOnlyTable === undefined) {
-        this._makeReadOnlyTable();
-        this._container.appendChild(this._readOnlyTable.htmlElement)
       }
-      this._recontructParaTable(data);
-      this._initToolBarAndEvent();
-    }
-    else {
-      console.log('not implemented!');
+      else if (!dataNotEmpty && fromContructor) { // 如果没有具体的造型参数数据
+        this._makeModelNameTitle(data); // 造型标题
+        this._makeModelHeadTable(data); // 造型头
+        this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement]);
+        // this._initToolBarAndEvent();
+      }
+      else if (dataNotEmpty && !fromContructor) {
+        /**
+         * 这里要实现用户选择具体造型的情况
+         */
+        if (this._readOnlyTable === undefined) {
+          this._makeReadOnlyTable();
+          this._container.appendChild(this._readOnlyTable.htmlElement)
+        }
+        this._recontructParaTable(data);
+        this._initToolBarAndEvent();
+      }
+      else {
+        console.log('not implemented!');
+      }
+    } catch (e) {
+      console.log('_makeModelTables', e);
     }
   }
 
@@ -288,7 +334,8 @@ export class TableConstructor {
     // overwrite config
     let config = { rows: '1', cols: '2' };
     this._readOnlyTable = new TableReadOnly();
-    let data = { content: [['元素名称', '内容']] };
+    // let data = { content: [['元素名称', '内容']] };
+    let data = { content: [['对象', '内容']] };
     const size = this._resizeReadOnlyTable(data, config);
 
     this._fillReadOnlyTable(data, size);
@@ -329,8 +376,15 @@ export class TableConstructor {
         for (let j = 0; j < size.cols && j < data.content[i].length; j++) {
           // get current cell and her editable part
           const input = this._table.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
-
-          input.innerHTML = data.content[i][j];
+          // 处理回车换行
+          let content = data.content[i][j];
+          console.log('content', content);
+          // console.log("replaceAll", content.replaceAll);
+          // let b = content.replaceAll('\n', '<br/>');
+          const regrex = /\n/gi;
+          let b = content.replace(regrex, '<br/>');
+          console.log("content11", b);
+          input.innerHTML = b;
         }
       }
     }
@@ -368,7 +422,7 @@ export class TableConstructor {
   * @return {{rows: number, cols: number}} - number of cols and rows
   */
   _resizeTable(data, config) {
-    console.log('_resizeTable', data.contentSeprateIndex);
+    // console.log('_resizeTable', data.contentSeprateIndex);
     const isValidArray = Array.isArray(data.content);
     const isNotEmptyArray = isValidArray ? data.content.length : false;
     const contentRows = isValidArray ? data.content.length : undefined;
@@ -388,7 +442,7 @@ export class TableConstructor {
     const rows = contentRows || configRows || defaultRows;
     const cols = contentCols || configCols || defaultCols;
     // contentSeprateIndexColl = data.contentSeprateIndex;
-    console.log('set objSepIndexColl');
+    // console.log('set objSepIndexColl');
     this._table.objSepIndexColl = data.contentSeprateIndex;
 
     for (let i = 0; i < rows; i++) {
@@ -507,7 +561,7 @@ export class TableConstructor {
     // add by xiaowy test double click event 2020/09/19
     this._container.addEventListener('dblclick', (event) => {
       clearTimeout(this._clickTimeId);
-      console.log('doubleclick event!');
+      // console.log('doubleclick event!');
       this._dblclickToolbar(event);
       // alert('doubleclick event!');
     });
@@ -705,7 +759,7 @@ export class TableConstructor {
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
     else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
-      console.log(event.keyCode);
+      // console.log(event.keyCode);
       this._containerArrowKeyPressed(event);
     }
   }
@@ -813,7 +867,7 @@ export class TableConstructor {
    * @param {KeyboardEvent} event
    */
   _containerEnterPressedOld(event) {
-    console.log('Enter _containerEnterPressed');
+    // console.log('Enter _containerEnterPressed');
     if (!(this._table.selectedCell !== null && !event.shiftKey)) {
       return;
     }
@@ -861,7 +915,7 @@ export class TableConstructor {
     }
     event.preventDefault();
     event.stopPropagation();
-    console.log('_containerEnterPressed finished!');
+    // console.log('_containerEnterPressed finished!');
   }
 
   /**
@@ -873,6 +927,7 @@ export class TableConstructor {
   _containerEnterPressed(event) {
     console.log('Enter _containerEnterPressed');
     if (!(this._table.selectedCell !== null && !event.shiftKey)) {
+      console.log('this._table.selectedCell', this._table.selectedCell);
       return;
     }
     this._processDownArrowKey(event);
@@ -1014,7 +1069,7 @@ export class TableConstructor {
     const table_rows = table.rows;
     if (currentRowIndex < table_rows.length - 1) { // not table bottom
       const next_row = table_rows[currentRowIndex + 1];
-      console.log('nextRowIndex:', currentRowIndex + 1);
+      console.log('nextRowIndex:', currentRowIndex + 1, next_row);
       next_row.cells[currentCellIndex].click()
     }
     else {
@@ -1038,15 +1093,15 @@ export class TableConstructor {
     console.log('Enter _processUpArrowKey');
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
-    console.log('currentRowIndex:' + currentRowIndex);
+    // console.log('currentRowIndex:' + currentRowIndex);
     const currentCellIndex = this._table.selectedCell.cellIndex;
-    console.log('currentCellIndex:' + currentCellIndex);
+    // console.log('currentCellIndex:' + currentCellIndex);
     const table = this._table.body;
     const table_rows = table.rows;
     if (currentRowIndex != 0) { // not table top
       const nextRowIndex = currentRowIndex - 1;
-      console.log('nextRowIndex:', nextRowIndex);
       const nextRow = table_rows[nextRowIndex];
+      console.log('nextRowIndex:', nextRowIndex, nextRow);
       nextRow.cells[currentCellIndex].click();
     }
     else {
@@ -1234,7 +1289,7 @@ export class TableConstructor {
    */
   _processParentUiResultCall() {
     let that = this;
-    let _processParentUiResult = function(obj) {
+    let _processParentUiResult = function (obj) {
       console.log('enter _processParentUiResult');
       console.log('_processParentUiResult obj', obj);
       that._makeModelTables(obj, null, false);
@@ -1431,7 +1486,7 @@ export class TableConstructor {
     }
     let ret = {};
     ret[temp.name] = obj;
-    
+
     // let paraName = this._descTitle.innerHTML;
     // let leftIndex = paraName.indexOf('【');
     // let rightIndex = paraName.indexOf('】');

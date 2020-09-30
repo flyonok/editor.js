@@ -41,11 +41,12 @@ export class ModelHeadTable {
    * 创建属性div元素
    */
   _createDivAttributes(data) {
-    let attrContentDefault = !!data.Tags ? data.tags : '属性用空格分开';
-    let labelEle = create('label', null);
+    let attrContentDefault = !!data.Tags ? data.tags : '';
+    let labelEle = create('label', null, { for: 'modelAttr' });
     labelEle.innerHTML = '属性：';
-    this._labelAttrEle = create('label', null);
-    this._labelAttrEle.innerHTML = attrContentDefault;
+    this._labelAttrEle = create('input', null, {type:'text', name:'modelAttr'});
+    this._labelAttrEle.placeholder = '属性用空格分开';
+    this._labelAttrEle.value = attrContentDefault;
     return create('div', [CSS.table, CSS.center], null, [labelEle, this._labelAttrEle]);
   }
 

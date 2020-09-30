@@ -33,7 +33,7 @@ export class Table {
    */
   addColumn(index = -1) {
     this._numberOfColumns++;
-    console.log('this._objSepIndexColl', this._objSepIndexColl);
+    // console.log('this._objSepIndexColl', this._objSepIndexColl);
     /** Add cell in each row */
     const rows = this._table.rows;
 
@@ -44,7 +44,7 @@ export class Table {
       //   continue;
       // }
       if (this._objSepIndexColl.indexOf(i) >= 0) {
-        console.log('find!!!');
+        // console.log('find!!!');
         this._fillCell(cell, true)
       }
       else {
@@ -61,8 +61,13 @@ export class Table {
   addRow(index = -1) {
     this._numberOfRows++;
     const row = this._table.insertRow(index);
-
-    this._fillRow(row);
+    if (this._objSepIndexColl.indexOf(this._numberOfRows) > 0){
+      this._fillRow(row, true);
+    }
+    else {
+      this._fillRow(row);
+    }
+    
     return row;
   };
 
@@ -143,6 +148,7 @@ export class Table {
    */
   _createContenteditableArea() {
     return create('div', [CSS.inputField], { contenteditable: 'true' });
+    // return create('textarea', [CSS.inputField], { contenteditable: 'true' });
   }
 
   /**
@@ -194,22 +200,23 @@ export class Table {
    * Fills the empty row with cells  in the size of numberOfColumns
    * @param row = the empty row
    */
-  _fillRow(row) {
+  _fillRow(row, isObjSep = false) {
     // console.log('_fillRow:', this._numberOfColumns);
-    console.log('this._objSepIndexColl', this._objSepIndexColl);
+    // console.log('this._objSepIndexColl', this._objSepIndexColl);
     for (let i = 0; i < this._numberOfColumns; i++) {
       const cell = row.insertCell();
+      this._fillCell(cell, isObjSep);
       // if (i === 0) {
       //   this._fillReadOnlyCell(cell);
       //   continue;
       // }
-      if (this._objSepIndexColl.indexOf(i) >= 0) {
-        console.log('find!!!!!!---');
-        this._fillCell(cell, true);
-      }
-      else {
-        this._fillCell(cell);
-      }
+      // if (this._objSepIndexColl.indexOf(i) >= 0) {
+      //   // console.log('find!!!!!!---');
+      //   this._fillCell(cell, true);
+      // }
+      // else {
+      //   this._fillCell(cell);
+      // }
     }
   }
 
@@ -248,10 +255,16 @@ export class Table {
    * @param {FocusEvent} event
    */
   _focusEditField(event) {
+    console.log('enter _focusEditField');
     if (!event.target.classList.contains(CSS.inputField)) {
+      console.log('enter _focusEditField11');
       return;
     }
     this._selectedCell = event.target.closest('.' + CSS.cell);
+    if (!this._selectedCell) {
+      this._selectedCell = event.target.closest('.' + CSS.cellWithBorder);
+    }
+    console.log('exit _focusEditField');
   }
 
   /**
@@ -296,7 +309,7 @@ export class Table {
    * @param {MouseEvent} event
    */
   _clickedOnCell(event) {
-    if (!event.target.classList.contains(CSS.cell)) {
+    if (!( event.target.classList.contains(CSS.cell) || event.target.classList.contains(CSS.cellWithBorder))) {
       return;
     }
     const content = event.target.querySelector('.' + CSS.inputField);
@@ -343,13 +356,21 @@ export class Table {
       if (cells[0].classList.contains(CSS.cellWithBorder)) {
         // const inputs1 = cell[0].querySelector('.' + CSS.input);
         // const inputs2 = cell[0].querySelector('.' + CSS.input);
-        modelParaObj[inputs[0].innerHTML] = inputs[1].innerHTML;
+        let content = inputs[1].innerHTML;
+        // let b = content.replaceAll('<br>', '\n');
+        const regrex = /<br>/gi;
+        let b = content.replace(regrex, '\n');
+        modelParaObj[inputs[0].innerHTML] = b;
         // console.log('getJsonResult:', modelParaObj);
         listResults.push(modelParaObj);
         modelParaObj = {};
       }
       else {
-        modelParaObj[inputs[0].innerHTML] = inputs[1].innerHTML;
+        let content = inputs[1].innerHTML;
+        // let b = content.replaceAll('<br>', '\n');
+        const regrex = /<br>/gi;
+        let b = content.replace(regrex, '\n');
+        modelParaObj[inputs[0].innerHTML] = b;
         // console.log('getJsonResult1:', modelParaObj);
       }
     }

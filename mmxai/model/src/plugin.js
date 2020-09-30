@@ -1,5 +1,5 @@
 const TableConstructor = require('./tableConstructor').TableConstructor;
-const svgIcon = require('./img/toolboxIcon.svg');
+const svgIcon = require('./img/shapes.svg');
 
 const CSS = {
   input: 'tc-table__inp'

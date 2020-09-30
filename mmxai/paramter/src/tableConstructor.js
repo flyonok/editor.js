@@ -24,8 +24,7 @@ export class TableConstructor {
    */
   constructor(data, config, api) {
     /** creating table */
-    console.log('parameter tableConstructor begin!');
-    this._table = new Table();
+    // console.log('parameter tableConstructor begin!');
     // add by xiaowy 增加参数说明 2020/09/19
     // if (data && data.title) {
     this._titleWrapper = document.createElement('div');
@@ -38,7 +37,7 @@ export class TableConstructor {
       this._descTitle.innerHTML = '【参数】';
     }
     this._descTitle.classList.add('mmxParameterDecsTitle');
-    console.log('_descTitle.classList.add');
+    // console.log('_descTitle.classList.add');
     let desc = document.createElement('p');
     desc.innerHTML = '说明： 每个参数占一行， 左边是参数名称， 右边是其数值。 没有值的， 右边可以不填。';
     desc.classList.add('mmxParameterDesc');
@@ -51,6 +50,7 @@ export class TableConstructor {
     this._clickTimeId = -1;
     // end
     let _innerData = this._cdrJsonConvert(data);
+    this._table = new Table();
     const size = this._resizeTable(_innerData, config);
 
     this._fillTable(_innerData, size);
