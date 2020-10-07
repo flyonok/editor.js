@@ -71,7 +71,9 @@ export class TableConstructor {
 
     // this._hangEvents();
     this._api = api; // add by xiaowy
+    
     let _innerData = this._cdrJsonConvert(data);
+    this._repeat = _innerData.Repeat; // add by xiaowy whether can add table parameter
     console.log('config:', config);
     this._makeModelTables(_innerData, config);
   }
@@ -92,7 +94,9 @@ export class TableConstructor {
         })
         if (find !== undefined) {
           console.log('find model thumb', data.name);
-          data.imgByteStr = find.imgByteStr;
+          // data.imgByteStr = find.imgByteStr;
+          data.Thumb = find.Thumb;
+          data.Repeat = find.Repeat; // 表示是否可以增加表格参数！！！ 2020/10/07
         }
         else {
           console.log('not find model thumb', data.name);
@@ -156,11 +160,9 @@ export class TableConstructor {
       // todo:处理列表中有多个对象的问题
       if (Array.isArray(arr)) {
         let repeatRowIndex = 0;
+        let isRepeat = this._checkModelParaListsIsRepeat(arr);
         arr.forEach((item, index) => {
           // console.log('item:', item);
-          if (repeatRowIndex > 0) {
-            _innerData['contentSeprateIndex'].push(--repeatRowIndex);
-          }
           for (let prop in item) {
             if (item.hasOwnProperty(prop)) {
               let rowArr = [];
@@ -169,14 +171,43 @@ export class TableConstructor {
               rowArr.push(item[prop]);
               // console.log('_cdrJsonConvert', rowArr);
               _innerData['content'].push(rowArr);
+              repeatRowIndex++;
             }
           }
-          repeatRowIndex++;
+          if (isRepeat && repeatRowIndex > 0 && index < arr.length - 1) {
+            let temp = repeatRowIndex - 1;
+            _innerData['contentSeprateIndex'].push(temp);
+          }
+          
         });
       }
     }
     console.log('_innerData:', _innerData);
     return _innerData;
+  }
+
+  /**
+   * check model parameter list is repeat!
+   * @param {Array} paraList
+   * @return {Boolean} true: is repeat, false: not repeat
+   */
+  _checkModelParaListsIsRepeat(paraList) {
+    console.log('enter _checkModelParaListsIsRepeat')
+    if (Array.isArray(paraList)) {
+      let objNamesColl = '';
+      paraList.forEach((item, index) =>{
+        for (let prop in item) {
+          if (item.hasOwnProperty(prop)) {
+            objNamesColl += prop + ' ';
+          }
+        } 
+      });
+      console.log('_checkModelParaListsIsRepeat11', );
+      let ret = this._checkFiledsIsRepeat(objNamesColl);
+      console.log('_checkModelParaListsIsRepeat', ret);
+      return ret.isRepeat;
+    }
+    return false;
   }
 
   /**
@@ -186,10 +217,12 @@ export class TableConstructor {
    */
   _initToolBarAndEvent() {
     /** creating ToolBars */
-    this._verticalToolBar = new VerticalBorderToolBar();
-    this._horizontalToolBar = new HorizontalBorderToolBar();
-    this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
-    this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
+    if (this._repeat !== undefined && this._repeat.trim() === '1') {
+      this._verticalToolBar = new VerticalBorderToolBar();
+      this._horizontalToolBar = new HorizontalBorderToolBar();
+      this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
+      this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
+    }
 
     /** Activated elements */
     this._hoveredCell = null;
@@ -227,7 +260,7 @@ export class TableConstructor {
       }
     }
     try {
-      if (dataNotEmpty && fromContructor) {
+      if (dataNotEmpty && fromContructor) { // 初始化构造
         this._makeModelNameTitle(data); // 造型标题
         console.log('after _makeModelNameTitle');
         this._makeModelHeadTable(data); // 造型头
@@ -262,8 +295,12 @@ export class TableConstructor {
           this._makeReadOnlyTable();
           this._container.appendChild(this._readOnlyTable.htmlElement)
         }
-        this._recontructParaTable(data);
-        this._initToolBarAndEvent();
+        this._repeat = data.Repeat;
+        // 如果造型名称相同则不重构参数表 2020/10/07
+        if (data.Name.trim() !== this._modelHeadTable.modelTypeName) {
+          this._recontructParaTable(data);
+          this._initToolBarAndEvent();
+        }
       }
       else {
         console.log('not implemented!');
@@ -378,12 +415,12 @@ export class TableConstructor {
           const input = this._table.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
           // 处理回车换行
           let content = data.content[i][j];
-          console.log('content', content);
+          // console.log('content', content);
           // console.log("replaceAll", content.replaceAll);
           // let b = content.replaceAll('\n', '<br/>');
           const regrex = /\n/gi;
           let b = content.replace(regrex, '<br/>');
-          console.log("content11", b);
+          // console.log("content11", b);
           input.innerHTML = b;
         }
       }
@@ -521,9 +558,11 @@ export class TableConstructor {
    * @param {number} coord - where show. x or y depending on the grade of the toolbar
    */
   _showToolBar(toolBar, coord) {
-    this._hideToolBar();
-    this._activatedToolBar = toolBar;
-    toolBar.showIn(coord);
+    if (toolBar !== undefined) {
+      this._hideToolBar();
+      this._activatedToolBar = toolBar;
+      toolBar.showIn(coord);
+    }
   }
 
   /**
@@ -547,24 +586,26 @@ export class TableConstructor {
       this._toolbarCalling(event);
     });
 
-    this._container.addEventListener('click', (event) => {
-      // added by xiaowy 2020/09/19
-      clearTimeout(this._clickTimeId);
-      let that = this;
-      this._clickTimeId = setTimeout(function () {
-        that._clickToolbar(event);
-      }, 250);
-      // end
-      // this._clickToolbar(event);
-    });
+    if (this._repeat !== undefined && this._repeat.trim() === '1') {
+      this._container.addEventListener('click', (event) => {
+        // added by xiaowy 2020/09/19
+        clearTimeout(this._clickTimeId);
+        let that = this;
+        this._clickTimeId = setTimeout(function () {
+          that._clickToolbar(event);
+        }, 250);
+        // end
+        // this._clickToolbar(event);
+      });
 
-    // add by xiaowy test double click event 2020/09/19
-    this._container.addEventListener('dblclick', (event) => {
-      clearTimeout(this._clickTimeId);
-      // console.log('doubleclick event!');
-      this._dblclickToolbar(event);
-      // alert('doubleclick event!');
-    });
+      // add by xiaowy test double click event 2020/09/19
+      this._container.addEventListener('dblclick', (event) => {
+        clearTimeout(this._clickTimeId);
+        // console.log('doubleclick event!');
+        this._dblclickToolbar(event);
+        // alert('doubleclick event!');
+      });
+    }
 
     this._container.addEventListener('input', () => {
       this._hideToolBar();
@@ -1359,7 +1400,8 @@ export class TableConstructor {
   /**
    * @private
    * check selected model object fileds is all repeat
-   * 检查整个字符串是否完全重复
+   * 检查整个字符串是否完全重复, 比如 ‘1 2 3 4 1 2 3 4’
+   * 
    */
   _checkFiledsIsRepeat(fields) {
     let fieldsArr = fields.split(' ');

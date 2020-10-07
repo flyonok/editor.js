@@ -356,7 +356,7 @@ export class Table {
       if (cells[0].classList.contains(CSS.cellWithBorder)) {
         // const inputs1 = cell[0].querySelector('.' + CSS.input);
         // const inputs2 = cell[0].querySelector('.' + CSS.input);
-        let content = inputs[1].innerHTML;
+        let content = inputs[1].innerHTML.trim();
         // let b = content.replaceAll('<br>', '\n');
         const regrex = /<br>/gi;
         let b = content.replace(regrex, '\n');

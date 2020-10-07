@@ -59,7 +59,8 @@ export class ModelHeadTable {
       this._imgEle = undefined;
       return undefined;
     }
-    let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : !!data.Thumb? data.Thumb : './assets/dog1.jpg';
+    // let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : !!data.Thumb? data.Thumb : './assets/dog1.jpg';
+    let imgUrl = !!data.Thumb ? 'file://' + data.Thumb : !!data.imgByteStr.changingThisBreaksApplicationSecurity ? data.imgByteStr.changingThisBreaksApplicationSecurity : './assets/dog1.jpg';
     // let imgUrl = !!data.Thumb ? data.Thumb : './assets/dog1.jpg';
     this._imgEle = create('img', [CSS.imageRight], { alt: 'img', src: imgUrl });
     let divImg = create('div', [CSS.imageParentDiv], null, [this._imgEle]);
@@ -75,9 +76,10 @@ export class ModelHeadTable {
     let labelEle = create('label', null, { for: 'modelType' });
     let subName = !!data.name ? data.name : '';
     labelEle.innerHTML = '类型：';
-    this._inputTypeTxt = create('input', null, { type: 'text', name: 'modelType', readonly:'true' });
+    // this._inputTypeTxt = create('input', null, { type: 'text', name: 'modelType', readonly:'true' });
+    this._inputTypeTxt = create('input', null, { type: 'text', name: 'modelType'});
     this._inputTypeTxt.value = subName;
-    this._modelSelBtn = create('input', null, { type: 'button', name: 'selectModel', value: '选择模型...' });
+    this._modelSelBtn = create('input', null, { type: 'button', name: 'selectModel', value: '选择造型...' });
     // this._modelSelBtn = inputBtn;
     // console.log('_createDivType finished!');
     return create('div', [CSS.table], null, [labelEle, this._inputTypeTxt, this._modelSelBtn]);
@@ -94,7 +96,19 @@ export class ModelHeadTable {
       type: 'text', name: 'modelTitle',
       placeholder: '造型内部小标题，可空', value: title
     });
+    // this._inputTitleTxt = create('input', null, {
+    //   type: 'text', name: 'modelTitle',
+    //   placeholder: '造型内部小标题，可空'
+    // });
     return create('div', [CSS.table, CSS.center], null, [labelEle, this._inputTitleTxt]);
+  }
+
+  /**
+   * get model type name
+   * @return {string}
+   */
+  get modelTypeName() {
+    return this._inputTypeTxt.value.trim();
   }
   /**
    * get html element of table
@@ -134,7 +148,8 @@ export class ModelHeadTable {
       }
       if (data.Thumb !== undefined || data.imgByteStr !== undefined) {
         if (that._imgEle !== undefined) {
-          let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : data.Thumb;
+          // let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : data.Thumb;
+          let imgUrl = !!data.Thumb ? 'file://' + data.Thumb : data.imgByteStr.changingThisBreaksApplicationSecurity;
           that._imgEle.src = imgUrl;
         }
         else {
@@ -154,8 +169,8 @@ export class ModelHeadTable {
   getHeadParam() {
     let obj = {};
     obj['板块头'] = {};
-    obj['板块头']['标题'] = this._inputTitleTxt.value;
-    obj.name = this._inputTypeTxt.value;
+    obj['板块头']['标题'] = this._inputTitleTxt.value.trim();
+    obj.name = this._inputTypeTxt.value.trim();
     // obj['属性'] = this._labelAttrEle.innerHTML;
     console.log('getHeadParam', obj);
     return obj;
