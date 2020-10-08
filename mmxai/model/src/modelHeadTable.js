@@ -41,7 +41,7 @@ export class ModelHeadTable {
    * 创建属性div元素
    */
   _createDivAttributes(data) {
-    let attrContentDefault = !!data.Tags ? data.tags : '';
+    let attrContentDefault = !!data.Tags ? data.Tags : '';
     let labelEle = create('label', null, { for: 'modelAttr' });
     labelEle.innerHTML = '属性：';
     this._labelAttrEle = create('input', null, {type:'text', name:'modelAttr'});
@@ -170,6 +170,7 @@ export class ModelHeadTable {
     let obj = {};
     obj['板块头'] = {};
     obj['板块头']['标题'] = this._inputTitleTxt.value.trim();
+    obj['板块头']['Tags'] = this._labelAttrEle.value.trim();
     obj.name = this._inputTypeTxt.value.trim();
     // obj['属性'] = this._labelAttrEle.innerHTML;
     console.log('getHeadParam', obj);

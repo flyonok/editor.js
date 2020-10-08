@@ -359,19 +359,19 @@ export class Table {
         let content = inputs[1].innerHTML.trim();
         // let b = content.replaceAll('<br>', '\n');
         const regrex = /<br>/gi;
-        let b = content.replace(regrex, '\n');
+        let b = content.replace(regrex, '\r');
         modelParaObj[inputs[0].innerHTML] = b;
-        // console.log('getJsonResult:', modelParaObj);
+        console.log('getJsonResult:', modelParaObj);
         listResults.push(modelParaObj);
         modelParaObj = {};
       }
       else {
-        let content = inputs[1].innerHTML;
+        let content = inputs[1].innerHTML.trim();
         // let b = content.replaceAll('<br>', '\n');
         const regrex = /<br>/gi;
-        let b = content.replace(regrex, '\n');
+        let b = content.replace(regrex, '\r');
         modelParaObj[inputs[0].innerHTML] = b;
-        // console.log('getJsonResult1:', modelParaObj);
+        console.log('getJsonResult1:', modelParaObj);
       }
     }
     listResults.push(modelParaObj);

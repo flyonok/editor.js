@@ -151,6 +151,13 @@ export class TableConstructor {
       _innerData.innerTitle = cdrData['板块头']['标题'];
     }
 
+    if (cdrData['板块头'] && (cdrData['板块头']['Tags'] || cdrData['板块头']['tags'])) {
+      _innerData.Tags = cdrData['板块头']['Tags'];
+      if (_innerData.Tags === undefined) {
+        _innerData.Tags = cdrData['板块头']['tags'];
+      }
+    }
+
     // console.log(cdrData['列表']);
     if (cdrData['列表']) {
       _innerData['content'] = [];
@@ -217,7 +224,7 @@ export class TableConstructor {
    */
   _initToolBarAndEvent() {
     /** creating ToolBars */
-    if (this._repeat !== undefined && this._repeat.trim() === '1') {
+    if (this._repeat !== undefined && this._repeat === 1) {
       this._verticalToolBar = new VerticalBorderToolBar();
       this._horizontalToolBar = new HorizontalBorderToolBar();
       this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
@@ -418,7 +425,7 @@ export class TableConstructor {
           // console.log('content', content);
           // console.log("replaceAll", content.replaceAll);
           // let b = content.replaceAll('\n', '<br/>');
-          const regrex = /\n/gi;
+          const regrex = /[\r|\n]/gi;
           let b = content.replace(regrex, '<br/>');
           // console.log("content11", b);
           input.innerHTML = b;
@@ -586,7 +593,7 @@ export class TableConstructor {
       this._toolbarCalling(event);
     });
 
-    if (this._repeat !== undefined && this._repeat.trim() === '1') {
+    if (this._repeat !== undefined && this._repeat === 1) {
       this._container.addEventListener('click', (event) => {
         // added by xiaowy 2020/09/19
         clearTimeout(this._clickTimeId);
@@ -1534,7 +1541,7 @@ export class TableConstructor {
     // let rightIndex = paraName.indexOf('】');
     // let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
     // obj['name'] = this._descTitle.innerHTML;
-    // console.log("tableConstructor getJsonResult", obj);
+    console.log("tableConstructor getJsonResult", ret);
     return ret;
   }
 }
