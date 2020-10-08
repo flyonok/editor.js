@@ -61,13 +61,13 @@ export class Table {
   addRow(index = -1) {
     this._numberOfRows++;
     const row = this._table.insertRow(index);
-    if (this._objSepIndexColl.indexOf(this._numberOfRows) > 0){
+    if (this._objSepIndexColl.indexOf(this._numberOfRows) > 0) {
       this._fillRow(row, true);
     }
     else {
       this._fillRow(row);
     }
-    
+
     return row;
   };
 
@@ -293,7 +293,7 @@ export class Table {
       return;
     }
     if (event.keyCode === 13 && !event.shiftKey) {
-      event.preventDefault();
+      // event.preventDefault();
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
     else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
@@ -309,7 +309,7 @@ export class Table {
    * @param {MouseEvent} event
    */
   _clickedOnCell(event) {
-    if (!( event.target.classList.contains(CSS.cell) || event.target.classList.contains(CSS.cellWithBorder))) {
+    if (!(event.target.classList.contains(CSS.cell) || event.target.classList.contains(CSS.cellWithBorder))) {
       return;
     }
     const content = event.target.querySelector('.' + CSS.inputField);
@@ -358,9 +358,17 @@ export class Table {
         // const inputs2 = cell[0].querySelector('.' + CSS.input);
         let content = inputs[1].innerHTML.trim();
         // let b = content.replaceAll('<br>', '\n');
-        const regrex = /<br>/gi;
-        let b = content.replace(regrex, '\r');
-        modelParaObj[inputs[0].innerHTML] = b;
+        // const regrexa = /<div>|<\/div>/gi;
+        const regrexa = /<br>|<\/div>/gi;
+        let a = content.replace(regrexa, '');
+        // const regrex = /<br>/gi;
+        const regrex = /<div>/gi;
+        let b = a.replace(regrex, '\r');
+        const regrexall = /<br>|<\/div>|<div>/gi;
+        let inputs0 = inputs[0].innerHTML.trim();
+        let key = inputs0.replace(regrexall, '');
+        // modelParaObj[inputs[0].innerHTML] = b;
+        modelParaObj[key] = b;
         console.log('getJsonResult:', modelParaObj);
         listResults.push(modelParaObj);
         modelParaObj = {};
@@ -368,9 +376,17 @@ export class Table {
       else {
         let content = inputs[1].innerHTML.trim();
         // let b = content.replaceAll('<br>', '\n');
-        const regrex = /<br>/gi;
-        let b = content.replace(regrex, '\r');
-        modelParaObj[inputs[0].innerHTML] = b;
+        // const regrexa = /<div>|<\/div>/gi;
+        const regrexa = /<br>|<\/div>/gi;
+        let a = content.replace(regrexa, '');
+        // const regrex = /<br>/gi;
+        const regrex = /<div>/gi;
+        let b = a.replace(regrex, '\r');
+        const regrexall = /<br>|<\/div>|<div>/gi;
+        let inputs0 = inputs[0].innerHTML.trim();
+        let key = inputs0.replace(regrexall, '');
+        // modelParaObj[inputs[0].innerHTML] = b;
+        modelParaObj[key] = b;
         console.log('getJsonResult1:', modelParaObj);
       }
     }

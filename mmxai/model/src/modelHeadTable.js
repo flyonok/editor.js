@@ -143,9 +143,9 @@ export class ModelHeadTable {
       if (data.Name) {
         that._inputTypeTxt.value = data.Name;
       }
-      if (data.Tags) {
-        that._labelAttrEle.innerHTML = data.Tags;
-      }
+      // if (data.Tags) {
+      //   that._labelAttrEle.innerHTML = data.Tags;
+      // }
       if (data.Thumb !== undefined || data.imgByteStr !== undefined) {
         if (that._imgEle !== undefined) {
           // let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : data.Thumb;
@@ -170,7 +170,7 @@ export class ModelHeadTable {
     let obj = {};
     obj['板块头'] = {};
     obj['板块头']['标题'] = this._inputTitleTxt.value.trim();
-    obj['板块头']['Tags'] = this._labelAttrEle.value.trim();
+    obj['属性'] = this._labelAttrEle.value.trim();
     obj.name = this._inputTypeTxt.value.trim();
     // obj['属性'] = this._labelAttrEle.innerHTML;
     console.log('getHeadParam', obj);

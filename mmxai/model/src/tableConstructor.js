@@ -151,11 +151,8 @@ export class TableConstructor {
       _innerData.innerTitle = cdrData['板块头']['标题'];
     }
 
-    if (cdrData['板块头'] && (cdrData['板块头']['Tags'] || cdrData['板块头']['tags'])) {
-      _innerData.Tags = cdrData['板块头']['Tags'];
-      if (_innerData.Tags === undefined) {
-        _innerData.Tags = cdrData['板块头']['tags'];
-      }
+    if (cdrData['属性'] !== undefined) {
+      _innerData.Tags = cdrData['属性'];
     }
 
     // console.log(cdrData['列表']);
@@ -426,7 +423,8 @@ export class TableConstructor {
           // console.log("replaceAll", content.replaceAll);
           // let b = content.replaceAll('\n', '<br/>');
           const regrex = /[\r|\n]/gi;
-          let b = content.replace(regrex, '<br/>');
+          // let b = content.replace(regrex, '<br/>');
+          let b = content.replace(regrex, '<div><\/div>');
           // console.log("content11", b);
           input.innerHTML = b;
         }
@@ -973,12 +971,12 @@ export class TableConstructor {
    * added by xiaowy 2020/09/23
    */
   _containerEnterPressed(event) {
-    console.log('Enter _containerEnterPressed');
+    // console.log('Enter _containerEnterPressed');
     if (!(this._table.selectedCell !== null && !event.shiftKey)) {
-      console.log('this._table.selectedCell', this._table.selectedCell);
+      // console.log('this._table.selectedCell', this._table.selectedCell);
       return;
     }
-    this._processDownArrowKey(event);
+    // this._processDownArrowKey(event);
     console.log('_containerEnterPressed finished!');
   }
 
@@ -1525,6 +1523,7 @@ export class TableConstructor {
     // console.log('temp:', temp);
     let obj = {};
     obj['板块头'] = temp['板块头'];
+    obj['属性'] = temp['属性'];
     // let obj = Object.assign({}, temp['板块头']);
     // console.log("tableConstructor getJsonResult11", obj);
     if (this._table !== undefined) {
