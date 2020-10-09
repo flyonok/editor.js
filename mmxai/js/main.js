@@ -120,12 +120,12 @@ const mmxai = function (module) {
                                 {
                                     "图片": "logo.svg",
                                     "标题": "天奕设计",
-                                    "副标题": "TIANYI DESIGN"
+                                    "副标题": "TIANYI DESIGN\r123"
                                 }
                             ]
                         }
                     }
-                },
+                }/*,
                 {
                     "type": "model",
                     "data": {
@@ -201,7 +201,22 @@ const mmxai = function (module) {
                             ]
                         }
                     }
-                }
+                },
+                {
+                    "type":"model",
+                    "data" :{
+                        "横幅": {
+                            "板块头": {
+                                "标题": ""
+                            },
+                            "列表": [
+                                {
+                                    "横幅": "天奕设计，专注智能AI设计服务。"
+                                }
+                            ]
+                        }
+                    }
+                }*/
             ],
             "version": "2.18.0"
         };

@@ -76,6 +76,14 @@ export class Table {
   }
 
   /**
+   * get count of table rows
+   * @return {number}
+   */
+  get rows() {
+    return this._numberOfRows;
+  }
+
+  /**
    * get real table tag
    * @return {HTMLElement}
    */
@@ -204,13 +212,14 @@ export class Table {
    * @param {KeyboardEvent} event
    */
   _pressedEnterInEditField(event) {
-    let keycodes = [37, 38, 39, 40, 9]; // 9 is TAB
+    // let keycodes = [37, 38, 39, 40, 9]; // 9 is TAB
+    let keycodes = [38, 40, 9]; // 9 for tab key
     // console.log(event.keyCode);
     if (!event.target.classList.contains(CSS.inputField)) {
       return;
     }
     if (event.keyCode === 13 && !event.shiftKey) {
-      event.preventDefault();
+      // event.preventDefault();
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
     else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey)

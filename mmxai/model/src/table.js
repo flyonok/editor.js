@@ -255,16 +255,16 @@ export class Table {
    * @param {FocusEvent} event
    */
   _focusEditField(event) {
-    console.log('enter _focusEditField');
+    // console.log('enter _focusEditField');
     if (!event.target.classList.contains(CSS.inputField)) {
-      console.log('enter _focusEditField11');
+      // console.log('enter _focusEditField11');
       return;
     }
     this._selectedCell = event.target.closest('.' + CSS.cell);
     if (!this._selectedCell) {
       this._selectedCell = event.target.closest('.' + CSS.cellWithBorder);
     }
-    console.log('exit _focusEditField');
+    // console.log('exit _focusEditField');
   }
 
   /**
@@ -287,7 +287,8 @@ export class Table {
    * @param {KeyboardEvent} event
    */
   _pressedEnterInEditField(event) {
-    let keycodes = [37, 38, 39, 40, 9]; // 9 is TAB
+    // let keycodes = [37, 38, 39, 40, 9]; // 9 is TAB
+    let keycodes = [38, 40, 9]; // 9 for tab key
     // console.log(event.keyCode);
     if (!event.target.classList.contains(CSS.inputField)) {
       return;
@@ -348,50 +349,94 @@ export class Table {
     let listResults = [];
     let modelParaObj = {};
     for (let i = 0; i < rows.length; i++) {
-      let cells = rows[i].cells;
+      let jsonCells = JSON.parse(JSON.stringify(rows[i].cells));
+      console.log('jsoncells',jsonCells);
+      // let cells = rows[i].cells;
+      let cells = jsonCells;
+      // 预处理
+      this._preProcessTableCell(cells);
       // console.log(cells);
       const cols = Array.from(cells);
       const inputs = cols.map(cell => cell.querySelector('.' + CSS.inputField));
       // console.log('getJsonResult inputs:', inputs);
-      if (cells[0].classList.contains(CSS.cellWithBorder)) {
-        // const inputs1 = cell[0].querySelector('.' + CSS.input);
-        // const inputs2 = cell[0].querySelector('.' + CSS.input);
-        let content = inputs[1].innerHTML.trim();
-        // let b = content.replaceAll('<br>', '\n');
-        // const regrexa = /<div>|<\/div>/gi;
-        const regrexa = /<br>|<\/div>/gi;
-        let a = content.replace(regrexa, '');
-        // const regrex = /<br>/gi;
-        const regrex = /<div>/gi;
-        let b = a.replace(regrex, '\r');
-        const regrexall = /<br>|<\/div>|<div>/gi;
-        let inputs0 = inputs[0].innerHTML.trim();
-        let key = inputs0.replace(regrexall, '');
-        // modelParaObj[inputs[0].innerHTML] = b;
-        modelParaObj[key] = b;
-        console.log('getJsonResult:', modelParaObj);
-        listResults.push(modelParaObj);
-        modelParaObj = {};
-      }
-      else {
-        let content = inputs[1].innerHTML.trim();
-        // let b = content.replaceAll('<br>', '\n');
-        // const regrexa = /<div>|<\/div>/gi;
-        const regrexa = /<br>|<\/div>/gi;
-        let a = content.replace(regrexa, '');
-        // const regrex = /<br>/gi;
-        const regrex = /<div>/gi;
-        let b = a.replace(regrex, '\r');
-        const regrexall = /<br>|<\/div>|<div>/gi;
-        let inputs0 = inputs[0].innerHTML.trim();
-        let key = inputs0.replace(regrexall, '');
-        // modelParaObj[inputs[0].innerHTML] = b;
-        modelParaObj[key] = b;
-        console.log('getJsonResult1:', modelParaObj);
+      // 处理空的div
+      // let divs = inputs.map(input1 => input1.querySelector('div'));
+      // divs.map((div1) => {
+      //   if ((div1 !== null) && div1.innerHTML.trim().length == 0) {
+      //     // let parent = div1.parentElement;
+      //     // parent.removeChild(div1);
+      //     div1.remove();
+      //   }
+      // });
+      let content = inputs[1].innerHTML.trim();
+      // let b = content.replaceAll('<br>', '\n');
+      // const regrexa = /<div>|<\/div>/gi;
+      const regrexa = /<br>|<\/div>/gi;
+      let a = content.replace(regrexa, '');
+      // const regrex = /<br>/gi;
+      const regrex = /<div>/gi;
+      let b = a.replace(regrex, '\r');
+      const regrexall = /<br>|<\/div>|<div>/gi;
+      const regrexone = /<br>|<\/div>/gi;
+      let inputs0 = inputs[0].innerHTML.trim();
+      let keyOne = inputs0.replace(regrexone, '');
+      const regrexTwo = /<div>/gi;
+      let key = keyOne.replace(regrexTwo, '\r');
+      // 增加容错处理 xiaowy 2020/10/09
+      if (key.length > 0) {
+        if (cells[0].classList.contains(CSS.cellWithBorder)) {
+
+          // modelParaObj[inputs[0].innerHTML] = b;
+          modelParaObj[key] = b;
+          // console.log('getJsonResult:', modelParaObj);
+          listResults.push(modelParaObj);
+          modelParaObj = {};
+        }
+        else {
+          // 增加容错处理 xiaowy 2020/10/09
+          modelParaObj[key] = b;
+          // if (key.length > 0) {
+          //   modelParaObj[key] = b;
+          // }
+          // console.log('getJsonResult1:', modelParaObj);
+        }
       }
     }
     listResults.push(modelParaObj);
-    // console.log('getJsonResult2:', listResults);
+    // console.log('after table getJsonResult:', listResults);
     return listResults;
+  }
+
+  /**
+   * @private
+   * div预处理，清除不必要的div
+   * @param {HtmlTableElement Cell Array} cellsLists
+   */
+  _preProcessTableCell(cellsLists) {
+    const cols = Array.from(cellsLists);
+    const inputs = cols.map(cell => cell.querySelector('.' + CSS.inputField));
+    let divs = inputs.map(input1 => input1.querySelectorAll('div'));
+    // divs.forEach()
+    divs.forEach((div1) => {
+      // if (div1 !== null) {
+      //   console.log('remove11',div1.innerHTML);
+      // }
+      if (div1 !== null && div1 !== undefined) {
+        // let parent = div1.parentElement;
+        // parent.removeChild(div1);
+        if (div1.innerText !== undefined && div1.innerText.length == 0) {
+          div1.remove();
+        }
+        else {
+          div1.forEach(ele => {
+            if (ele.innerText !== undefined && ele.innerText.trim().length === 0 && ele.nextSibling === null) {
+            // if (div1.textContent.trim().length === 0) {
+              ele.remove();
+            }
+          });
+        }
+        // console.log('remove from:', div1.parentElement.innerHTML);
+      }
+    });
   }
 }

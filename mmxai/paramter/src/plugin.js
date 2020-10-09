@@ -72,6 +72,8 @@ class MmxParameter {
 
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
+      // 预处理
+      this._preProcessTableCell(row.cells);
       const cols = Array.from(row.cells);
       const inputs = cols.map(cell => cell.querySelector('.' + CSS.input));
       const isWorthless = inputs.every(this._isEmpty);
@@ -80,7 +82,22 @@ class MmxParameter {
         continue;
       }
       // data.push(inputs.map(input => input.innerHTML));
-      data[inputs[0].innerHTML] = inputs[1].innerHTML;
+      let content = inputs[1].innerHTML.trim();
+      // let b = content.replaceAll('<br>', '\n');
+      // const regrexa = /<div>|<\/div>/gi;
+      const regrexa = /<br>|<\/div>/gi;
+      let a = content.replace(regrexa, '');
+      // const regrex = /<br>/gi;
+      const regrex = /<div>/gi;
+      let b = a.replace(regrex, '\r');
+      const regrexone = /<br>|<\/div>/gi;
+      let inputs0 = inputs[0].innerHTML.trim();
+      let keyOne = inputs0.replace(regrexone, '');
+      const regrexTwo = /<div>/gi;
+      let key = keyOne.replace(regrexTwo, '\r');
+
+      // data[inputs[0].innerHTML] = inputs[1].innerHTML;
+      data[key] = b;
     }
 
     // added by xiaowy 2020/09/21 for  参数名称
@@ -103,6 +120,40 @@ class MmxParameter {
    */
   _isEmpty(input) {
     return !input.textContent.trim();
+  }
+
+  /**
+   * @private
+   * div预处理，清除不必要的div
+   * @param {HtmlTableElement Cell Array} cellsLists
+   */
+  _preProcessTableCell(cellsLists) {
+    const cols = Array.from(cellsLists);
+    const inputs = cols.map(cell => cell.querySelector('.' + CSS.input));
+    let divs = inputs.map(input1 => input1.querySelectorAll('div'));
+    // divs.forEach()
+    // divs.forEach()
+    divs.forEach((div1) => {
+      // if (div1 !== null) {
+      //   console.log('remove11',div1.innerHTML);
+      // }
+      if (div1 !== null && div1 !== undefined) {
+        // let parent = div1.parentElement;
+        // parent.removeChild(div1);
+        if (div1.innerText !== undefined && div1.innerText.length == 0) {
+          div1.remove();
+        }
+        else {
+          div1.forEach(ele => {
+            if (ele.innerText !== undefined && ele.innerText.trim().length === 0 && ele.nextSibling === null) {
+            // if (div1.textContent.trim().length === 0) {
+              ele.remove();
+            }
+          });
+        }
+        // console.log('remove from:', div1.parentElement.innerHTML);
+      }
+    });
   }
 }
 

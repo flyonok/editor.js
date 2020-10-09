@@ -71,7 +71,7 @@ export class TableConstructor {
 
     // this._hangEvents();
     this._api = api; // add by xiaowy
-    
+
     let _innerData = this._cdrJsonConvert(data);
     this._repeat = _innerData.Repeat; // add by xiaowy whether can add table parameter
     console.log('config:', config);
@@ -182,7 +182,7 @@ export class TableConstructor {
             let temp = repeatRowIndex - 1;
             _innerData['contentSeprateIndex'].push(temp);
           }
-          
+
         });
       }
     }
@@ -199,12 +199,12 @@ export class TableConstructor {
     console.log('enter _checkModelParaListsIsRepeat')
     if (Array.isArray(paraList)) {
       let objNamesColl = '';
-      paraList.forEach((item, index) =>{
+      paraList.forEach((item, index) => {
         for (let prop in item) {
           if (item.hasOwnProperty(prop)) {
             objNamesColl += prop + ' ';
           }
-        } 
+        }
       });
       console.log('_checkModelParaListsIsRepeat11', );
       let ret = this._checkFiledsIsRepeat(objNamesColl);
@@ -799,7 +799,8 @@ export class TableConstructor {
    * @param {KeyboardEvent} event
    */
   _containerKeydown(event) {
-    let keycodes = [37, 38, 39, 40, 9]; // 9 for tab key
+    // let keycodes = [37, 38, 39, 40, 9]; // 9 for tab key
+    let keycodes = [38, 40, 9]; // 9 for tab key
     if (event.keyCode === 13) {
       this._containerEnterPressed(event);
     }
@@ -855,6 +856,8 @@ export class TableConstructor {
    * @private
    */
   _addRow() {
+    /*
+    ** 这段代码目前不太稳定，暂时屏蔽，统一在表的尾部添加 xiaowy 2020/10/09
     const indicativeRow = this._hoveredCell.closest('TR');
     let index = this._getHoveredSideOfContainer();
 
@@ -865,6 +868,9 @@ export class TableConstructor {
     }
 
     this._table.addRow(index);
+    */
+    this._table.addRow(this._table.rows);
+
   }
 
   /**
@@ -977,7 +983,7 @@ export class TableConstructor {
       return;
     }
     // this._processDownArrowKey(event);
-    console.log('_containerEnterPressed finished!');
+    // console.log('_containerEnterPressed finished!');
   }
 
   /**
@@ -1042,11 +1048,19 @@ export class TableConstructor {
     }
     else { // bottom row
       const cells = indicativeRow.cells;
-      if (currentCellIndex < cells.length - 1) {
-        cells[currentCellIndex + 1].click();
+      if (event.keyCode === 9) {
+        let oldSelectCell = this._table.selectedCell;
+        this._table.addRow(this._table.rows);
+        // oldSelectCell.click();
+        cells[currentCellIndex].click();
       }
-      else { // first row
-        table_rows[0].cells[currentCellIndex - 1].click();
+      else {
+        if (currentCellIndex < cells.length - 1) {
+          cells[currentCellIndex + 1].click();
+        }
+        else { // first row
+          table_rows[0].cells[currentCellIndex - 1].click();
+        }
       }
     }
   }
@@ -1061,7 +1075,11 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processLeftArrowKey(event) {
-    console.log('Enter _processLeftArrowKey');
+    // console.log('Enter _processLeftArrowKey');
+    // let ret = this._moveCharacterInTableCell();
+    // if (!ret) {
+    //   return;
+    // }
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
     // console.log('currentRowIndex:' + currentRowIndex);
@@ -1082,16 +1100,16 @@ export class TableConstructor {
     else {
       const cells = indicativeRow.cells;
       if (currentCellIndex == 0) { // 左边列
-        console.log('move up');
+        // console.log('move up');
         const previous_row = table_rows[currentRowIndex - 1];
         previous_row.cells[previous_row.cells.length - 1].click();
       }
       else {
-        console.log('move left');
+        // console.log('move left');
         cells[currentCellIndex - 1].click();
       }
     }
-    console.log('_processLeftArrowKey finished!');
+    // console.log('_processLeftArrowKey finished!');
   }
 
   /**
@@ -1105,24 +1123,24 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processDownArrowKey(event) {
-    console.log('Enter _processDownArrowKey');
+    // console.log('Enter _processDownArrowKey');
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
-    console.log('currentRowIndex:' + currentRowIndex);
+    // console.log('currentRowIndex:' + currentRowIndex);
     const currentCellIndex = this._table.selectedCell.cellIndex;
-    console.log('currentCellIndex:' + currentCellIndex);
+    // console.log('currentCellIndex:' + currentCellIndex);
     const table = this._table.body;
     const table_rows = table.rows;
     if (currentRowIndex < table_rows.length - 1) { // not table bottom
       const next_row = table_rows[currentRowIndex + 1];
-      console.log('nextRowIndex:', currentRowIndex + 1, next_row);
+      // console.log('nextRowIndex:', currentRowIndex + 1, next_row);
       next_row.cells[currentCellIndex].click()
     }
     else {
       const next_row = table_rows[0]
       next_row.cells[currentCellIndex].click();
     }
-    console.log('_processDownArrowKey finished!');
+    // console.log('_processDownArrowKey finished!');
   }
 
   /**
@@ -1136,7 +1154,7 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processUpArrowKey(event) {
-    console.log('Enter _processUpArrowKey');
+    // console.log('Enter _processUpArrowKey');
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
     // console.log('currentRowIndex:' + currentRowIndex);
@@ -1147,16 +1165,34 @@ export class TableConstructor {
     if (currentRowIndex != 0) { // not table top
       const nextRowIndex = currentRowIndex - 1;
       const nextRow = table_rows[nextRowIndex];
-      console.log('nextRowIndex:', nextRowIndex, nextRow);
+      // console.log('nextRowIndex:', nextRowIndex, nextRow);
       nextRow.cells[currentCellIndex].click();
     }
     else {
       const nextRowIndex = table_rows.length - 1;
-      console.log('nextRowIndex:', nextRowIndex);
+      // console.log('nextRowIndex:', nextRowIndex);
       const nextRow = table_rows[nextRowIndex];
       nextRow.cells[currentCellIndex].click();
     }
-    console.log('_processUpArrowKey finished!');
+    // console.log('_processUpArrowKey finished!');
+  }
+
+  /**
+   * @private
+   * move character in table cell for right and left arrow key
+   * @return {Boolean} true:don't process later, false: reach cell end and move to next cell
+   * xiaowy 2020/10/09
+   */
+  _moveCharacterInTableCell(moveConfig={}) {
+    let selection = window.getSelection();
+    console.log(selection);
+    let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
+    console.log(this._table.selectedCell);
+    console.log(input);
+    if (input) {
+      selection.collapse(input,1);
+    }
+    return false;
   }
 
   /**
@@ -1194,7 +1230,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '正文',
         Tags: '正文 智能 自动',
-        Thumb: './assets/dog1.jpg'
+        Thumb: './assets/dog1.jpg',
+        Repeat: 1,
       },
       {
         Name: '项目符号',
@@ -1202,7 +1239,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '正文',
         Tags: '项目符号 编号 智能 自动',
-        Thumb: './assets/dog2.jpg'
+        Thumb: './assets/dog2.jpg',
+        Repeat: 1,
       },
       {
         Name: '页标题',
@@ -1210,7 +1248,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '标题 副标题 引标',
         Tags: '页标题 标题 智能 自动',
-        Thumb: './assets/dog3.jpg'
+        Thumb: './assets/dog3.jpg',
+        Repeat: 1,
       },
       {
         Name: '封面标题',
@@ -1218,7 +1257,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '标题 副标题 口号 引标',
         Tags: '封面标题 封面 标题 智能 自动',
-        Thumb: './assets/dog4.jpg'
+        Thumb: './assets/dog4.jpg',
+        Repeat: 1,
       },
       {
         Name: '小节',
@@ -1226,7 +1266,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '标题',
         Tags: '小节 标题 智能 自动',
-        Thumb: './assets/dog4.jpg'
+        Thumb: './assets/dog4.jpg',
+        Repeat: 1,
       },
       {
         Name: '列表',
@@ -1234,7 +1275,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '标题 正文 图片',
         Tags: '列表 特性 卖点 排列 智能 自动',
-        Thumb: './assets/dog5.jpg'
+        Thumb: './assets/dog5.jpg',
+        Repeat: 1,
       },
       {
         Name: '编号',
@@ -1242,7 +1284,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '标题 正文 图片',
         Tags: '编号 排列 数字 智能 自动',
-        Thumb: './assets/dog6.jpg'
+        Thumb: './assets/dog6.jpg',
+        Repeat: 1
       },
       {
         Name: '图片',
@@ -1250,7 +1293,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '图片',
         Tags: '图片 智能 自动',
-        Thumb: './assets/dog6.jpg'
+        Thumb: './assets/dog6.jpg',
+        Repeat: 1,
       },
       {
         Name: 'logo',
@@ -1258,7 +1302,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '图片 标题 副标题 引标',
         Tags: 'logo 公司名称 智能 自动',
-        Thumb: './assets/dog7.jpg'
+        Thumb: './assets/dog7.jpg',
+        Repeat: 1,
       },
       {
         Name: '二维码',
@@ -1266,7 +1311,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '图片',
         Tags: '二维码 扫码 智能 自动',
-        Thumb: './assets/dog8.jpg'
+        Thumb: './assets/dog8.jpg',
+        Repeat: 1,
       },
       {
         Name: '地址',
@@ -1274,7 +1320,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '图片 正文',
         Tags: '地址 联系方式 电话 公司地址 智能 自动',
-        Thumb: './assets/dog9.jpg'
+        Thumb: './assets/dog9.jpg',
+        Repeat: 1,
       },
       {
         Name: '强调',
@@ -1282,7 +1329,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '正文',
         Tags: '强调 文字 智能 自动',
-        Thumb: './assets/dog9.jpg'
+        Thumb: './assets/dog9.jpg',
+        Repeat: 1,
       },
       {
         Name: '时间线',
@@ -1290,7 +1338,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '图片 标题 正文',
         Tags: '时间线 智能 自动',
-        Thumb: './assets/dog10.jpg'
+        Thumb: './assets/dog10.jpg',
+        Repeat: 1,
       },
       {
         Name: '图片集',
@@ -1298,7 +1347,8 @@ export class TableConstructor {
         Info: '自动选择造型',
         Fields: '图片 标题 正文 图片 标题 正文',
         Tags: '图片集 图片 logo墙 人员介绍 合作伙伴 智能 自动',
-        Thumb: './assets/dog11.jpg'
+        Thumb: './assets/dog11.jpg',
+        Repeat: 1,
       }
     ]
     let processModelSel = function (modelHeadCallBack = undefined) {
@@ -1518,7 +1568,7 @@ export class TableConstructor {
    */
   getJsonResult() {
     // let obj = {};
-    console.log('enter getJsonResult');
+    // console.log('enter getJsonResult');
     let temp = this._modelHeadTable.getHeadParam();
     // console.log('temp:', temp);
     let obj = {};
@@ -1540,7 +1590,7 @@ export class TableConstructor {
     // let rightIndex = paraName.indexOf('】');
     // let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
     // obj['name'] = this._descTitle.innerHTML;
-    console.log("tableConstructor getJsonResult", ret);
+    // console.log("tableConstructor getJsonResult", ret);
     return ret;
   }
 }

@@ -517,13 +517,14 @@ export class TableConstructor {
    * @param {KeyboardEvent} event
    */
   _containerKeydown(event) {
-    let keycodes = [37, 38, 39, 40, 9]; // 9 for tab key
+    // let keycodes = [37, 38, 39, 40, 9]; // 9 for tab key
+    let keycodes = [38, 40, 9]; // 9 for tab key
     if (event.keyCode === 13) {
       this._containerEnterPressed(event);
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
     else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
-      console.log(event.keyCode);
+      // console.log(event.keyCode);
       this._containerArrowKeyPressed(event);
     }
   }
@@ -573,6 +574,8 @@ export class TableConstructor {
    * @private
    */
   _addRow() {
+/*
+    ** 这段代码目前不太稳定，暂时屏蔽，统一在表的尾部添加 xiaowy 2020/10/09
     const indicativeRow = this._hoveredCell.closest('TR');
     let index = this._getHoveredSideOfContainer();
 
@@ -583,6 +586,8 @@ export class TableConstructor {
     }
 
     this._table.addRow(index);
+    */
+    this._table.addRow(this._table.rows);
   }
 
   /**
@@ -645,37 +650,7 @@ export class TableConstructor {
 
     // newstr.cells[0].click();
     // 原有代码结束
-    const currentRowIndex = indicativeRow.sectionRowIndex;
-    const currentCellIndex = this._table.selectedCell.cellIndex;
-    if (currentRowIndex == this._table.body.rows.length - 1 &&
-      currentCellIndex == indicativeRow.cells.length - 1) { // table 的尾部且在最后一列
-      // if (index === 1) {
-      //   index = indicativeRow.sectionRowIndex + 1;
-      // }
-      index = indicativeRow.sectionRowIndex + 1;
-      const newstr = this._table.addRow(index);
-
-      newstr.cells[0].click();
-    }
-    else {
-      if (currentCellIndex < indicativeRow.cells.length - 1) {
-        // let paraent = this._table.selectedCell.paraent;
-        // console.log(indicativeRow);
-        // paraent.cells[1].click();
-        indicativeRow.cells[currentCellIndex + 1].click();
-      }
-      else {
-        let table = this._table.body;
-        let row = table.rows[currentRowIndex + 1]
-        // console.log(row);
-        if (row !== null && row !== undefined) {
-          row.cells[0].click();
-        }
-      }
-    }
-    event.preventDefault();
-    event.stopPropagation();
-    console.log('_containerEnterPressed finished!');
+    // this._processDownArrowKey(event)
   }
 
   /**
@@ -739,12 +714,21 @@ export class TableConstructor {
       }
     }
     else { // bottom row
+      // const cells = indicativeRow.cells;
       const cells = indicativeRow.cells;
-      if (currentCellIndex < cells.length - 1) {
-        cells[currentCellIndex + 1].click();
+      if (event.keyCode === 9) {
+        let oldSelectCell = this._table.selectedCell;
+        this._table.addRow(this._table.rows);
+        // oldSelectCell.click();
+        cells[currentCellIndex].click();
       }
-      else { // first row
-        table_rows[0].cells[currentCellIndex - 1].click();
+      else {
+        if (currentCellIndex < cells.length - 1) {
+          cells[currentCellIndex + 1].click();
+        }
+        else { // first row
+          table_rows[0].cells[currentCellIndex - 1].click();
+        }
       }
     }
   }
