@@ -73,7 +73,7 @@ class MmxParameter {
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
       // 预处理
-      this._preProcessTableCell(row.cells);
+      // this._preProcessTableCell(row.cells);
       const cols = Array.from(row.cells);
       const inputs = cols.map(cell => cell.querySelector('.' + CSS.input));
       const isWorthless = inputs.every(this._isEmpty);

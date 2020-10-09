@@ -349,12 +349,12 @@ export class Table {
     let listResults = [];
     let modelParaObj = {};
     for (let i = 0; i < rows.length; i++) {
-      let jsonCells = JSON.parse(JSON.stringify(rows[i].cells));
-      console.log('jsoncells',jsonCells);
-      // let cells = rows[i].cells;
-      let cells = jsonCells;
+      // let jsonCells = JSON.parse(JSON.stringify(rows[i].cells));
+      // console.log('jsoncells',jsonCells);
+      let cells = rows[i].cells;
+      // let cells = jsonCells;
       // 预处理
-      this._preProcessTableCell(cells);
+      // this._preProcessTableCell(cells);
       // console.log(cells);
       const cols = Array.from(cells);
       const inputs = cols.map(cell => cell.querySelector('.' + CSS.inputField));
