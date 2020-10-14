@@ -84,3 +84,128 @@ export function getSideByCoords(coords, x, y) {
 
   return side;
 }
+
+/**
+* 
+* check selected model object fileds is all repeat
+* 检查整个字符串是否完全重复, 比如 ‘1 2 3 4 1 2 3 4’
+* @param {string} fileds
+* @returns {Object} {isRepeat: boolean,repeatWords: string}
+*/
+export function checkFiledsIsRepeat(fields) {
+  // console.log('enter checkFiledsIsRepeat', fields);
+  // let filedsArr = undefined;
+  // if ( fields.push !== undefined && Array.isArray(fields)) {
+  //   filedsArr = fields;
+  // }
+  // else {
+  //   fieldsArr = fields.split(' ');
+  // }
+  // find first words(not empty)
+  let b = fields.trim().split(' ');
+  // console.log(fields.trim().split(' '));
+  // let a = fields.split.trim().split(' ');
+  // console.log('a', a);
+  // let fieldsArr = fields.split(' ');
+  // console.log(filedsArr);
+  let firstSubString = '';
+  for (let i = 0; i < b.length; i++) {
+    if (b[i].trim().length != 0) {
+      firstSubString = b[i].trim();
+      // console.log('1', firstSubString);
+      break;
+    }
+  }
+  // console.log(firstSubString);
+  if (firstSubString !== undefined) {
+    let findIndexColl = [];
+    let findIndex = fields.indexOf(firstSubString);
+    // collect all find index
+    while (findIndex != -1) {
+      findIndexColl.push(findIndex);
+      findIndex = fields.indexOf(firstSubString, findIndex + 1);
+    }
+    // check find collect substring
+    if (findIndexColl.length >= 2 && findIndexColl[0] === 0) {
+      let firstSubIndex = findIndexColl[0];
+      let subStringColl = [];
+      let subStringLenth = 0;
+      let firstSubStringColl = ' ';
+      // let secondSubStringLength = 0;
+      for (let j = 1; j < findIndexColl.length; j++) {
+        if (j === 1 && j === findIndexColl.length - 1) {
+          subStringLenth = findIndexColl[j] - firstSubIndex;
+          firstSubStringColl = fields.substring(firstSubIndex, findIndexColl[j]);
+          let last = fields.substring(findIndexColl[j]);
+          if (last.trim() != firstSubStringColl.trim()) {
+            return {
+              isRepeat: false,
+              repeatWords: ' '
+            };
+          }
+          else {
+            return {
+              isRepeat: true,
+              repeatWords: firstSubStringColl
+            };
+          }
+          // firstSubIndex = findIndexColl[j];
+          // subStringColl.push(firstSubString);
+        }
+        else if (j == 1) {
+          subStringLenth = findIndexColl[j] - firstSubIndex;
+          firstSubStringColl = fields.substring(firstSubIndex, findIndexColl[j]);
+        }
+        else {
+          if ((findIndexColl[j] - firstSubIndex) != subStringLenth) {
+            return {
+              isRepeat: false,
+              repeatWords: ''
+            };
+          }
+          let temp = firstSubStringColl;
+          firstSubStringColl = fields.substring(firstSubIndex, findIndexColl[j])
+          // if (j == length - 1) {
+          //   firstSubString = fields.substring(findIndexColl[j]);
+          // }
+          // else {
+          //   firstSubString = fields.substring(firstSubIndex, findIndexColl[j])
+          // }
+          if (temp.trim() != firstSubStringColl.trim()) {
+            return {
+              isRepeat: false,
+              repeatWords: ' '
+            };
+          }
+        }
+        firstSubIndex = findIndexColl[j];
+      }
+      // last index process
+      let final = fields.substring(firstSubIndex);
+      if (final.trim() != firstSubStringColl.trim()) {
+        return {
+          isRepeat: false,
+          repeatWords: ' '
+        };
+      }
+      else {
+        return {
+          isRepeat: true,
+          repeatWords: firstSubStringColl
+        };
+      }
+    }
+    else {
+      return {
+        isRepeat: false,
+        repeatWords: ' '
+      };
+    }
+  }
+  else {
+    return {
+      isRepeat: false,
+      repeatWords: ' '
+    };
+  }
+}

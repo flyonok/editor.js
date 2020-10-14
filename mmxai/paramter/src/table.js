@@ -130,8 +130,25 @@ export class Table {
   _fillCell(cell) {
     cell.classList.add(CSS.cell);
     const content = this._createContenteditableArea();
+    content.onpaste = this._pasteEvent;
 
     cell.appendChild(create('div', [CSS.area], null, [content]));
+  }
+
+  /**
+   * @private
+   * process table input cell paste event
+   * @returns {boolean}
+   */
+  _pasteEvent(event) {
+    let clipData = event.clipboardData;
+    let dataContent = clipData.getData('text/plain');
+    let ele = event.target;
+    ele.innerHTML += dataContent;
+    // console.log(dataContent);
+    event.preventDefault();
+    event.stopPropagation();
+    return true;
   }
 
   /**

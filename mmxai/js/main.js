@@ -109,6 +109,7 @@ const mmxai = function (module) {
         let data = {
             // "time": 1600400191475,
             "blocks": [
+                
                 {
                     "type": "model",
                     "data":{
@@ -125,7 +126,7 @@ const mmxai = function (module) {
                             ]
                         }
                     }
-                }/*,
+                },
                 {
                     "type": "model",
                     "data": {
@@ -216,7 +217,7 @@ const mmxai = function (module) {
                             ]
                         }
                     }
-                }*/
+                }
             ],
             "version": "2.18.0"
         };

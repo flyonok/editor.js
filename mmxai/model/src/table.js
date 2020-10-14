@@ -1,4 +1,4 @@
-import { create, getCoords, getSideByCoords } from './documentUtils';
+import { create, getCoords, getSideByCoords, checkFiledsIsRepeat } from './documentUtils';
 import './styles/table.pcss';
 
 const CSS = {
@@ -23,6 +23,8 @@ export class Table {
     this._element = this._createTableWrapper();
     this._table = this._element.querySelector('table');
     this._objSepIndexColl = [];
+    this._firstColumnIsRead = true; // 默认不可以修改对象名称 2020/10/14
+    this._repeat = 100; // 对象的重复模式0，1，-1
 
     this._hangEvents();
   }
@@ -36,20 +38,34 @@ export class Table {
     // console.log('this._objSepIndexColl', this._objSepIndexColl);
     /** Add cell in each row */
     const rows = this._table.rows;
+    let cellConfig = {isObjSep:false, isWritable:false};
 
     for (let i = 0; i < rows.length; i++) {
+      let isFirstColumn = false;
+      if (rows[i].cells.length === 0) {
+        isFirstColumn = true;
+      }
       const cell = rows[i].insertCell(index);
       // if (this._numberOfColumns === 1) {
       //   this._fillReadOnlyCell(cell);
       //   continue;
       // }
-      if (this._objSepIndexColl.indexOf(i) >= 0) {
+      if (this._objSepIndexColl && this._objSepIndexColl.indexOf(i) >= 0) {
         // console.log('find!!!');
-        this._fillCell(cell, true)
+        // this._fillCell(cell, true)
+        cellConfig.isObjSep = true;
       }
       else {
-        this._fillCell(cell);
+        cellConfig.isObjSep = false;
       }
+
+      if (this._firstColumnIsRead && isFirstColumn) {
+        cellConfig.isWritable = false;
+      }
+      else {
+        cellConfig.isWritable = true;
+      }
+      this._fillCell(cell, cellConfig);
     }
   };
 
@@ -61,7 +77,7 @@ export class Table {
   addRow(index = -1) {
     this._numberOfRows++;
     const row = this._table.insertRow(index);
-    if (this._objSepIndexColl.indexOf(this._numberOfRows) > 0) {
+    if (this._objSepIndexColl && this._objSepIndexColl.indexOf(this._numberOfRows) > 0) {
       this._fillRow(row, true);
     }
     else {
@@ -122,6 +138,17 @@ export class Table {
     return this._numberOfRows;
   }
 
+  set firstColumnIsRead(value) {
+    this._firstColumnIsRead = value;
+  }
+
+  set repeat(value) {
+    this._repeat = value;
+    if (this._repeat === -1) {
+      this._firstColumnIsRead = false;
+    }
+  }
+
   /**
    * returns selected/editable cell
    * @return {HTMLElement}
@@ -137,7 +164,8 @@ export class Table {
    * @return {HTMLElement} tbody - where rows will be
    */
   _createTableWrapper() {
-    return create('div', [CSS.wrapper], null, [create('table', [CSS.table])]);
+    let tableBr = document.createElement('br');
+    return create('div', [CSS.wrapper], null, [create('table', [CSS.table]), tableBr]);
   }
 
   /**
@@ -166,17 +194,41 @@ export class Table {
    *
    * Fills the empty cell of the editable area
    * @param {HTMLElement} cell - empty cell
+   * @param {Object} cellConfig => {isObjSep:false, isWritable:false}
    */
-  _fillCell(cell, isObjSep = false) {
-    if (isObjSep) {
+  _fillCell(cell, cellConfig = { isObjSep: false, isWritable: false}) {
+    if (cellConfig.isObjSep) {
       cell.classList.add(CSS.cellWithBorder);
     }
     else {
       cell.classList.add(CSS.cell);
     }
-    const content = this._createContenteditableArea();
+    if (cellConfig.isWritable) {
+      const content = this._createContenteditableArea();
+      content.onpaste = this._pasteEvent;
 
-    cell.appendChild(create('div', [CSS.area], null, [content]));
+      cell.appendChild(create('div', [CSS.area], null, [content]));
+    }
+    else {
+      const content = this._createContentReadOnlyArea();
+      cell.appendChild(create('div', [CSS.area], null, [content]));
+    }
+  }
+
+  /**
+   * @private
+   * process table input cell paste event
+   * @returns {boolean}
+   */
+  _pasteEvent(event) {
+    let clipData = event.clipboardData;
+    let dataContent = clipData.getData('text/plain');
+    let ele = event.target;
+    ele.innerHTML += dataContent;
+    // console.log(dataContent);
+    event.preventDefault();
+    event.stopPropagation();
+    return true;
   }
 
   /**
@@ -203,9 +255,14 @@ export class Table {
   _fillRow(row, isObjSep = false) {
     // console.log('_fillRow:', this._numberOfColumns);
     // console.log('this._objSepIndexColl', this._objSepIndexColl);
+    let cellConfig = {isObjSep: isObjSep, isWritable: true}
     for (let i = 0; i < this._numberOfColumns; i++) {
       const cell = row.insertCell();
-      this._fillCell(cell, isObjSep);
+      if (i == 0 && this._firstColumnIsRead)
+        cellConfig.isWritable = false;
+      else
+        cellConfig.isWritable = true;
+      this._fillCell(cell, cellConfig);
       // if (i === 0) {
       //   this._fillReadOnlyCell(cell);
       //   continue;
@@ -289,6 +346,7 @@ export class Table {
   _pressedEnterInEditField(event) {
     // let keycodes = [37, 38, 39, 40, 9]; // 9 is TAB
     let keycodes = [38, 40, 9]; // 9 for tab key
+    let leftAndRight = [37, 39];
     // console.log(event.keyCode);
     if (!event.target.classList.contains(CSS.inputField)) {
       return;
@@ -348,6 +406,13 @@ export class Table {
     let rows = this._table.rows;
     let listResults = [];
     let modelParaObj = {};
+    let ret = this._tableIsRpeat();
+    // 找出重复对象名中的第一个单词
+    let firstRepeatWord = ''
+    if (ret.isRepeat) {
+      let wordsColl = ret.repeatWords.trim();
+      firstRepeatWord = wordsColl.split(' ')[0];
+    }
     for (let i = 0; i < rows.length; i++) {
       // let jsonCells = JSON.parse(JSON.stringify(rows[i].cells));
       // console.log('jsoncells',jsonCells);
@@ -384,13 +449,24 @@ export class Table {
       let key = keyOne.replace(regrexTwo, '\r');
       // 增加容错处理 xiaowy 2020/10/09
       if (key.length > 0) {
-        if (cells[0].classList.contains(CSS.cellWithBorder)) {
+        // if (cells[0].classList.contains(CSS.cellWithBorder)) {
 
-          // modelParaObj[inputs[0].innerHTML] = b;
-          modelParaObj[key] = b;
-          // console.log('getJsonResult:', modelParaObj);
-          listResults.push(modelParaObj);
-          modelParaObj = {};
+        //   // modelParaObj[inputs[0].innerHTML] = b;
+        //   modelParaObj[key] = b;
+        //   // console.log('getJsonResult:', modelParaObj);
+        //   listResults.push(modelParaObj);
+        //   modelParaObj = {};
+        // }
+        // else if (ret.isRepeat) {
+        if (ret.isRepeat) {
+          if (key === firstRepeatWord && i > 0) {
+            listResults.push(modelParaObj);
+            modelParaObj = {};
+            modelParaObj[key] = b;
+          }
+          else {
+            modelParaObj[key] = b;
+          }
         }
         else {
           // 增加容错处理 xiaowy 2020/10/09
@@ -405,6 +481,26 @@ export class Table {
     listResults.push(modelParaObj);
     // console.log('after table getJsonResult:', listResults);
     return listResults;
+  }
+
+  /**
+   * @private
+   * check whether table is repeat
+   * @param {nothing}
+   * @returns {boolean} @see checkFiledsIsRepeat
+   */
+  _tableIsRpeat() {
+    let rows = this._table.rows;
+    let listResults = [];
+    for (let i = 0; i < rows.length; i++) {
+      let cell = rows[i].cells[0];
+      let input = cell.querySelector('.' + CSS.inputField);
+      let key = input.innerHTML.trim();
+      listResults.push(key);
+    }
+    let ret = checkFiledsIsRepeat(listResults.join(' '));
+    console.log(ret);
+    return ret;
   }
 
   /**
@@ -430,7 +526,7 @@ export class Table {
         else {
           div1.forEach(ele => {
             if (ele.innerText !== undefined && ele.innerText.trim().length === 0 && ele.nextSibling === null) {
-            // if (div1.textContent.trim().length === 0) {
+              // if (div1.textContent.trim().length === 0) {
               ele.remove();
             }
           });

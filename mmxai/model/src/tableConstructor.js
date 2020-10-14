@@ -1,5 +1,5 @@
 import './styles/table-constructor.pcss';
-import { create, getCoords, getSideByCoords } from './documentUtils';
+import { create, getCoords, getSideByCoords, checkFiledsIsRepeat } from './documentUtils';
 import { HorizontalBorderToolBar, VerticalBorderToolBar } from './borderToolBar';
 import { Table } from './table';
 import { TableReadOnly } from './tableReadOnly'
@@ -74,7 +74,8 @@ export class TableConstructor {
 
     let _innerData = this._cdrJsonConvert(data);
     this._repeat = _innerData.Repeat; // add by xiaowy whether can add table parameter
-    console.log('config:', config);
+    // console.log('repeat:', this._repeat);
+    this._repeatWordsColl = [];
     this._makeModelTables(_innerData, config);
   }
 
@@ -196,7 +197,7 @@ export class TableConstructor {
    * @return {Boolean} true: is repeat, false: not repeat
    */
   _checkModelParaListsIsRepeat(paraList) {
-    console.log('enter _checkModelParaListsIsRepeat')
+    // console.log('enter _checkModelParaListsIsRepeat')
     if (Array.isArray(paraList)) {
       let objNamesColl = '';
       paraList.forEach((item, index) => {
@@ -206,9 +207,12 @@ export class TableConstructor {
           }
         }
       });
-      console.log('_checkModelParaListsIsRepeat11', );
-      let ret = this._checkFiledsIsRepeat(objNamesColl);
-      console.log('_checkModelParaListsIsRepeat', ret);
+      // console.log('_checkModelParaListsIsRepeat11', );
+      let ret = checkFiledsIsRepeat(objNamesColl.trim());
+      if (ret.isRepeat) {
+        this._repeatWordsColl = ret.repeatWords.trim().split(' ');
+      }
+      // console.log('_checkModelParaListsIsRepeat', ret);
       return ret.isRepeat;
     }
     return false;
@@ -221,23 +225,24 @@ export class TableConstructor {
    */
   _initToolBarAndEvent() {
     /** creating ToolBars */
-    if (this._repeat !== undefined && this._repeat === 1) {
+    if (this._repeat !== undefined && this._repeat === 1 && this._verticalToolBar === undefined) {
       this._verticalToolBar = new VerticalBorderToolBar();
       this._horizontalToolBar = new HorizontalBorderToolBar();
       this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
       this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
+      /** Activated elements */
+      this._hoveredCell = null;
+      this._activatedToolBar = null;
+      this._hoveredCellSide = null;
+
+      /** Timers */
+      this._plusButDelay = null;
+      this._toolbarShowDelay = null;
+
+      this._hangEvents();
     }
 
-    /** Activated elements */
-    this._hoveredCell = null;
-    this._activatedToolBar = null;
-    this._hoveredCellSide = null;
 
-    /** Timers */
-    this._plusButDelay = null;
-    this._toolbarShowDelay = null;
-
-    this._hangEvents();
   }
 
   /**
@@ -266,30 +271,41 @@ export class TableConstructor {
     try {
       if (dataNotEmpty && fromContructor) { // 初始化构造
         this._makeModelNameTitle(data); // 造型标题
-        console.log('after _makeModelNameTitle');
+        // console.log('after _makeModelNameTitle');
         this._makeModelHeadTable(data); // 造型头
-        console.log('after _makeModelHeadTable');
+        // console.log('after _makeModelHeadTable');
         this._makeReadOnlyTable(); // 造型表格头
-        console.log('after _makeReadOnlyTable');
+        // console.log('after _makeReadOnlyTable');
         // 造型表格和其他组件的换行
         // 具体的造型参数
         this._table = new Table();
+        this._table.repeat = this._repeat;
+        // if (this._repeat === -1) {
+        //   this._table.firstColumnIsRead = false;
+        // }
         const size = this._resizeTable(data, config);
 
         this._fillTable(data, size);
-        let tablebr = document.createElement('br');
+        // let tablebr = document.createElement('br');
         // 构建造型容器
-        this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
+        // this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
+        this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement]);
         // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
         // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
         this._initToolBarAndEvent();
 
       }
-      else if (!dataNotEmpty && fromContructor) { // 如果没有具体的造型参数数据
+      else if (!dataNotEmpty && fromContructor) { // 如果没有具体的造型参数数据，一般是新建造型
         this._makeModelNameTitle(data); // 造型标题
         this._makeModelHeadTable(data); // 造型头
-        this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement]);
-        // this._initToolBarAndEvent();
+        this._table = new Table();
+        const size = this._resizeTable(data, config);
+        this._makeReadOnlyTable(); // 造型表格头
+        this._repeat = 1;
+        this._table.repeat = this._repeat; 
+        this._table.firstColumnIsRead = false; // to do 这里以后要注释掉
+        this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement]);
+        this._initToolBarAndEvent();
       }
       else if (dataNotEmpty && !fromContructor) {
         /**
@@ -801,12 +817,13 @@ export class TableConstructor {
   _containerKeydown(event) {
     // let keycodes = [37, 38, 39, 40, 9]; // 9 for tab key
     let keycodes = [38, 40, 9]; // 9 for tab key
+    let leftAndRight = [37, 39];
     if (event.keyCode === 13) {
       this._containerEnterPressed(event);
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
     else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
-      // console.log(event.keyCode);
+      console.log(event.keyCode);
       this._containerArrowKeyPressed(event);
     }
   }
@@ -1017,8 +1034,8 @@ export class TableConstructor {
         break;
     }
     // prevent default behavior
-    event.preventDefault();
-    event.stopPropagation();
+    // event.preventDefault();
+    // event.stopPropagation();
   }
 
   /**
@@ -1031,6 +1048,11 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processRightArrowKey(event) {
+    console.log('enter _processRightArrowKey');
+    // let ret = this._moveCharacterInTableCellForRightArrow();
+    // if (ret) {
+    //   return;
+    // }
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
     const currentCellIndex = this._table.selectedCell.cellIndex;
@@ -1048,11 +1070,27 @@ export class TableConstructor {
     }
     else { // bottom row
       const cells = indicativeRow.cells;
+      // console.log('bottom');
       if (event.keyCode === 9) {
-        let oldSelectCell = this._table.selectedCell;
-        this._table.addRow(this._table.rows);
-        // oldSelectCell.click();
-        cells[currentCellIndex].click();
+        // 确认造型是否可以添加新对象属性
+        if (this._repeat !== undefined && this._repeat === 1) {
+          let oldSelectCell = this._table.selectedCell;
+          let rowIndexBegin = this._table.body.rows.length;
+          for (let i = 0; i < this._repeatWordsColl.length; i++) {
+            this._table.addRow();
+          }
+          // console.log('rowIndexBegin', rowIndexBegin);
+          // console.log('this._table.rows.length', this._table.body.rows.length);
+          for (let j = rowIndexBegin; j < this._table.body.rows.length; j++){
+            // console.log('fill data');
+            let row = this._table.body.rows[j];
+            let cell = row.cells[0];
+            const input = cell.querySelector('.' + CSS.inputField);
+            input.innerHTML = this._repeatWordsColl[j - rowIndexBegin];
+          }
+          // oldSelectCell.click();
+          cells[currentCellIndex].click();
+        }
       }
       else {
         if (currentCellIndex < cells.length - 1) {
@@ -1063,6 +1101,8 @@ export class TableConstructor {
         }
       }
     }
+    event.preventDefault();
+    event.stopPropagation();
   }
 
   /**
@@ -1076,8 +1116,8 @@ export class TableConstructor {
    */
   _processLeftArrowKey(event) {
     // console.log('Enter _processLeftArrowKey');
-    // let ret = this._moveCharacterInTableCell();
-    // if (!ret) {
+    // let ret = this._moveCharacterInTableCellForLeftArrow();
+    // if (ret) {
     //   return;
     // }
     const indicativeRow = this._table.selectedCell.closest('TR');
@@ -1109,6 +1149,8 @@ export class TableConstructor {
         cells[currentCellIndex - 1].click();
       }
     }
+    event.preventDefault();
+    event.stopPropagation();
     // console.log('_processLeftArrowKey finished!');
   }
 
@@ -1140,6 +1182,8 @@ export class TableConstructor {
       const next_row = table_rows[0]
       next_row.cells[currentCellIndex].click();
     }
+    event.preventDefault();
+    event.stopPropagation();
     // console.log('_processDownArrowKey finished!');
   }
 
@@ -1174,6 +1218,8 @@ export class TableConstructor {
       const nextRow = table_rows[nextRowIndex];
       nextRow.cells[currentCellIndex].click();
     }
+    event.preventDefault();
+    event.stopPropagation();
     // console.log('_processUpArrowKey finished!');
   }
 
@@ -1183,14 +1229,58 @@ export class TableConstructor {
    * @return {Boolean} true:don't process later, false: reach cell end and move to next cell
    * xiaowy 2020/10/09
    */
-  _moveCharacterInTableCell(moveConfig={}) {
+  _moveCharacterInTableCellForLeftArrow() {
     let selection = window.getSelection();
-    console.log(selection);
+    // console.log(selection.toString());
     let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
-    console.log(this._table.selectedCell);
-    console.log(input);
+    // console.log(this._table.selectedCell);
+    // console.log(input);
     if (input) {
-      selection.collapse(input,1);
+      let range = selection.getRangeAt(0)
+      if (range) {
+        // console.log('range', range);
+        let innerText = input.innerText.trim();
+        if (range.collapsed && range.startOffset === 0)
+          return false;
+        else {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @private
+   * move character in table cell for right and right arrow key
+   * @return {Boolean} true:don't process later, false: reach cell end and move to previous cell
+   * xiaowy 2020/10/12
+   */
+  _moveCharacterInTableCellForRightArrow() {
+    let selection = window.getSelection();
+    // console.log(selection.toString());
+    let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
+    // console.log(this._table.selectedCell);
+    // console.log(input);
+    if (input) {
+      let range = selection.getRangeAt(0)
+      if (range) {
+        // console.log('range', range);
+
+        if (range.collapsed) {
+          let node = range.endContainer;
+          let innerText = node.innerText.trim();
+          if (range.startOffset === innerText.length && !node.childNodes.length && !node.nextSibling) {
+            return false;
+          }
+          else {
+            return true;
+          }
+        }
+        else {
+          return true;
+        }
+      }
     }
     return false;
   }
@@ -1330,7 +1420,7 @@ export class TableConstructor {
         Fields: '正文',
         Tags: '强调 文字 智能 自动',
         Thumb: './assets/dog9.jpg',
-        Repeat: 1,
+        Repeat: -1,
       },
       {
         Name: '时间线',
@@ -1339,7 +1429,7 @@ export class TableConstructor {
         Fields: '图片 标题 正文',
         Tags: '时间线 智能 自动',
         Thumb: './assets/dog10.jpg',
-        Repeat: 1,
+        Repeat: -1,
       },
       {
         Name: '图片集',
@@ -1348,7 +1438,7 @@ export class TableConstructor {
         Fields: '图片 标题 正文 图片 标题 正文',
         Tags: '图片集 图片 logo墙 人员介绍 合作伙伴 智能 自动',
         Thumb: './assets/dog11.jpg',
-        Repeat: 1,
+        Repeat: -1,
       }
     ]
     let processModelSel = function (modelHeadCallBack = undefined) {
@@ -1413,6 +1503,8 @@ export class TableConstructor {
       // check table  is empty
       if (this._table === undefined) {
         this._table = new Table();
+        // let tablebr = document.createElement('br');
+        // this._table.htmlElement.appendChild(tablebr);
         this._container.appendChild(this._table.htmlElement);
       }
       else {
@@ -1427,7 +1519,17 @@ export class TableConstructor {
       let data = {};
       data.content = [];
       data.contentSeprateIndex = [];
-      let isFielsRepeat = this._checkFiledsIsRepeat(modelObj.Fields);
+      let isFielsRepeat = checkFiledsIsRepeat(modelObj.Fields);
+      if (isFielsRepeat.isRepeat) {
+        this._repeatWordsColl = isFielsRepeat.repeatWords.trim().split(' ');
+      }
+      else if (this._repeat !== undefined && this._repeat === 1) {
+        this._repeatWordsColl = modelObj.Fields.trim().split(' ');
+        // let arr = modelObj.Fields.trim();
+        // if (arr.length === 1) {
+        //   this._repeatWordsColl = arr;
+        // }
+      }
       let objSepIndex = 0;
       fieldArr.forEach((item, index) => {
         let temp = item.trim();
@@ -1446,118 +1548,13 @@ export class TableConstructor {
         objSepIndex++;
       });
       let config = { rows: fieldArr.length, cols: 2 }
+      // if (this._repeat === -1) {
+      //   this._table.firstColumnIsRead = false;
+      // }
+      this._table.repeat = this._repeat;
       const size = this._resizeTable(data, config);
       this._fillTable(data, size);
 
-    }
-  }
-
-  /**
-   * @private
-   * check selected model object fileds is all repeat
-   * 检查整个字符串是否完全重复, 比如 ‘1 2 3 4 1 2 3 4’
-   * 
-   */
-  _checkFiledsIsRepeat(fields) {
-    let fieldsArr = fields.split(' ');
-    // find first words(not empty)
-    let firstsub = undefined;
-    for (let i = 0; i < fieldsArr.length; i++) {
-      if (fieldsArr[i].trim().length != 0) {
-        firstsub = fieldsArr[i];
-        break;
-      }
-    }
-    if (firstsub !== undefined) {
-      let findIndexColl = [];
-      let findIndex = fields.indexOf(firstsub);
-      // collect all find index
-      while (findIndex != -1) {
-        findIndexColl.push(findIndex);
-        findIndex = fields.indexOf(firstsub, findIndex + 1);
-      }
-      // check find collect substring
-      if (findIndexColl.length >= 2 && findIndexColl[0] === 0) {
-        let firstSubIndex = findIndexColl[0];
-        let subStringColl = [];
-        let subStringLenth = 0;
-        let firstSubString = ' ';
-        // let secondSubStringLength = 0;
-        for (let j = 1; j < findIndexColl.length; j++) {
-          if (j == 1 && j == findIndexColl.length - 1) {
-            subStringLenth = findIndexColl[j] - firstSubIndex;
-            firstSubString = fields.substring(firstSubIndex, findIndexColl[j]);
-            let last = fields.substring(findIndexColl[j]);
-            if (last.trim() != firstSubString.trim()) {
-              return {
-                isRepeat: false,
-                repeatWords: firstsub
-              };
-            }
-            else {
-              return {
-                isRepeat: true,
-                repeatWords: firstsub
-              };
-            }
-            // firstSubIndex = findIndexColl[j];
-            // subStringColl.push(firstSubString);
-          }
-          else if (j == 1) {
-            subStringLenth = findIndexColl[j] - firstSubIndex;
-            firstSubString = fields.substring(firstSubIndex, findIndexColl[j]);
-          }
-          else {
-            if ((findIndexColl[j] - firstSubIndex) != subStringLenth) {
-              return {
-                isRepeat: false,
-                repeatWords: firstsub
-              };
-            }
-            let temp = firstSubString;
-            firstSubString = fields.substring(firstSubIndex, findIndexColl[j])
-            // if (j == length - 1) {
-            //   firstSubString = fields.substring(findIndexColl[j]);
-            // }
-            // else {
-            //   firstSubString = fields.substring(firstSubIndex, findIndexColl[j])
-            // }
-            if (temp.trim() != firstSubString.trim()) {
-              return {
-                isRepeat: false,
-                repeatWords: firstsub
-              };
-            }
-          }
-          firstSubIndex = findIndexColl[j];
-        }
-        // last index process
-        let final = fields.substring(firstSubIndex);
-        if (final.trim() != firstSubString.trim()) {
-          return {
-            isRepeat: false,
-            repeatWords: firstsub
-          };
-        }
-        else {
-          return {
-            isRepeat: true,
-            repeatWords: firstsub
-          };
-        }
-      }
-      else {
-        return {
-          isRepeat: false,
-          repeatWords: firstsub
-        };
-      }
-    }
-    else {
-      return {
-        isRepeat: false,
-        repeatWords: firstsub
-      };
     }
   }
 
