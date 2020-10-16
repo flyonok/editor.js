@@ -166,6 +166,9 @@ export class TableConstructor {
       if (Array.isArray(arr)) {
         let repeatRowIndex = 0;
         let isRepeat = this._checkModelParaListsIsRepeat(arr);
+        if (isRepeat) {
+          _innerData.Repeat = 1;
+        }
         arr.forEach((item, index) => {
           // console.log('item:', item);
           for (let prop in item) {
@@ -239,8 +242,9 @@ export class TableConstructor {
       this._plusButDelay = null;
       this._toolbarShowDelay = null;
 
-      this._hangEvents();
+      // this._hangEvents();
     }
+    this._hangEvents();
 
 
   }
@@ -302,7 +306,7 @@ export class TableConstructor {
         const size = this._resizeTable(data, config);
         this._makeReadOnlyTable(); // 造型表格头
         this._repeat = 1;
-        this._table.repeat = this._repeat; 
+        this._table.repeat = this._repeat;
         this._table.firstColumnIsRead = false; // to do 这里以后要注释掉
         this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement]);
         this._initToolBarAndEvent();
@@ -592,7 +596,7 @@ export class TableConstructor {
    * Hide all of toolbars
    */
   _hideToolBar() {
-    if (this._activatedToolBar !== null) {
+    if (this._activatedToolBar !== null && this._activatedToolBar !== undefined) {
       this._activatedToolBar.hide();
     }
   }
@@ -817,12 +821,14 @@ export class TableConstructor {
   _containerKeydown(event) {
     // let keycodes = [37, 38, 39, 40, 9]; // 9 for tab key
     let keycodes = [38, 40, 9]; // 9 for tab key
+    // Todo: process chracter move
     let leftAndRight = [37, 39];
     if (event.keyCode === 13) {
       this._containerEnterPressed(event);
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
-    else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
+    else if ((keycodes.indexOf(event.keyCode) >= 0 || leftAndRight.indexOf(event.keyCode) >= 0) &&
+      !event.shiftKey && !event.ctrlKey && !event.altKey) {
       console.log(event.keyCode);
       this._containerArrowKeyPressed(event);
     }
@@ -1010,6 +1016,7 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _containerArrowKeyPressed(event) {
+    console.log('enter _containerArrowKeyPressed');
     if (!(this._table.selectedCell !== null && !event.shiftKey && !event.ctrlKey && !event.altKey)) {
       return;
     }
@@ -1049,10 +1056,15 @@ export class TableConstructor {
    */
   _processRightArrowKey(event) {
     console.log('enter _processRightArrowKey');
-    // let ret = this._moveCharacterInTableCellForRightArrow();
-    // if (ret) {
-    //   return;
-    // }
+    if (event.keyCode !== 9) {
+      let ret = this._moveCharacterInTableCellForRightArrow();
+      if (ret) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+    }
+    // console.log('process right arrow key begin');
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
     const currentCellIndex = this._table.selectedCell.cellIndex;
@@ -1065,12 +1077,33 @@ export class TableConstructor {
         cells[currentCellIndex + 1].click();
       }
       else { // next row
-        table_rows[currentRowIndex + 1].cells[currentCellIndex - 1].click();
+        // console.log('right nex row',table_rows[currentRowIndex + 1].cells[currentCellIndex - 1]);
+        if (this._repeat !== undefined && this._repeat === -1) {
+          let div = table_rows[currentRowIndex + 1].cells[currentCellIndex - 1];
+          // console.log('right nex row', div);
+          div.click();
+          // let input = div.querySelector('.' + CSS.inputField);
+          // if (input) {
+          //   console.log('right nex row',input);
+          //   input.click();
+          // }
+        }
+        else {
+          let div = table_rows[currentRowIndex + 1].cells[currentCellIndex];
+          // console.log('right nex row', div);
+          div.click();
+          // let input = div.querySelector('.' + CSS.inputField);
+          // if (input) {
+          //   console.log('right nex row',input);
+          //   input.click();
+          // }
+        }
+        // table_rows[currentRowIndex + 1].cells[currentCellIndex - 1].click();
       }
     }
     else { // bottom row
       const cells = indicativeRow.cells;
-      // console.log('bottom');
+      console.log('bottom');
       if (event.keyCode === 9) {
         // 确认造型是否可以添加新对象属性
         if (this._repeat !== undefined && this._repeat === 1) {
@@ -1081,7 +1114,7 @@ export class TableConstructor {
           }
           // console.log('rowIndexBegin', rowIndexBegin);
           // console.log('this._table.rows.length', this._table.body.rows.length);
-          for (let j = rowIndexBegin; j < this._table.body.rows.length; j++){
+          for (let j = rowIndexBegin; j < this._table.body.rows.length; j++) {
             // console.log('fill data');
             let row = this._table.body.rows[j];
             let cell = row.cells[0];
@@ -1091,13 +1124,32 @@ export class TableConstructor {
           // oldSelectCell.click();
           cells[currentCellIndex].click();
         }
+        else {
+          if (currentCellIndex < cells.length - 1) {
+            cells[currentCellIndex + 1].click();
+          }
+          else { // first row
+            if (this._repeat !== undefined && this._repeat === 1) {
+              table_rows[0].cells[currentCellIndex - 1].click();
+            }
+            else {
+              table_rows[0].cells[currentCellIndex].click();
+            }
+          }
+        }
       }
       else {
         if (currentCellIndex < cells.length - 1) {
           cells[currentCellIndex + 1].click();
         }
         else { // first row
-          table_rows[0].cells[currentCellIndex - 1].click();
+          // console.log('go to first row')
+          if (this._repeat !== undefined && this._repeat === 1) {
+            table_rows[0].cells[currentCellIndex - 1].click();
+          }
+          else {
+            table_rows[0].cells[currentCellIndex].click();
+          }
         }
       }
     }
@@ -1115,11 +1167,11 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processLeftArrowKey(event) {
-    // console.log('Enter _processLeftArrowKey');
-    // let ret = this._moveCharacterInTableCellForLeftArrow();
-    // if (ret) {
-    //   return;
-    // }
+    console.log('Enter _processLeftArrowKey');
+    let ret = this._moveCharacterInTableCellForLeftArrow();
+    if (ret) {
+      return;
+    }
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
     // console.log('currentRowIndex:' + currentRowIndex);
@@ -1134,7 +1186,13 @@ export class TableConstructor {
         last_row.cells[last_row.cells.length - 1].click();
       }
       else {
-        cells[currentCellIndex - 1].click();
+        if (this._repeat !== undefined && this._repeat === -1) {
+          cells[currentCellIndex - 1].click();
+        }
+        else {
+          const last_row = table_rows[table_rows.length - 1];
+          last_row.cells[last_row.cells.length - 1].click();
+        }
       }
     }
     else {
@@ -1146,7 +1204,13 @@ export class TableConstructor {
       }
       else {
         // console.log('move left');
-        cells[currentCellIndex - 1].click();
+        if (this._repeat !== undefined && this._repeat === -1) {
+          cells[currentCellIndex - 1].click();
+        }
+        else {
+          const previous_row = table_rows[currentRowIndex - 1];
+          previous_row.cells[previous_row.cells.length - 1].click();
+        }
       }
     }
     event.preventDefault();
@@ -1239,9 +1303,81 @@ export class TableConstructor {
       let range = selection.getRangeAt(0)
       if (range) {
         // console.log('range', range);
-        let innerText = input.innerText.trim();
-        if (range.collapsed && range.startOffset === 0)
-          return false;
+
+        if (range.collapsed) {
+          let node = range.endContainer;
+          console.log('node', node.nodeType);
+          if (node.nodeName === "#text") {
+            console.log('node', range.startOffset, node.nodeValue.length);
+            if (range.startOffset === 0) {
+              // go to previous Sibling
+              // console.log('go to previous Sibling',node.parentNode);
+              if (node.previousSibling) {
+                let sibling = node.previousSibling;
+                while (sibling && sibling.nodeName !== '#text') {
+                  console.log('move character left', sibling);
+                  sibling = sibling.previousSibling;
+                }
+                if (sibling) {
+                  let end = sibling.nodeValue.trim().length;
+                  range.setStart(sibling, end);
+                  return true;
+                }
+                else {
+                  return false;
+                }
+              } // go to parent
+              else if (node.parentNode) {
+                let parentNode = node.parentNode;
+                if (parentNode.nodeName === '#text') {
+                  range.setStart(parentNode, 0);
+                  return true;
+                } 
+                else if (parentNode.previousSibling) {
+                  let parentPreviousSibling = parentNode.previousSibling;
+                  if (parentPreviousSibling.nodeName === '#text') {
+                    let end1 = parentPreviousSibling.nodeValue.trim().length;
+                    console.log('move parent sibling', parentPreviousSibling.nodeValue, end1);
+                    range.setStart(parentPreviousSibling, end1);
+                    return true;
+                  }
+                  // parent sibling childs
+                  else {
+                    let childs = parentPreviousSibling.childNodes;
+                    for (let i = 0; i < childs.length; i++) {
+                      let child = childs[i];
+                      if (child.nodeName === '#text') {
+                        let childEnd = child.nodeValue.trim().length - 1;
+                        range.setStart(child, childEnd);
+                        return true;
+                      }
+                    }
+                    return false;
+                  }
+                  
+                }
+                
+              }
+              else {
+                return false;
+              }
+            }
+            else {
+              range.setStart(node, range.startOffset - 1);
+              return true;
+            }
+          }// other node type for todo
+          else {
+            let innerText = node.innerText.trim();
+            if (range.startOffset === innerText.length && !node.childNodes.length && !node.nextSibling) {
+              return false;
+            }
+            else {
+              return true;
+            }
+          }
+
+        }
         else {
           return true;
         }
@@ -1269,13 +1405,90 @@ export class TableConstructor {
 
         if (range.collapsed) {
           let node = range.endContainer;
-          let innerText = node.innerText.trim();
-          if (range.startOffset === innerText.length && !node.childNodes.length && !node.nextSibling) {
-            return false;
+          console.log('node', node.nodeType);
+          if (node.nodeName === "#text") {
+            console.log('node', range.startOffset, node.nodeValue.length);
+            if (range.startOffset === node.nodeValue.length) {
+              if (node.childNodes.length) {
+                // go to child
+                let firstChild = node.childNodes[0];
+                range.setStart(firstChild, 0);
+                return true;
+
+              } // go to next Sibling
+              else if (node.nextSibling) {
+                console.log('move node.nextSibling', node.nextSibling);
+                let sibling = node.nextSibling;
+                // while (sibling && sibling.nodeName !== '#text') {
+                //   sibling = sibling.nextSibling;
+                // }
+                if (sibling.nodeName !== '#text') {
+                  console.log('move node.nextSibling ok');
+                  range.setStart(sibling, 0);
+                  return true;
+                }
+                else {
+                  let childs = sibling.childNodes;
+                  for (let i = 0; i < childs.length; i++) {
+                    let child = childs[i];
+                    if (child.nodeName === '#text') {
+                      rang.setStart(child, 0);
+                      return true;
+                    }
+                  }
+                  return false;
+                }
+              } 
+              else if (node.parentNode.nextSibling){
+                let parentNextSibling = node.parentNode.nextSibling;
+                console.log('move parent next sibling',parentNextSibling)
+                if (parentNextSibling.nodeName === '#text') {
+                  range.setStart(parentNextSibling, 0);
+                  return true;
+                }
+                let childs = parentNextSibling.childNodes;
+                for (let i = 0; i< childs.length; i++) {
+                  let child = childs[i];
+                  if (child.nodeName === '#text') {
+                    range.setStart(child, 0);
+                    return true;
+                  }
+                }
+                return false;
+              }// go to next row
+              else {
+                return false;
+              }
+            }
+            else {
+              range.setStart(node, range.startOffset + 1);
+              return true;
+            }
           }
           else {
-            return true;
+            console.log('not text node', node);
+            let innerText = node.innerText.trim();
+            if (range.startOffset === innerText.length && !node.childNodes.length && !node.nextSibling) {
+              return false;
+            }
+            else {
+              let childs = node.childNodes;
+              for (let i = 0; i < childs.length; i++) {
+                let child = childs[i];
+                if (child.nodeName === '#text') {
+                  range.setStart(child, range.startOffset + 1);
+                  return true;
+                }
+              }
+              let nextSibling = node.nextSibling;
+              if (nextSibling && nextSibling.nodeName === '#text') {
+                range.setStart(nextSibling, range.startOffset + 1);
+                return true;
+              }
+              return false;
+            }
           }
+
         }
         else {
           return true;
