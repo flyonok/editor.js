@@ -85,22 +85,24 @@ export class TableConstructor {
    * 
    */
   _getModelThumbFromParent(data) {
-    if (window.mmxaiGetAllModelList !== undefined) {
+    if (window.mmxaiGetAllModelList !== undefined && data.name !== undefined) {
       try {
-        console.log('enter _getModelThumbFromParent');
+        // console.log('enter _getModelThumbFromParent');
         let retArr = window.mmxaiGetAllModelList();
         console.log('mmxaiGetAllModelList', retArr);
-        let find = retArr.find((item) => {
-          return item.Name === data.name;
-        })
-        if (find !== undefined) {
-          console.log('find model thumb', data.name);
-          // data.imgByteStr = find.imgByteStr;
-          data.Thumb = find.Thumb;
-          data.Repeat = find.Repeat; // 表示是否可以增加表格参数！！！ 2020/10/07
-        }
-        else {
-          console.log('not find model thumb', data.name);
+        if (retArr) {
+          let find = retArr.find((item) => {
+            return item.Name === data.name;
+          })
+          if (find !== undefined) {
+            // console.log('find model thumb', data.name);
+            // data.imgByteStr = find.imgByteStr;
+            data.Thumb = find.Thumb;
+            data.Repeat = find.Repeat; // 表示是否可以增加表格参数！！！ 2020/10/07
+          }
+          else {
+            console.log('not find model thumb', data.name);
+          }
         }
       }
       catch (e) {
@@ -229,10 +231,14 @@ export class TableConstructor {
   _initToolBarAndEvent() {
     /** creating ToolBars */
     if (this._repeat !== undefined && this._repeat === 1 && this._verticalToolBar === undefined) {
-      this._verticalToolBar = new VerticalBorderToolBar();
-      this._horizontalToolBar = new HorizontalBorderToolBar();
-      this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
-      this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
+      // 不再需要工具栏添加行了--xiaowy 2020/10/20
+      // this._verticalToolBar = new VerticalBorderToolBar();
+      // this._horizontalToolBar = new HorizontalBorderToolBar();
+      // this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
+      // this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
+      this._verticalToolBar = undefined;
+      this._horizontalToolBar = undefined;
+      // 不再需要工具栏添加行了 end
       /** Activated elements */
       this._hoveredCell = null;
       this._activatedToolBar = null;
@@ -323,7 +329,8 @@ export class TableConstructor {
         // 如果造型名称相同则不重构参数表 2020/10/07
         if (data.Name.trim() !== this._modelHeadTable.modelTypeName) {
           this._recontructParaTable(data);
-          this._initToolBarAndEvent();
+          // 这里会重复注册事件处理，导致注册事件会处理两次
+          // this._initToolBarAndEvent();
         }
       }
       else {
@@ -595,7 +602,7 @@ export class TableConstructor {
    *
    * Hide all of toolbars
    */
-  _hideToolBar() {
+  _hideToolBar(event) {
     if (this._activatedToolBar !== null && this._activatedToolBar !== undefined) {
       this._activatedToolBar.hide();
     }
@@ -610,7 +617,8 @@ export class TableConstructor {
     this._container.addEventListener('mouseInActivatingArea', (event) => {
       this._toolbarCalling(event);
     });
-
+    // this._container.addEventListener('mouseInActivatingArea', this._toolbarCalling);
+    /* 去掉工具栏添加行功能 xiaowy 2020/10/20
     if (this._repeat !== undefined && this._repeat === 1) {
       this._container.addEventListener('click', (event) => {
         // added by xiaowy 2020/09/19
@@ -631,22 +639,40 @@ export class TableConstructor {
         // alert('doubleclick event!');
       });
     }
+    */
 
-    this._container.addEventListener('input', () => {
-      this._hideToolBar();
+    this._container.addEventListener('input', (event) => {
+      this._hideToolBar(event);
     });
+    // this._container.addEventListener('input', this._hideToolBar);
 
     this._container.addEventListener('keydown', (event) => {
       this._containerKeydown(event);
     });
+    // this._container.addEventListener('keydown', this._containerKeydown);
 
     this._container.addEventListener('mouseout', (event) => {
       this._leaveDetectArea(event);
     });
+    // this._container.addEventListener('mouseout', this._leaveDetectArea);
 
     this._container.addEventListener('mouseover', (event) => {
       this._mouseEnterInDetectArea(event);
     });
+
+    this._container.addEventListener('dblclick', (event) => {
+      this._processDbClick(event);
+    });
+    // this._container.addEventListener('mouseover', this._mouseEnterInDetectArea);
+  }
+
+  /**
+   * @private
+   * remove component events
+   * @param {nothing}
+   */
+  _removeAllEvent() {
+    this._container.removeEventListener('mouseInActivatingArea', this._toolbarCalling);
   }
 
   /**
@@ -670,13 +696,14 @@ export class TableConstructor {
       areaCoords.x2 -= paddingContainer;
       areaCoords.y2 -= paddingContainer;
     }
-
+    /* 不需要工具栏添加行了 xiaowy 2020/10/20
     if (this._hoveredCellSide === 'top') {
       this._showToolBar(this._horizontalToolBar, areaCoords.y1 - containerCoords.y1 - 2);
     }
     if (this._hoveredCellSide === 'bottom') {
       this._showToolBar(this._horizontalToolBar, areaCoords.y2 - containerCoords.y1 - 1);
     }
+    */
     /* 
     ** 不需要增加列，秒秒学AI默认就2列  comment by xiaowy 2020/09/19
     if (this._hoveredCellSide === 'left') {
@@ -823,13 +850,14 @@ export class TableConstructor {
     let keycodes = [38, 40, 9]; // 9 for tab key
     // Todo: process chracter move
     let leftAndRight = [37, 39];
-    if (event.keyCode === 13) {
+    if (event.keyCode === 13 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
+      console.log('process enter key');
       this._containerEnterPressed(event);
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
-    else if ((keycodes.indexOf(event.keyCode) >= 0 || leftAndRight.indexOf(event.keyCode) >= 0) &&
+    if ((keycodes.indexOf(event.keyCode) >= 0 || leftAndRight.indexOf(event.keyCode) >= 0) &&
       !event.shiftKey && !event.ctrlKey && !event.altKey) {
-      console.log(event.keyCode);
+      console.log('in table constructor', event.keyCode);
       this._containerArrowKeyPressed(event);
     }
   }
@@ -1006,8 +1034,59 @@ export class TableConstructor {
       return;
     }
     // this._processDownArrowKey(event);
-    // console.log('_containerEnterPressed finished!');
+    // let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
+    // let div = document.createElement('div');
+    // input.appendChild(div);
+    let selection = window.getSelection();
+    if (selection) {
+      let node = selection.focusNode;
+      if (node.nodeName === '#text') {
+        node = node.parentNode;
+      }
+      if (node) {
+        let div = document.createElement('div');
+        // let textNode = document.createTextNode('11');
+        let textNode = document.createElement('br');
+        div.appendChild(textNode);
+        node.appendChild(div);
+        // textNode.focus();
+        let range = selection.getRangeAt(0);
+        range.setStart(div, 1);
+        // textNode.textContent = ' ';
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
+    console.log('_containerEnterPressed finished!');
   }
+
+  /**
+   * @private
+   * 处理表格双击事件
+   */
+  _processDbClick(event) {
+    
+    if (!(this._table.selectedCell !== null && !event.shiftKey)) {
+      // console.log('this._table.selectedCell', this._table.selectedCell);
+      return;
+    }
+    // console.log("enter _processDbClick");
+    let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
+    let innerHTML = input.innerHTML.trim();
+    if (innerHTML.length === 0) {
+      console.log("enter _processDbClick---", this._api);
+      if (this._clickTimeId) {
+        clearTimeout(this._clickTimeId);
+      }
+      this._clickTimeId = setTimeout(()=>{alert('api'),this._api.inlineToolbar.open();}, 250);
+      this._api.inlineToolbar.open();
+      // this._api.toolbar.open();
+      event.preventDefault();
+      event.stopPropagation();
+      console.log("exit _processDbClick---");
+    }
+  }
+
 
   /**
    * @private
@@ -1043,6 +1122,7 @@ export class TableConstructor {
     // prevent default behavior
     // event.preventDefault();
     // event.stopPropagation();
+    return;
   }
 
   /**
@@ -1229,7 +1309,7 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processDownArrowKey(event) {
-    // console.log('Enter _processDownArrowKey');
+    console.log('Enter _processDownArrowKey');
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
     // console.log('currentRowIndex:' + currentRowIndex);
@@ -1262,7 +1342,7 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processUpArrowKey(event) {
-    // console.log('Enter _processUpArrowKey');
+    console.log('Enter _processUpArrowKey');
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
     // console.log('currentRowIndex:' + currentRowIndex);
@@ -1332,7 +1412,7 @@ export class TableConstructor {
                 if (parentNode.nodeName === '#text') {
                   range.setStart(parentNode, 0);
                   return true;
-                } 
+                }
                 else if (parentNode.previousSibling) {
                   let parentPreviousSibling = parentNode.previousSibling;
                   if (parentPreviousSibling.nodeName === '#text') {
@@ -1354,9 +1434,9 @@ export class TableConstructor {
                     }
                     return false;
                   }
-                  
+
                 }
-                
+
               }
               else {
                 return false;
@@ -1438,16 +1518,16 @@ export class TableConstructor {
                   }
                   return false;
                 }
-              } 
-              else if (node.parentNode.nextSibling){
+              }
+              else if (node.parentNode.nextSibling) {
                 let parentNextSibling = node.parentNode.nextSibling;
-                console.log('move parent next sibling',parentNextSibling)
+                console.log('move parent next sibling', parentNextSibling)
                 if (parentNextSibling.nodeName === '#text') {
                   range.setStart(parentNextSibling, 0);
                   return true;
                 }
                 let childs = parentNextSibling.childNodes;
-                for (let i = 0; i< childs.length; i++) {
+                for (let i = 0; i < childs.length; i++) {
                   let child = childs[i];
                   if (child.nodeName === '#text') {
                     range.setStart(child, 0);
@@ -1505,15 +1585,17 @@ export class TableConstructor {
    * @param {MouseEvent} event
    */
   _mouseEnterInDetectArea(event) {
-    const coords = getCoords(this._container);
-    let side = getSideByCoords(coords, event.pageX, event.pageY);
+    if (this._container !== undefined) {
+      const coords = getCoords(this._container);
+      let side = getSideByCoords(coords, event.pageX, event.pageY);
 
-    event.target.dispatchEvent(new CustomEvent('mouseInActivatingArea', {
-      'detail': {
-        'side': side
-      },
-      'bubbles': true
-    }));
+      event.target.dispatchEvent(new CustomEvent('mouseInActivatingArea', {
+        'detail': {
+          'side': side
+        },
+        'bubbles': true
+      }));
+    }
   }
 
   /**
@@ -1689,13 +1771,13 @@ export class TableConstructor {
   _processParentUiResultCall() {
     let that = this;
     let _processParentUiResult = function (obj) {
-      console.log('enter _processParentUiResult');
+      // console.log('enter _processParentUiResult');
       console.log('_processParentUiResult obj', obj);
       that._makeModelTables(obj, null, false);
       if (that._modelHeadCallBack !== undefined) {
         that._modelHeadCallBack(obj);
       }
-      console.log('exit _processParentUiResult');
+      // console.log('exit _processParentUiResult');
     };
     return _processParentUiResult;
   }
@@ -1781,26 +1863,38 @@ export class TableConstructor {
     // console.log('enter getJsonResult');
     let temp = this._modelHeadTable.getHeadParam();
     // console.log('temp:', temp);
-    let obj = {};
-    obj['板块头'] = temp['板块头'];
-    obj['属性'] = temp['属性'];
-    // let obj = Object.assign({}, temp['板块头']);
-    // console.log("tableConstructor getJsonResult11", obj);
-    if (this._table !== undefined) {
-      obj['列表'] = this._table.getJsonResult();
+    let ret = {};
+    if (temp) {
+      try {
+        let obj = {};
+        obj['板块头'] = temp['板块头'];
+        obj['属性'] = temp['属性'];
+        // let obj = Object.assign({}, temp['板块头']);
+        // console.log("tableConstructor getJsonResult11", obj);
+        if (this._table !== undefined) {
+          obj['列表'] = this._table.getJsonResult();
+        }
+        else {
+          obj['列表'] = [];
+        }
+        ret[temp.name] = obj;
+
+        // let paraName = this._descTitle.innerHTML;
+        // let leftIndex = paraName.indexOf('【');
+        // let rightIndex = paraName.indexOf('】');
+        // let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
+        // obj['name'] = this._descTitle.innerHTML;
+        console.log("tableConstructor getJsonResult", ret);
+        return ret;
+      }
+      catch (e) {
+        console.log('getJsonResule occur exception:', e);
+        return ret;
+      }
     }
     else {
-      obj['列表'] = [];
+      console.log("tableConstructor getJsonResult", ret);
+      return ret;
     }
-    let ret = {};
-    ret[temp.name] = obj;
-
-    // let paraName = this._descTitle.innerHTML;
-    // let leftIndex = paraName.indexOf('【');
-    // let rightIndex = paraName.indexOf('】');
-    // let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
-    // obj['name'] = this._descTitle.innerHTML;
-    // console.log("tableConstructor getJsonResult", ret);
-    return ret;
   }
 }

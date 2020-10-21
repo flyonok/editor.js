@@ -44,7 +44,7 @@ export class ModelHeadTable {
     let attrContentDefault = !!data.Tags ? data.Tags : '';
     let labelEle = create('label', null, { for: 'modelAttr' });
     labelEle.innerHTML = '属性：';
-    this._labelAttrEle = create('input', null, {type:'text', name:'modelAttr'});
+    this._labelAttrEle = create('input', null, { type: 'text', name: 'modelAttr' });
     this._labelAttrEle.placeholder = '属性用空格分开';
     this._labelAttrEle.value = attrContentDefault;
     return create('div', [CSS.table, CSS.center], null, [labelEle, this._labelAttrEle]);
@@ -77,7 +77,7 @@ export class ModelHeadTable {
     let subName = !!data.name ? data.name : '';
     labelEle.innerHTML = '类型：';
     // this._inputTypeTxt = create('input', null, { type: 'text', name: 'modelType', readonly:'true' });
-    this._inputTypeTxt = create('input', null, { type: 'text', name: 'modelType'});
+    this._inputTypeTxt = create('input', null, { type: 'text', name: 'modelType' });
     this._inputTypeTxt.value = subName;
     this._modelSelBtn = create('input', null, { type: 'button', name: 'selectModel', value: '选择造型...' });
     // this._modelSelBtn = inputBtn;
@@ -139,7 +139,7 @@ export class ModelHeadTable {
    */
   _modifyHeadDataCall() {
     let that = this;
-    let _modifyHeadData = function(data) {
+    let _modifyHeadData = function (data) {
       if (data.Name) {
         that._inputTypeTxt.value = data.Name;
       }
@@ -167,13 +167,19 @@ export class ModelHeadTable {
    * get model head parameter json object
    */
   getHeadParam() {
-    let obj = {};
-    obj['板块头'] = {};
-    obj['板块头']['标题'] = this._inputTitleTxt.value.trim();
-    obj['属性'] = this._labelAttrEle.value.trim();
-    obj.name = this._inputTypeTxt.value.trim();
-    // obj['属性'] = this._labelAttrEle.innerHTML;
-    console.log('getHeadParam', obj);
-    return obj;
+    try {
+      let obj = {};
+      obj['板块头'] = {};
+      obj['板块头']['标题'] = this._inputTitleTxt.value.trim();
+      obj['属性'] = this._labelAttrEle.value.trim();
+      obj.name = this._inputTypeTxt.value.trim();
+      // obj['属性'] = this._labelAttrEle.innerHTML;
+      console.log('getHeadParam', obj);
+      return obj;
+    }
+    catch (e) {
+      console.log('getHeadParam exception:', e);
+      return undefined;
+    }
   }
 }

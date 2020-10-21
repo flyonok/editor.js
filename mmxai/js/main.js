@@ -70,6 +70,11 @@ const mmxai = function (module) {
             // linkTool: LinkTool,
 
             embed: Embed,
+            table: {
+                class: Table,
+                inlineToolbar: true,
+                shortcut: 'CMD+ALT+T'
+            },
 
             model: {
                 class: MmxModel,
@@ -109,10 +114,10 @@ const mmxai = function (module) {
         let data = {
             // "time": 1600400191475,
             "blocks": [
-                
+
                 {
                     "type": "model",
-                    "data":{
+                    "data": {
                         "logo": {
                             "板块头": {
                                 "标题": ""
@@ -204,8 +209,8 @@ const mmxai = function (module) {
                     }
                 },
                 {
-                    "type":"model",
-                    "data" :{
+                    "type": "model",
+                    "data": {
                         "横幅": {
                             "板块头": {
                                 "标题": ""
@@ -214,6 +219,26 @@ const mmxai = function (module) {
                                 {
                                     "横幅": "天奕设计，专注智能AI设计服务。"
                                 }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "type":"parameter",
+                    "data": {
+                        "参数": {
+                            "垂直对齐": "垂直中部对齐",
+                            "logo": [
+                                31.13,
+                                22.46,
+                                68.87,
+                                62.46
+                            ],
+                            "宣传": [
+                                10.52,
+                                69.72,
+                                89.48,
+                                94.0
                             ]
                         }
                     }

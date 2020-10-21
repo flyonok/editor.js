@@ -64,51 +64,64 @@ class MmxParameter {
   save(toolsContent) {
     // modified by xiaowy 2020/09/21
     // const table = toolsContent.querySelector('table');
-    console.log(toolsContent);
-    const table = toolsContent.querySelector('table.tc-paraTable');
-    console.log(table);
-    const data = {};
-    const rows = table.rows;
+    try {
+      console.log(toolsContent);
+      const table = toolsContent.querySelector('table.tc-paraTable');
+      console.log(table);
+      const data = {};
+      const rows = table.rows;
 
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      // 预处理
-      // this._preProcessTableCell(row.cells);
-      const cols = Array.from(row.cells);
-      const inputs = cols.map(cell => cell.querySelector('.' + CSS.input));
-      const isWorthless = inputs.every(this._isEmpty);
+      for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        // 预处理
+        // this._preProcessTableCell(row.cells);
+        const cols = Array.from(row.cells);
+        const inputs = cols.map(cell => cell.querySelector('.' + CSS.input));
+        const isWorthless = inputs.every(this._isEmpty);
 
-      if (isWorthless) {
-        continue;
+        if (isWorthless) {
+          continue;
+        }
+        // data.push(inputs.map(input => input.innerHTML));
+        let content = inputs[1].innerHTML.trim();
+        // let b = content.replaceAll('<br>', '\n');
+        // const regrexa = /<div>|<\/div>/gi;
+        const regrexa = /<br>|<\/div>/gi;
+        let a = content.replace(regrexa, '');
+        // const regrex = /<br>/gi;
+        const regrex = /<div>/gi;
+        let b = a.replace(regrex, '\r');
+        const regrexone = /<br>|<\/div>/gi;
+        let inputs0 = inputs[0].innerHTML.trim();
+        let keyOne = inputs0.replace(regrexone, '');
+        const regrexTwo = /<div>/gi;
+        let key = keyOne.replace(regrexTwo, '\r');
+
+        // data[inputs[0].innerHTML] = inputs[1].innerHTML;
+        if (b.indexOf('[') === 0 && b.indexOf(']') === b.length - 1) {
+          let result = b.substring(1, b.length - 1)
+          let arr = result.split(',');
+          let cont = arr.map(ele => parseFloat(ele));
+          data[key] = cont;
+        }
+        else {
+          data[key] = b;
+        }
       }
-      // data.push(inputs.map(input => input.innerHTML));
-      let content = inputs[1].innerHTML.trim();
-      // let b = content.replaceAll('<br>', '\n');
-      // const regrexa = /<div>|<\/div>/gi;
-      const regrexa = /<br>|<\/div>/gi;
-      let a = content.replace(regrexa, '');
-      // const regrex = /<br>/gi;
-      const regrex = /<div>/gi;
-      let b = a.replace(regrex, '\r');
-      const regrexone = /<br>|<\/div>/gi;
-      let inputs0 = inputs[0].innerHTML.trim();
-      let keyOne = inputs0.replace(regrexone, '');
-      const regrexTwo = /<div>/gi;
-      let key = keyOne.replace(regrexTwo, '\r');
 
-      // data[inputs[0].innerHTML] = inputs[1].innerHTML;
-      data[key] = b;
+      // added by xiaowy 2020/09/21 for  参数名称
+      const blockName = toolsContent.querySelector('.mmxParameterDecsTitle');
+      let paraName = blockName.innerHTML;
+      let leftIndex = paraName.indexOf('【');
+      let rightIndex = paraName.indexOf('】');
+      let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
+      let ret = {};
+      ret[realName] = data;
+      return ret;
+    } catch (e) {
+      alert(e);
+      return {};
     }
-
-    // added by xiaowy 2020/09/21 for  参数名称
-    const blockName = toolsContent.querySelector('.mmxParameterDecsTitle');
-    let paraName = blockName.innerHTML;
-    let leftIndex = paraName.indexOf('【');
-    let rightIndex = paraName.indexOf('】');
-    let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
-    let ret = {};
-    ret[realName] = data;
-    return ret;
   }
 
   /**
@@ -146,7 +159,7 @@ class MmxParameter {
         else {
           div1.forEach(ele => {
             if (ele.innerText !== undefined && ele.innerText.trim().length === 0 && ele.nextSibling === null) {
-            // if (div1.textContent.trim().length === 0) {
+              // if (div1.textContent.trim().length === 0) {
               ele.remove();
             }
           });

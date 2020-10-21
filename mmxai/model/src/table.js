@@ -208,7 +208,8 @@ export class Table {
     }
     if (cellConfig.isWritable) {
       const content = this._createContenteditableArea();
-      content.onpaste = this._pasteEvent;
+      // content.onpaste = this._pasteEvent;
+      content.addEventListener('paste', this._pasteEvent);
 
       cell.appendChild(create('div', [CSS.area], null, [content]));
     }
@@ -224,14 +225,23 @@ export class Table {
    * @returns {boolean}
    */
   _pasteEvent(event) {
+    let selection = window.getSelection();
+    if (selection && selection.rangeCount) {
+      let range = selection.getRangeAt(0);
+      if (range) {
+        range.deleteContents();
+      }
+    }
     let clipData = event.clipboardData;
     let dataContent = clipData.getData('text/plain');
-    let ele = event.target;
-    ele.innerHTML += dataContent;
+    clipData.setData('text/plain', dataContent);
+    // let ele = event.target;
+    // ele.innerHTML += dataContent;
     // console.log(dataContent);
-    event.preventDefault();
+    // 不能去掉默认处理，否则不能ctrl+Z
+    // event.preventDefault();
     event.stopPropagation();
-    return true;
+    // return true;
   }
 
   /**
@@ -350,18 +360,19 @@ export class Table {
     // let keycodes = [37, 38, 39, 40, 9]; // 9 is TAB
     let keycodes = [38, 40, 9]; // 9 for tab key
     let leftAndRight = [37, 39];
-    console.log(event.keyCode);
+    // console.log(event.keyCode);
     if (!event.target.classList.contains(CSS.inputField)) {
       return;
     }
-    if (event.keyCode === 13 && !event.shiftKey) {
-      // event.preventDefault();
-    }
+    // if (event.keyCode === 13 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
+    //   event.preventDefault();
+    // }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
-    else if ((keycodes.indexOf(event.keyCode) >= 0 || leftAndRight.indexOf(event.keyCode) >= 0) &&
-            !event.shiftKey && !event.ctrlKey && !event.altKey) {
-      console.log(event.keyCode);
+    if ((keycodes.indexOf(event.keyCode) >= 0 || leftAndRight.indexOf(event.keyCode) >= 0) &&
+      !event.shiftKey && !event.ctrlKey && !event.altKey) {
+      console.log('in table ', event.keyCode);
       // event.preventDefault();
+      // event.stopPropagation();
     }
   }
 
@@ -410,7 +421,7 @@ export class Table {
   _getObjectFromCells(cells) {
     if (cells.length < 2) {
       console.log('cells lenth must equals 2');
-      return ['',''];
+      return ['', ''];
     }
     const cols = Array.from(cells);
     const inputs = cols.map(cell => cell.querySelector('.' + CSS.inputField));
@@ -424,7 +435,10 @@ export class Table {
     //     div1.remove();
     //   }
     // });
-    let content = inputs[1].innerHTML.trim();
+    let tempInput = inputs[1].cloneNode(true);
+    let afterProcessNode = this._processWordContent(tempInput);
+    // let content = inputs[1].innerHTML.trim();
+    let content = afterProcessNode.innerHTML.trim();
     // let b = content.replaceAll('<br>', '\n');
     // const regrexa = /<div>|<\/div>/gi;
     const regrexa = /<br>|<\/div>/gi;
@@ -438,7 +452,49 @@ export class Table {
     let keyOne = inputs0.replace(regrexone, '');
     const regrexTwo = /<div>/gi;
     let key = keyOne.replace(regrexTwo, '\r');
+    // console.log('_getObjectFromCells', [key, b]);
     return [key, b];
+  }
+
+  /**
+   * @private
+   * 处理word那边来的内容，会包含很多p和span
+   */
+  _processWordContent(node) {
+    // console.log('_processWordContent', node);
+    let pLists = node.querySelectorAll('p');
+    let contentsList = [];
+    if (pLists) {
+      for (let i = 0; i < pLists.length; i++) {
+        let p = pLists[i]
+        let textContent = p.innerText;
+        // contentsList.push(textContent);
+        // node.removeChild(p);
+        if (i === 0) {
+          let div = document.createTextNode(textContent);
+          p.parentNode.replaceChild(div, p);
+          // node.appendChild(div);
+        }
+        else {
+          let div = document.createElement('div');
+          div.innerText = textContent;
+          // node.appendChild(div);
+          p.parentNode.replaceChild(div, p);
+        }
+      }
+      // for (let j = 0; j < contentsList.length; j++) {
+      //   if (j === 0) {
+      //     let div = document.createTextNode(contentsList[j]);
+      //     node.appendChild(div);
+      //   }
+      //   else {
+      //     let div = document.createElement('div');
+      //     div.innerText = contentsList[j];
+      //     node.appendChild(div);
+      //   }
+      // }
+    }
+    return node;
   }
   /**
    * @public
@@ -451,10 +507,11 @@ export class Table {
     let listResults = [];
     let modelParaObj = {};
     let ret = this._tableIsRpeat();
-    if (!this._checkTableFormat(ret.isRepeat)) {
-      alert('造型的对象名称不符合规范，请检查！');
-      return [];
-    }
+    // todo：判断表格是否符合repeat规范 xiaowy 2020/10/19
+    // if (!this._checkTableFormat(ret.isRepeat)) {
+    //   alert('造型的对象名称不符合规范，请检查！');
+    //   return [];
+    // }
     // 找出重复对象名中的第一个单词
     let firstRepeatWord = ''
     let repeatCnt = 0;
@@ -463,8 +520,9 @@ export class Table {
       let wordsColl = ret.repeatWords.trim().split(' ');
       firstRepeatWord = wordsColl[0];
       repeatCnt = wordsColl.length;
-      console.log('repeatWordscnt', repeatCnt);
+      // console.log('repeatWordscnt', repeatCnt);
     }
+    // console.log('table getJsonResult repeat ret:', ret, repeatCnt);
     if (ret.isRepeat) {
       for (let j = 0; j < rows.length; j += repeatCnt) {
         let emptyCnt = 0;
@@ -535,24 +593,24 @@ export class Table {
           //   modelParaObj = {};
           // }
           // else if (ret.isRepeat) {
-        //   if (ret.isRepeat) {
-        //     if (key === firstRepeatWord && i > 0) {
-        //       listResults.push(modelParaObj);
-        //       modelParaObj = {};
-        //       modelParaObj[key] = b;
-        //     }
-        //     else {
-        //       modelParaObj[key] = b;
-        //     }
-        //   }
-        //   else {
-        //     // 增加容错处理 xiaowy 2020/10/09
-        //     modelParaObj[key] = b;
-        //     // if (key.length > 0) {
-        //     //   modelParaObj[key] = b;
-        //     // }
-        //     // console.log('getJsonResult1:', modelParaObj);
-        //   }
+          //   if (ret.isRepeat) {
+          //     if (key === firstRepeatWord && i > 0) {
+          //       listResults.push(modelParaObj);
+          //       modelParaObj = {};
+          //       modelParaObj[key] = b;
+          //     }
+          //     else {
+          //       modelParaObj[key] = b;
+          //     }
+          //   }
+          //   else {
+          //     // 增加容错处理 xiaowy 2020/10/09
+          //     modelParaObj[key] = b;
+          //     // if (key.length > 0) {
+          //     //   modelParaObj[key] = b;
+          //     // }
+          //     // console.log('getJsonResult1:', modelParaObj);
+          //   }
         }
       }
       listResults.push(modelParaObj);
@@ -578,7 +636,7 @@ export class Table {
       listResults.push(key);
     }
     let ret = checkFiledsIsRepeat(listResults.join(' '));
-    // console.log(ret);
+    // console.log('_tableIsRpeat ret', ret);
     return ret;
   }
 

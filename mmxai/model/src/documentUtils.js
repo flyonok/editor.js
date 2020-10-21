@@ -93,7 +93,7 @@ export function getSideByCoords(coords, x, y) {
 * @returns {Object} {isRepeat: boolean,repeatWords: string}
 */
 export function checkFiledsIsRepeat(fields) {
-  // console.log('enter checkFiledsIsRepeat', fields);
+  console.log('enter checkFiledsIsRepeat', fields);
   // let filedsArr = undefined;
   // if ( fields.push !== undefined && Array.isArray(fields)) {
   //   filedsArr = fields;
@@ -103,6 +103,12 @@ export function checkFiledsIsRepeat(fields) {
   // }
   // find first words(not empty)
   let b = fields.trim().split(' ');
+  if (b.length < 2) {
+    return {
+      isRepeat: false,
+      repeatWords: ' '
+    };
+  }
   // console.log(fields.trim().split(' '));
   // let a = fields.split.trim().split(' ');
   // console.log('a', a);

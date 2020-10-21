@@ -116,6 +116,14 @@ export class TableConstructor {
         let rowArr = [];
         // console.log('prop:', item[prop])
         rowArr.push(prop);
+        // if (Array.isArray(cdrData[prop])) {
+        //   let joinArr = cdrData[prop].join();
+        //   let a = '[' + joinArr + ']';
+        //   rowArr.push(a);
+        // }
+        // else {
+        //   rowArr.push(cdrData[prop]);
+        // }
         rowArr.push(cdrData[prop]);
         // console.log('parameter _cdrJsonConvert rowArr', rowArr);
         _innerData['content'].push(rowArr);
@@ -162,8 +170,18 @@ export class TableConstructor {
         for (let j = 0; j < size.cols && j < data.content[i].length; j++) {
           // get current cell and her editable part
           const input = this._table.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
-
-          input.innerHTML = data.content[i][j];
+          if (Array.isArray(data.content[i][j])) {
+            let joinArr = data.content[i][j].join();
+            let a = '[' + joinArr + ']';
+            // rowArr.push(a);
+            input.innerHTML = a;
+            input.setAttribute('contenteditable', false);
+          }
+          else {
+            // rowArr.push(cdrData[prop]);
+            input.innerHTML = data.content[i][j];
+          }
+          
         }
       }
     }
@@ -523,10 +541,13 @@ export class TableConstructor {
       this._containerEnterPressed(event);
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
-    else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
+    if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
       // console.log(event.keyCode);
       this._containerArrowKeyPressed(event);
     }
+    // else {
+    //   return;
+    // }
   }
 
   /**
@@ -574,19 +595,19 @@ export class TableConstructor {
    * @private
    */
   _addRow() {
-/*
-    ** 这段代码目前不太稳定，暂时屏蔽，统一在表的尾部添加 xiaowy 2020/10/09
-    const indicativeRow = this._hoveredCell.closest('TR');
-    let index = this._getHoveredSideOfContainer();
-
-    if (index === 1) {
-      index = indicativeRow.sectionRowIndex;
-      // if inserting after hovered cell
-      index = index + this._isBottomOrRight();
-    }
-
-    this._table.addRow(index);
-    */
+    /*
+        ** 这段代码目前不太稳定，暂时屏蔽，统一在表的尾部添加 xiaowy 2020/10/09
+        const indicativeRow = this._hoveredCell.closest('TR');
+        let index = this._getHoveredSideOfContainer();
+    
+        if (index === 1) {
+          index = indicativeRow.sectionRowIndex;
+          // if inserting after hovered cell
+          index = index + this._isBottomOrRight();
+        }
+    
+        this._table.addRow(index);
+        */
     this._table.addRow(this._table.rows);
   }
 

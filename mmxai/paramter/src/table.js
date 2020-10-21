@@ -130,7 +130,8 @@ export class Table {
   _fillCell(cell) {
     cell.classList.add(CSS.cell);
     const content = this._createContenteditableArea();
-    content.onpaste = this._pasteEvent;
+    // content.onpaste = this._pasteEvent;
+    content.addEventListener('paste', this._pasteEvent);
 
     cell.appendChild(create('div', [CSS.area], null, [content]));
   }
@@ -141,14 +142,22 @@ export class Table {
    * @returns {boolean}
    */
   _pasteEvent(event) {
+    let selection = window.getSelection();
+    if (selection && selection.rangeCount) {
+      let range = selection.getRangeAt(0);
+      if (range) {
+        range.deleteContents();
+      }
+    }
     let clipData = event.clipboardData;
     let dataContent = clipData.getData('text/plain');
     let ele = event.target;
     ele.innerHTML += dataContent;
     // console.log(dataContent);
-    event.preventDefault();
+    // event.preventDefault();
     event.stopPropagation();
-    return true;
+    // return true;
+    // return;
   }
 
   /**
@@ -239,11 +248,14 @@ export class Table {
       // event.preventDefault();
     }
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
-    else if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey)
+    if (keycodes.indexOf(event.keyCode) >= 0 && !event.shiftKey && !event.ctrlKey && !event.altKey)
     {
       // console.log(event.keyCode);
       event.preventDefault();
     }
+    // else {
+    //   return;
+    // }
   }
 
   /**
