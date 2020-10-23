@@ -1051,7 +1051,16 @@ export class TableConstructor {
         console.log('for text node');
         let textNode = document.createTextNode(node.textContent.substr(selection.focusOffset));
         node.textContent = node.textContent.substr(0, selection.focusOffset);
-        div.appendChild(textNode);
+        let mmxNode = this._checkEleIsListOrSymbol(node);
+        if (mmxNode) {
+          let nodeCopy = mmxNode.clone(true);
+          div.appendChild(nodeCopy);
+          div.appendChild(textNode);
+        }
+        else {
+          div.appendChild(textNode);
+        }
+        
         if (insertNode.nextSibling) {
           // console.log('add before sibling.');
           input.insertBefore(div, insertNode.nextSibling);
@@ -1069,7 +1078,16 @@ export class TableConstructor {
       else {
         console.log('for other node');
         let textNode = document.createElement('br');
-        div.appendChild(textNode);
+        // div.appendChild(textNode);
+        let mmxNode = this._checkEleIsListOrSymbol(node);
+        if (mmxNode) {
+          let nodeCopy = mmxNode.cloneNode(true);
+          div.appendChild(nodeCopy);
+          div.appendChild(textNode);
+        }
+        else {
+          div.appendChild(textNode);
+        }
         if (insertNode.nextSibling) {
           // console.log('add before sibling.');
           input.insertBefore(div, insertNode.nextSibling);
@@ -1095,10 +1113,16 @@ export class TableConstructor {
    * @private
    * 处理列表或项目符号元素
    * 检查是否为列表或项目符号
-   * @return 具体的符号特征
+   * @return 具体的符号元素或者null
    */
   _checkEleIsListOrSymbol(ele) {
-
+    let prevNode = ele.previousSibling;
+    if (prevNode && prevNode.classList.contains('mmx-listSymbol') >= 0){
+      return prevNode;
+    }
+    else {
+      return null;
+    }
   }
 
   /**

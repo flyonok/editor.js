@@ -81,6 +81,7 @@ const mmxai = function (module) {
                 inlineToolbar: true,
                 shortcut: 'CMD+ALT+M'
             },
+            symbol: mmxSymbol,
 
             parameter: {
                 class: MmxParameter,
