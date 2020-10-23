@@ -1034,30 +1034,71 @@ export class TableConstructor {
       return;
     }
     // this._processDownArrowKey(event);
-    // let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
+    let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
     // let div = document.createElement('div');
     // input.appendChild(div);
     let selection = window.getSelection();
     if (selection) {
       let node = selection.focusNode;
-      if (node.nodeName === '#text') {
-        node = node.parentNode;
+      let insertNode = node;
+      if (node.nodeName === '#text' && !node.nextSibling) {
+        insertNode = node.parentNode;
       }
-      if (node) {
-        let div = document.createElement('div');
-        // let textNode = document.createTextNode('11');
+      console.log('node', node);
+      let div = document.createElement('div');
+      // let textNode = document.createTextNode('11');
+      if (node.nodeName === '#text' && selection.focusOffset < node.textContent.length) {
+        console.log('for text node');
+        let textNode = document.createTextNode(node.textContent.substr(selection.focusOffset));
+        node.textContent = node.textContent.substr(0, selection.focusOffset);
+        div.appendChild(textNode);
+        if (insertNode.nextSibling) {
+          // console.log('add before sibling.');
+          input.insertBefore(div, insertNode.nextSibling);
+          // node.appendChild(div);
+          // textNode.focus();
+
+        }
+        else {
+          console.log('append end');
+          input.appendChild(div);
+        }
+        let range = selection.getRangeAt(0);
+        range.setStart(textNode, 0);
+      }
+      else {
+        console.log('for other node');
         let textNode = document.createElement('br');
         div.appendChild(textNode);
-        node.appendChild(div);
-        // textNode.focus();
+        if (insertNode.nextSibling) {
+          // console.log('add before sibling.');
+          input.insertBefore(div, insertNode.nextSibling);
+          // node.appendChild(div);
+          // textNode.focus();
+
+        }
+        else {
+          // console.log('append end');
+          input.appendChild(div);
+        }
         let range = selection.getRangeAt(0);
         range.setStart(div, 1);
-        // textNode.textContent = ' ';
-        event.preventDefault();
-        event.stopPropagation();
       }
+      // textNode.textContent = ' ';
+      event.preventDefault();
+      event.stopPropagation();
     }
     console.log('_containerEnterPressed finished!');
+  }
+
+  /**
+   * @private
+   * 处理列表或项目符号元素
+   * 检查是否为列表或项目符号
+   * @return 具体的符号特征
+   */
+  _checkEleIsListOrSymbol(ele) {
+
   }
 
   /**
@@ -1065,24 +1106,43 @@ export class TableConstructor {
    * 处理表格双击事件
    */
   _processDbClick(event) {
-    
+
     if (!(this._table.selectedCell !== null && !event.shiftKey)) {
       // console.log('this._table.selectedCell', this._table.selectedCell);
       return;
     }
+    // if (event.srcElement.getAttribute("contenteditable")=='false') {
+    //   return;
+    // }
     // console.log("enter _processDbClick");
     let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
-    let innerHTML = input.innerHTML.trim();
+    if (input.getAttribute(("contenteditable")=='false')) {
+      return;
+    }
+    let innerHTML = input.innerText.trim();
     if (innerHTML.length === 0) {
-      console.log("enter _processDbClick---", this._api);
-      if (this._clickTimeId) {
-        clearTimeout(this._clickTimeId);
-      }
-      this._clickTimeId = setTimeout(()=>{alert('api'),this._api.inlineToolbar.open();}, 250);
-      this._api.inlineToolbar.open();
+      // console.log("enter _processDbClick---", this._api);
+      // if (this._clickTimeId) {
+      //   clearTimeout(this._clickTimeId);
+      // }
+      // this._clickTimeId = setTimeout(()=>{alert('api'),this._api.inlineToolbar.open();}, 250);
+      // this._api.inlineToolbar.open();
       // this._api.toolbar.open();
-      event.preventDefault();
-      event.stopPropagation();
+      let inlineToolbar = document.querySelector('.ce-inline-toolbar');
+      if (inlineToolbar) {
+        // let coords = getCoords(input);
+        // let style = 'left:' + coords.x1 + 'px;top:' + coords.y1 +'px';
+        // let style = 'left:' + event.pageX + 'px;top:' + event.pageY +'px';
+        // inlineToolbar.setAttribute('style', style);
+        inlineToolbar.style.left = event.clientX-event.layerX + 'px';
+        inlineToolbar.style.top = event.clientY-event.layerY + 'px';
+        inlineToolbar.classList.add('ce-inline-toolbar--showed');
+
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      // event.preventDefault();
+      // event.stopPropagation();
       console.log("exit _processDbClick---");
     }
   }
