@@ -67,10 +67,14 @@ export class TableConstructor {
     // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
 
     /** creating ToolBars */
-    this._verticalToolBar = new VerticalBorderToolBar();
-    this._horizontalToolBar = new HorizontalBorderToolBar();
-    this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
-    this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
+    // 不需要添加行工具栏 xiaowy 2020/10/26
+    // this._verticalToolBar = new VerticalBorderToolBar();
+    // this._horizontalToolBar = new HorizontalBorderToolBar();
+    // this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
+    // this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
+    // end
+    this._verticalToolbar = null;
+    this._horizontalToolBar = null;
 
     /** Activated elements */
     this._hoveredCell = null;
@@ -325,28 +329,29 @@ export class TableConstructor {
    * hang necessary events
    */
   _hangEvents() {
-    this._container.addEventListener('mouseInActivatingArea', (event) => {
-      this._toolbarCalling(event);
-    });
+    // this._container.addEventListener('mouseInActivatingArea', (event) => {
+    //   this._toolbarCalling(event);
+    // });
 
-    this._container.addEventListener('click', (event) => {
-      // added by xiaowy 2020/09/19
-      clearTimeout(this._clickTimeId);
-      let that = this;
-      this._clickTimeId = setTimeout(function () {
-        that._clickToolbar(event);
-      }, 250);
-      // end
-      // this._clickToolbar(event);
-    });
+    // 行工具栏不再需要了 xiaowy 2020/10/26
+    // this._container.addEventListener('click', (event) => {
+    //   // added by xiaowy 2020/09/19
+    //   clearTimeout(this._clickTimeId);
+    //   let that = this;
+    //   this._clickTimeId = setTimeout(function () {
+    //     that._clickToolbar(event);
+    //   }, 250);
+    //   // end
+    //   // this._clickToolbar(event);
+    // });
 
-    // add by xiaowy test double click event 2020/09/19
-    this._container.addEventListener('dblclick', (event) => {
-      clearTimeout(this._clickTimeId);
-      console.log('doubleclick event!');
-      this._dblclickToolbar(event);
-      // alert('doubleclick event!');
-    });
+    // // add by xiaowy test double click event 2020/09/19
+    // this._container.addEventListener('dblclick', (event) => {
+    //   clearTimeout(this._clickTimeId);
+    //   console.log('doubleclick event!');
+    //   this._dblclickToolbar(event);
+    //   // alert('doubleclick event!');
+    // });
 
     this._container.addEventListener('input', () => {
       this._hideToolBar();

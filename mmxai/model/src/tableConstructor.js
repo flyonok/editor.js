@@ -25,51 +25,6 @@ export class TableConstructor {
    * @param {object} api - Editor.js API
    */
   constructor(data, config, api) {
-    // /** creating table */
-    // this._table = new Table();
-
-    // // }
-    // // end
-    // // add by xiaowy 同时融合单击和双击事件
-    // this._clickTimeId = -1;
-    // // end
-    // const size = this._resizeTable(data, config);
-
-    // this._fillTable(data, size);
-
-    // this._makeModelNameTitle(data);
-
-    // /** creating container around table */
-    // // modified by xiaowy
-    // // this._container = create('div', [CSS.editor, api.styles.block], null, [this._table.htmlElement]);
-    // // added by xiaowy 2020/09/21
-    // // this._readOnlyTable = new TableReadOnly();
-    // this._makeReadOnlyTable();
-    // this._isReadOnlyTableVisible(data);
-    // let tablebr = document.createElement('br');
-    // // end
-    // this._makeModelHeadTable();
-    // // console.log('after _makeModelHeadTable');
-    // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
-    // // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
-    // // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
-
-    // /** creating ToolBars */
-    // this._verticalToolBar = new VerticalBorderToolBar();
-    // this._horizontalToolBar = new HorizontalBorderToolBar();
-    // this._table.htmlElement.appendChild(this._horizontalToolBar.htmlElement);
-    // this._table.htmlElement.appendChild(this._verticalToolBar.htmlElement);
-
-    // /** Activated elements */
-    // this._hoveredCell = null;
-    // this._activatedToolBar = null;
-    // this._hoveredCellSide = null;
-
-    // /** Timers */
-    // this._plusButDelay = null;
-    // this._toolbarShowDelay = null;
-
-    // this._hangEvents();
     this._api = api; // add by xiaowy
 
     let _innerData = this._cdrJsonConvert(data);
@@ -660,9 +615,9 @@ export class TableConstructor {
       this._mouseEnterInDetectArea(event);
     });
 
-    this._container.addEventListener('dblclick', (event) => {
-      this._processDbClick(event);
-    });
+    // this._container.addEventListener('dblclick', (event) => {
+    //   this._processDbClick(event);
+    // });
     // this._container.addEventListener('mouseover', this._mouseEnterInDetectArea);
   }
 
@@ -1060,7 +1015,7 @@ export class TableConstructor {
         else {
           div.appendChild(textNode);
         }
-        
+
         if (insertNode.nextSibling) {
           // console.log('add before sibling.');
           input.insertBefore(div, insertNode.nextSibling);
@@ -1117,7 +1072,7 @@ export class TableConstructor {
    */
   _checkEleIsListOrSymbol(ele) {
     let prevNode = ele.previousSibling;
-    if (prevNode && prevNode.classList.contains('mmx-listSymbol') >= 0){
+    if (prevNode && prevNode.classList.contains('mmx-listSymbol') >= 0) {
       return prevNode;
     }
     else {
@@ -1139,36 +1094,34 @@ export class TableConstructor {
     //   return;
     // }
     // console.log("enter _processDbClick");
-    let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
-    if (input.getAttribute(("contenteditable")=='false')) {
-      return;
-    }
-    let innerHTML = input.innerText.trim();
-    if (innerHTML.length === 0) {
-      // console.log("enter _processDbClick---", this._api);
-      // if (this._clickTimeId) {
-      //   clearTimeout(this._clickTimeId);
-      // }
-      // this._clickTimeId = setTimeout(()=>{alert('api'),this._api.inlineToolbar.open();}, 250);
-      // this._api.inlineToolbar.open();
-      // this._api.toolbar.open();
-      let inlineToolbar = document.querySelector('.ce-inline-toolbar');
-      if (inlineToolbar) {
-        // let coords = getCoords(input);
-        // let style = 'left:' + coords.x1 + 'px;top:' + coords.y1 +'px';
-        // let style = 'left:' + event.pageX + 'px;top:' + event.pageY +'px';
-        // inlineToolbar.setAttribute('style', style);
-        inlineToolbar.style.left = event.clientX-event.layerX + 'px';
-        inlineToolbar.style.top = event.clientY-event.layerY + 'px';
-        inlineToolbar.classList.add('ce-inline-toolbar--showed');
+    // let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
+    // if (input.getAttribute(("contenteditable")=='false')) {
+    //   return;
+    // }
+    // let innerHTML = input.innerText.trim();
+    // if (innerHTML.length === 0) {
+    //   let inlineToolbar = document.querySelector('.ce-inline-toolbar');
+    //   if (inlineToolbar) {
+    //     inlineToolbar.style.left = event.clientX-event.layerX + 'px';
+    //     inlineToolbar.style.top = event.clientY-event.layerY + 'px';
+    //     inlineToolbar.classList.add('ce-inline-toolbar--showed');
 
-        event.preventDefault();
-        event.stopPropagation();
+    //     event.preventDefault();
+    //     event.stopPropagation();
+    //   }
+    if (window.getSelection().rangeCount > 0 && event.srcElement.getAttribute("contenteditable") == 'true') {
+      var inlineToolbar = document.getElementsByClassName("ce-inline-toolbar");
+      let rangeText = window.getSelection().getRangeAt(0).toString();
+      if (inlineToolbar.length > 0 && rangeText.length == 0) {
+        var parent = inlineToolbar[0].parentNode.parentNode;
+        inlineToolbar[0].style.left = (event.clientX - parent.offsetLeft - event.offsetX) + "px";
+        inlineToolbar[0].style.top = (event.clientY - parent.offsetTop + event.offsetY) + "px";
+        inlineToolbar[0].classList.add("ce-inline-toolbar--showed");
       }
-      // event.preventDefault();
-      // event.stopPropagation();
-      console.log("exit _processDbClick---");
     }
+    event.stopPropagation();
+    console.log("exit _processDbClick---");
+
   }
 
 
