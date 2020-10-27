@@ -22,7 +22,12 @@ export class ModelHeadTable {
    */
   constructor(data, modelSelCallBack = undefined) {
     this._modelSelCallBack = modelSelCallBack;
-    this._element = this._createDivWrapper(data);
+    try {
+      this._element = this._createDivWrapper(data);
+    }
+    catch (e) {
+      alert(e);
+    }
     // this._parent = parent;
     this._hangEvents();
   }
@@ -140,23 +145,28 @@ export class ModelHeadTable {
   _modifyHeadDataCall() {
     let that = this;
     let _modifyHeadData = function (data) {
-      if (data.Name) {
-        that._inputTypeTxt.value = data.Name;
+      try {
+        if (data.Name) {
+          that._inputTypeTxt.value = data.Name;
+        }
+        // if (data.Tags) {
+        //   that._labelAttrEle.innerHTML = data.Tags;
+        // }
+        if (data.Thumb !== undefined || data.imgByteStr !== undefined) {
+          if (that._imgEle !== undefined) {
+            // let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : data.Thumb;
+            let imgUrl = !!data.Thumb ? 'file://' + data.Thumb : data.imgByteStr.changingThisBreaksApplicationSecurity;
+            that._imgEle.src = imgUrl;
+          }
+          else {
+            let img = that._createImageAttr(data);
+            // that._element.appendChild(img);
+            that._divHead.insertAdjacentElement('beforebegin', img);
+          }
+        }
       }
-      // if (data.Tags) {
-      //   that._labelAttrEle.innerHTML = data.Tags;
-      // }
-      if (data.Thumb !== undefined || data.imgByteStr !== undefined) {
-        if (that._imgEle !== undefined) {
-          // let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : data.Thumb;
-          let imgUrl = !!data.Thumb ? 'file://' + data.Thumb : data.imgByteStr.changingThisBreaksApplicationSecurity;
-          that._imgEle.src = imgUrl;
-        }
-        else {
-          let img = that._createImageAttr(data);
-          // that._element.appendChild(img);
-          that._divHead.insertAdjacentElement('beforebegin', img);
-        }
+      catch(e) {
+        alert(e);
       }
     }
     return _modifyHeadData;
@@ -179,6 +189,7 @@ export class ModelHeadTable {
     }
     catch (e) {
       console.log('getHeadParam exception:', e);
+      alert(e);
       return undefined;
     }
   }

@@ -802,18 +802,24 @@ export class TableConstructor {
    */
   _containerKeydown(event) {
     // let keycodes = [37, 38, 39, 40, 9]; // 9 for tab key
-    let keycodes = [38, 40, 9]; // 9 for tab key
-    // Todo: process chracter move
-    let leftAndRight = [37, 39];
-    if (event.keyCode === 13 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
-      console.log('process enter key');
-      this._containerEnterPressed(event);
+    try {
+      let keycodes = [38, 40, 9]; // 9 for tab key
+      // Todo: process chracter move
+      let leftAndRight = [37, 39];
+      if (event.keyCode === 13 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
+        console.log('process enter key');
+        this._containerEnterPressed(event);
+      }
+      // 处理新需求，单元格跳转 xiaowy 2020/09/22
+      if ((keycodes.indexOf(event.keyCode) >= 0 || leftAndRight.indexOf(event.keyCode) >= 0) &&
+        !event.shiftKey && !event.ctrlKey && !event.altKey) {
+        console.log('in table constructor', event.keyCode);
+        this._containerArrowKeyPressed(event);
+      }
     }
-    // 处理新需求，单元格跳转 xiaowy 2020/09/22
-    if ((keycodes.indexOf(event.keyCode) >= 0 || leftAndRight.indexOf(event.keyCode) >= 0) &&
-      !event.shiftKey && !event.ctrlKey && !event.altKey) {
-      console.log('in table constructor', event.keyCode);
-      this._containerArrowKeyPressed(event);
+    catch (e) {
+      console.log(e);
+      alert(e);
     }
   }
 
@@ -1002,17 +1008,21 @@ export class TableConstructor {
       console.log('node', node);
       let div = document.createElement('div');
       // let textNode = document.createTextNode('11');
+      let textNode = null;
       if (node.nodeName === '#text' && selection.focusOffset < node.textContent.length) {
         console.log('for text node');
-        let textNode = document.createTextNode(node.textContent.substr(selection.focusOffset));
-        node.textContent = node.textContent.substr(0, selection.focusOffset);
-        let mmxNode = this._checkEleIsListOrSymbol(node);
+        let mmxNode = this._checkEleIsListOrSymbol(node, true);
         if (mmxNode) {
-          let nodeCopy = mmxNode.clone(true);
+          let nodeCopy = mmxNode.cloneNode(true);
+          this._modifyDigitSerialEle(nodeCopy);
           div.appendChild(nodeCopy);
+          textNode = document.createTextNode(node.textContent.substr(selection.focusOffset));
+          node.textContent = node.textContent.substr(0, selection.focusOffset);
           div.appendChild(textNode);
         }
         else {
+          textNode = document.createTextNode(node.textContent.substr(selection.focusOffset));
+          node.textContent = node.textContent.substr(0, selection.focusOffset);
           div.appendChild(textNode);
         }
 
@@ -1030,17 +1040,48 @@ export class TableConstructor {
         let range = selection.getRangeAt(0);
         range.setStart(textNode, 0);
       }
+      else if (node.nodeName === '#text') {
+        console.log('for text node content length is 0');
+        // let textNode = document.createElement('br');
+        // div.appendChild(textNode);
+        let mmxNode = this._checkEleIsListOrSymbol(node, true);
+        if (mmxNode) {
+          let nodeCopy = mmxNode.cloneNode(true);
+          this._modifyDigitSerialEle(nodeCopy);
+          div.appendChild(nodeCopy);
+          // div.appendChild(textNode);
+        }
+        else {
+          let textNode = document.createElement('br');
+          div.appendChild(textNode);
+        }
+        if (insertNode.nextSibling) {
+          // console.log('add before sibling.');
+          input.insertBefore(div, insertNode.nextSibling);
+          // node.appendChild(div);
+          // textNode.focus();
+
+        }
+        else {
+          // console.log('append end');
+          input.appendChild(div);
+        }
+        let range = selection.getRangeAt(0);
+        range.setStart(div, 1);
+      }
       else {
-        console.log('for other node');
-        let textNode = document.createElement('br');
+        console.log('for other node type');
+        // let textNode = document.createElement('br');
         // div.appendChild(textNode);
         let mmxNode = this._checkEleIsListOrSymbol(node);
         if (mmxNode) {
           let nodeCopy = mmxNode.cloneNode(true);
+          this._modifyDigitSerialEle(nodeCopy);
           div.appendChild(nodeCopy);
-          div.appendChild(textNode);
+          // div.appendChild(textNode);
         }
         else {
+          let textNode = document.createElement('br');
           div.appendChild(textNode);
         }
         if (insertNode.nextSibling) {
@@ -1068,15 +1109,54 @@ export class TableConstructor {
    * @private
    * 处理列表或项目符号元素
    * 检查是否为列表或项目符号
+   * @param 
    * @return 具体的符号元素或者null
    */
-  _checkEleIsListOrSymbol(ele) {
-    let prevNode = ele.previousSibling;
-    if (prevNode && prevNode.classList.contains('mmx-listSymbol') >= 0) {
-      return prevNode;
+  _checkEleIsListOrSymbol(ele, isTextNode = false) {
+    console.log('_checkEleIsListOrSymbol previoisNode', ele.previousSibling);
+    if (isTextNode) {
+      let prevNode = ele.previousSibling;
+      if (prevNode && prevNode.classList && prevNode.classList.contains('mmx-listSymbol')) {
+        console.log('prevNode', prevNode);
+        if (prevNode.previousSibling) {
+          if (!prevNode.previousSibling.textContent || prevNode.previousSibling.textContent.length === 0) {
+            return prevNode;
+          }
+          else {
+            return null;
+          }
+        }
+        return prevNode;
+      }
+      else {
+        return null;
+      }
     }
     else {
-      return null;
+      let child = ele.querySelector('.mmx-listSymbol');
+      if (child) {
+        return child
+      }
+      else {
+        return null;
+      }
+    }
+  }
+
+  /**
+   * @private
+   * 处理序号，依次累加
+   */
+  _modifyDigitSerialEle(ele) {
+    let content = ele.textContent;
+    console.log('content', content);
+    let index = content.indexOf('.');
+    if (content.length > 0 && index >= 0 && index === content.length - 1) {
+      console.log('find number xuhao');
+      let numStr = content.substr(0, index);
+      let newNum = parseInt(numStr) + 1;
+      ele.textContent = newNum + '.';
+      console.log('new ele', ele);
     }
   }
 

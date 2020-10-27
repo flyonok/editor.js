@@ -503,121 +503,72 @@ export class Table {
    * @return {Array}
    */
   getJsonResult() {
-    let rows = this._table.rows;
-    let listResults = [];
-    let modelParaObj = {};
-    let ret = this._tableIsRpeat();
-    // todo：判断表格是否符合repeat规范 xiaowy 2020/10/19
-    // if (!this._checkTableFormat(ret.isRepeat)) {
-    //   alert('造型的对象名称不符合规范，请检查！');
-    //   return [];
-    // }
-    // 找出重复对象名中的第一个单词
-    let firstRepeatWord = ''
-    let repeatCnt = 0;
-    if (ret.isRepeat) {
-      // console.log('repeatWords', ret.repeatWords);
-      let wordsColl = ret.repeatWords.trim().split(' ');
-      firstRepeatWord = wordsColl[0];
-      repeatCnt = wordsColl.length;
-      // console.log('repeatWordscnt', repeatCnt);
-    }
-    // console.log('table getJsonResult repeat ret:', ret, repeatCnt);
-    if (ret.isRepeat) {
-      for (let j = 0; j < rows.length; j += repeatCnt) {
-        let emptyCnt = 0;
-        // let childResults = []; // child repeat objects collect
-        for (let k = j; k < j + repeatCnt; k++) {
-          let cells = rows[k].cells;
-          let cell1 = cells[1];
-          let temp = cell1.querySelector('.' + CSS.inputField);
-          if (temp.innerHTML.trim().length === 0) {
-            emptyCnt++;
-          }
-          let retObj = this._getObjectFromCells(cells);
-          if (retObj[0].length > 0) {
-            modelParaObj[retObj[0]] = retObj[1];
-          }
-        }
-        if (emptyCnt < repeatCnt) {
-          listResults.push(modelParaObj);
-        }
-        modelParaObj = {};
+    try {
+      let rows = this._table.rows;
+      let listResults = [];
+      let modelParaObj = {};
+      let ret = this._tableIsRpeat();
+      // todo：判断表格是否符合repeat规范 xiaowy 2020/10/19
+      // if (!this._checkTableFormat(ret.isRepeat)) {
+      //   alert('造型的对象名称不符合规范，请检查！');
+      //   return [];
+      // }
+      // 找出重复对象名中的第一个单词
+      let firstRepeatWord = ''
+      let repeatCnt = 0;
+      if (ret.isRepeat) {
+        // console.log('repeatWords', ret.repeatWords);
+        let wordsColl = ret.repeatWords.trim().split(' ');
+        firstRepeatWord = wordsColl[0];
+        repeatCnt = wordsColl.length;
+        // console.log('repeatWordscnt', repeatCnt);
       }
-    }
-    else {
-      for (let i = 0; i < rows.length; i++) {
-        // let jsonCells = JSON.parse(JSON.stringify(rows[i].cells));
-        // console.log('jsoncells',jsonCells);
-        let cells = rows[i].cells;
-        // let cells = jsonCells;
-        // 预处理
-        // this._preProcessTableCell(cells);
-        // console.log(cells);
-        // const cols = Array.from(cells);
-        // const inputs = cols.map(cell => cell.querySelector('.' + CSS.inputField));
-        // // console.log('getJsonResult inputs:', inputs);
-        // // 处理空的div
-        // // let divs = inputs.map(input1 => input1.querySelector('div'));
-        // // divs.map((div1) => {
-        // //   if ((div1 !== null) && div1.innerHTML.trim().length == 0) {
-        // //     // let parent = div1.parentElement;
-        // //     // parent.removeChild(div1);
-        // //     div1.remove();
-        // //   }
-        // // });
-        // let content = inputs[1].innerHTML.trim();
-        // // let b = content.replaceAll('<br>', '\n');
-        // // const regrexa = /<div>|<\/div>/gi;
-        // const regrexa = /<br>|<\/div>/gi;
-        // let a = content.replace(regrexa, '');
-        // // const regrex = /<br>/gi;
-        // const regrex = /<div>/gi;
-        // let b = a.replace(regrex, '\r');
-        // const regrexall = /<br>|<\/div>|<div>/gi;
-        // const regrexone = /<br>|<\/div>/gi;
-        // let inputs0 = inputs[0].innerHTML.trim();
-        // let keyOne = inputs0.replace(regrexone, '');
-        // const regrexTwo = /<div>/gi;
-        // let key = keyOne.replace(regrexTwo, '\r');
-        let retObj = this._getObjectFromCells(cells);
-        // 增加容错处理 xiaowy 2020/10/09
-        if (retObj[0].length > 0 && retObj[1].length > 0) {
-          modelParaObj[retObj[0]] = retObj[1];
-          // if (cells[0].classList.contains(CSS.cellWithBorder)) {
+      // console.log('table getJsonResult repeat ret:', ret, repeatCnt);
+      if (ret.isRepeat) {
+        for (let j = 0; j < rows.length; j += repeatCnt) {
+          let emptyCnt = 0;
+          // let childResults = []; // child repeat objects collect
+          for (let k = j; k < j + repeatCnt; k++) {
+            let cells = rows[k].cells;
+            let cell1 = cells[1];
+            let temp = cell1.querySelector('.' + CSS.inputField);
+            if (temp.innerHTML.trim().length === 0) {
+              emptyCnt++;
+            }
+            let retObj = this._getObjectFromCells(cells);
+            if (retObj[0].length > 0) {
+              modelParaObj[retObj[0]] = retObj[1];
+            }
+          }
+          if (emptyCnt < repeatCnt) {
+            listResults.push(modelParaObj);
+          }
+          modelParaObj = {};
+        }
+      }
+      else {
+        for (let i = 0; i < rows.length; i++) {
+          // let jsonCells = JSON.parse(JSON.stringify(rows[i].cells));
+          // console.log('jsoncells',jsonCells);
+          let cells = rows[i].cells;
 
-          //   // modelParaObj[inputs[0].innerHTML] = b;
-          //   modelParaObj[key] = b;
-          //   // console.log('getJsonResult:', modelParaObj);
-          //   listResults.push(modelParaObj);
-          //   modelParaObj = {};
-          // }
-          // else if (ret.isRepeat) {
-          //   if (ret.isRepeat) {
-          //     if (key === firstRepeatWord && i > 0) {
-          //       listResults.push(modelParaObj);
-          //       modelParaObj = {};
-          //       modelParaObj[key] = b;
-          //     }
-          //     else {
-          //       modelParaObj[key] = b;
-          //     }
-          //   }
-          //   else {
-          //     // 增加容错处理 xiaowy 2020/10/09
-          //     modelParaObj[key] = b;
-          //     // if (key.length > 0) {
-          //     //   modelParaObj[key] = b;
-          //     // }
-          //     // console.log('getJsonResult1:', modelParaObj);
-          //   }
+          let retObj = this._getObjectFromCells(cells);
+          // 增加容错处理 xiaowy 2020/10/09
+          if (retObj[0].length > 0 && retObj[1].length > 0) {
+            modelParaObj[retObj[0]] = retObj[1];
+
+          }
         }
+        listResults.push(modelParaObj);
+        // console.log('after table getJsonResult:', listResults);
+        // return listResults;
       }
-      listResults.push(modelParaObj);
-      // console.log('after table getJsonResult:', listResults);
-      // return listResults;
+      return listResults;
     }
-    return listResults;
+    catch (e) {
+      console.log(e);
+      alert(e);
+    }
   }
 
   /**
