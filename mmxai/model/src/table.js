@@ -233,8 +233,100 @@ export class Table {
       }
     }
     let clipData = event.clipboardData;
-    let dataContent = clipData.getData('text/plain');
-    clipData.setData('text/plain', dataContent);
+    // for debug
+    // if (clipData.types != null) {
+    //   clipData.clearData();
+    //   for (let i = 0; i < clipData.types.length; i++) {
+    //     // console.log("... types[" + i + "] = " + clipData.types[i]);
+    //     let data = clipData.getData(clipData.types[i]);
+    //     console.log('types: '  + clipData.types[i] + ";data: " + data);
+
+    //   }
+    // }
+    let datahtml = clipData.getData('text/html')
+    if (datahtml && datahtml.length) {
+      // console.log('html', datahtml);
+      let testdiv = document.createElement('div');
+      testdiv.innerHTML = datahtml;
+      let pColls = testdiv.querySelectorAll('p');
+      if (pColls && pColls.length) {
+        pColls.forEach((pele) => {
+          if (pele.hasAttribute('style')) {
+            pele.removeAttribute('style');
+          }
+          let spans = pele.querySelectorAll('span');
+          if (spans.length) {
+            spans.forEach((span) => {
+              if (span.hasAttribute('style')) {
+                span.removeAttribute('style');
+                
+              }
+            });
+
+          }
+          event.target.appendChild(pele);
+        }
+        );
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+    }
+    else {
+      let dataContent = clipData.getData('text/plain');
+      if (dataContent && dataContent.length) {
+        event.target.innerHTML = dataContent;
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+    }
+    /*
+    console.log('paste2', dataContent);
+    if (clipData.types != null) {
+      clipData.clearData();
+      for (let i = 0; i < clipData.types.length; i++) {
+        // console.log("... types[" + i + "] = " + clipData.types[i]);
+        let data = clipData.getData(clipData.types[i]);
+        console.log('types: '  + clipData.types[i] + ";data: " + data);
+        clipData.setData(clipData.types[i], dataContent);
+        console.log('types1: '  + clipData.types[i] + ";data: " + clipData.getData(clipData.types[i]));
+      }
+      // for (let i = 0; i < clipData.types.length; i++) {
+      //   console.log("... types[" + i + "] = " + clipData.types[i]);
+      //   let data = clipData.getData(clipData.types[i]);
+      //   console.log('types: '  + clipData.types[i] + ";data: " + data);
+      //   // clipData.setData(clipData.types[i], dataContent);
+      // }
+
+     
+
+    }
+    if (clipData.items != null) {
+      for (var i=0; i < clipData.items.length; i++) {
+        console.log("... items[" + i + "].kind = " + clipData.items[i].kind + " ; type = " + clipData.items[i].type);
+      }
+    }
+    // let dataContent = clipData.getData(clipData.types);
+    // console.log('types', clipData.types);
+    // console.log('paste1', dataContent);
+    // word conetent process
+    let testdiv = document.createElement('div');
+    testdiv.innerHTML = dataContent;
+    let spans = testdiv.querySelectorAll('span');
+    if (spans.length) {
+      spans.forEach((span) => {
+        if (span.hasAttribute('style')) {
+          span.removeAttribue('style');
+        }
+      });
+      dataContent = testdiv.innerHTML;
+      console.log('paste2', dataContent);
+    }
+    // word content process end
+    // clipData.clearData();
+    // clipData.setData('text/plain', dataContent);
+    // clipData.setData(clipData.types, dataContent);
     // let ele = event.target;
     // ele.innerHTML += dataContent;
     // console.log(dataContent);
@@ -242,6 +334,7 @@ export class Table {
     // event.preventDefault();
     event.stopPropagation();
     // return true;
+    */
   }
 
   /**

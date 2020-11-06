@@ -130,8 +130,13 @@ export class ModelHeadTable {
    */
   _hangEvents() {
     this._modelSelBtn.addEventListener('click', (event) => {
+      console.log('enter modelSelBtn click event');
       if (this._modelSelCallBack !== undefined) {
+        console.log('begin call _modelSelCallBack funtion');
         let returnData = this._modelSelCallBack(this._modifyHeadDataCall());
+        console.log('after call _modelSelCallBack funtion');
+        event.preventDefault();
+        event.stopPropagation();
         // this._modifyHeadData(returnData);
       }
     });

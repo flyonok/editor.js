@@ -1026,7 +1026,7 @@ export class TableConstructor {
           div.appendChild(textNode);
         }
 
-        if (insertNode.nextSibling) {
+        if (insertNode.nextSibling && insertNode.nextSibling.nodeName !== 'BR') {
           // console.log('add before sibling.');
           input.insertBefore(div, insertNode.nextSibling);
           // node.appendChild(div);
@@ -1055,8 +1055,8 @@ export class TableConstructor {
           let textNode = document.createElement('br');
           div.appendChild(textNode);
         }
-        if (insertNode.nextSibling) {
-          // console.log('add before sibling.');
+        if (insertNode.nextSibling && insertNode.nextSibling.nodeName !== 'BR') {
+          console.log('add before sibling.', insertNode.nextSibling);
           input.insertBefore(div, insertNode.nextSibling);
           // node.appendChild(div);
           // textNode.focus();
@@ -1084,7 +1084,7 @@ export class TableConstructor {
           let textNode = document.createElement('br');
           div.appendChild(textNode);
         }
-        if (insertNode.nextSibling) {
+        if (insertNode.nextSibling && insertNode.nextSibling.nodeName !== 'BR') {
           // console.log('add before sibling.');
           input.insertBefore(div, insertNode.nextSibling);
           // node.appendChild(div);
@@ -1113,23 +1113,45 @@ export class TableConstructor {
    * @return 具体的符号元素或者null
    */
   _checkEleIsListOrSymbol(ele, isTextNode = false) {
-    console.log('_checkEleIsListOrSymbol previoisNode', ele.previousSibling);
+    console.log('_checkEleIsListOrSymbol previoisNode', ele.parentNode);
     if (isTextNode) {
-      let prevNode = ele.previousSibling;
-      if (prevNode && prevNode.classList && prevNode.classList.contains('mmx-listSymbol')) {
-        console.log('prevNode', prevNode);
-        if (prevNode.previousSibling) {
-          if (!prevNode.previousSibling.textContent || prevNode.previousSibling.textContent.length === 0) {
-            return prevNode;
-          }
-          else {
-            return null;
-          }
+      let parent = ele.parentNode;
+      if (parent) {
+        let firstChild = parent.childNodes[0]
+        if (firstChild.classList && firstChild.classList.contains('mmx-listSymbol')) {
+          return firstChild
         }
-        return prevNode;
+        else {
+          return null;
+        }
       }
+      /*
+      if (isTextNode) {
+        let prevNode = ele.previousSibling;
+        if (prevNode && prevNode.classList && prevNode.classList.contains('mmx-listSymbol')) {
+          console.log('prevNode', prevNode);
+          if (prevNode.previousSibling) {
+            if (!prevNode.previousSibling.textContent || prevNode.previousSibling.textContent.length === 0) {
+              return prevNode;
+            }
+            else {
+              return null;
+            }
+          }
+          return prevNode;
+        }
+        else {
+          return null;
+        }
+      }*/
       else {
-        return null;
+        let child = ele.querySelector('.mmx-listSymbol');
+        if (child) {
+          return child
+        }
+        else {
+          return null;
+        }
       }
     }
     else {
@@ -1140,7 +1162,9 @@ export class TableConstructor {
       else {
         return null;
       }
+
     }
+
   }
 
   /**
