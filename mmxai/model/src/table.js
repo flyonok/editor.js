@@ -17,14 +17,22 @@ export class Table {
   /**
    * Creates
    */
-  constructor() {
+  constructor(tabConfig={}) {
+    /**
+     * tabConfig: {
+     * repeat:number, // 重复模式 1：全重复模式， -2：单行重复模式, -1:对象名称可修改
+     * objSepIndexColl: Array, // 记录重复字段的边界索引，从0开始
+     * repeatWordColl：Array, // 记录重复的对象名称
+     * }
+     */
     this._numberOfColumns = 0;
     this._numberOfRows = 0;
     this._element = this._createTableWrapper();
     this._table = this._element.querySelector('table');
-    this._objSepIndexColl = [];
+    // this._objSepIndexColl = [];
     this._firstColumnIsRead = true; // 默认不可以修改对象名称 2020/10/14
-    this._repeat = 100; // 对象的重复模式0，1，-1
+    // this._repeat = 100; // 对象的重复模式0，1，-1
+    this._tabConfig = tabConfig;
 
     this._hangEvents();
   }
@@ -50,7 +58,8 @@ export class Table {
       //   this._fillReadOnlyCell(cell);
       //   continue;
       // }
-      if (this._objSepIndexColl && this._objSepIndexColl.indexOf(i) >= 0) {
+      // if (this._objSepIndexColl && this._objSepIndexColl.indexOf(i) >= 0) {
+      if (this._tabConfig.objSepIndexColl && this._tabConfig.objSepIndexColl.indexOf(i) >= 0) {
         // console.log('find!!!');
         // this._fillCell(cell, true)
         cellConfig.isObjSep = true;
@@ -77,7 +86,12 @@ export class Table {
   addRow(index = -1) {
     this._numberOfRows++;
     const row = this._table.insertRow(index);
-    if (this._objSepIndexColl && this._objSepIndexColl.indexOf(this._numberOfRows) > 0) {
+    let nrows = this._numberOfRows - 1;
+    let isInColl = this._tabConfig.objSepIndexColl && this._tabConfig.objSepIndexColl.indexOf(nrows) > 0;
+    let modularRow = this._tabConfig.repeat && this._tabConfig.repeat === 1 && this._numberOfRows % (this._tabConfig.objSepIndexColl[0]+1) === 0;
+    if ( isInColl || modularRow) {
+      // console.log('isInColl', isInColl);
+      // console.log('modularRow', modularRow);
       this._fillRow(row, true);
     }
     else {
@@ -118,8 +132,16 @@ export class Table {
    */
   set objSepIndexColl(value) {
     // console.log('enter objSepIndexColl:', value, this._objSepIndexColl);
-    this._objSepIndexColl = value;
+    // this._objSepIndexColl = value;
+    this._tabConfig.objSepIndexColl = value;
     // console.log('after objSepIndexColl:', this._objSepIndexColl);
+  }
+
+  /**
+   * 设置表格的配置
+   */
+  set tabConfig(value) {
+    this._tabConfig = value;
   }
 
   /**
@@ -143,8 +165,8 @@ export class Table {
   }
 
   set repeat(value) {
-    this._repeat = value;
-    if (this._repeat === -1) {
+    this._tabConfig.repeat = value;
+    if (this._tabConfig.repeat === -1) {
       this._firstColumnIsRead = false;
     }
     else {
@@ -691,7 +713,7 @@ export class Table {
    * @returns {boolean} true: correct, false: not correct
    */
   _checkTableFormat(isRepeat) {
-    if (this._repeat === 1) {
+    if (this._tabConfig.repeat === 1) {
       if (!isRepeat) {
         return false;
       }

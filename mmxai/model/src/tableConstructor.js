@@ -466,8 +466,10 @@ export class TableConstructor {
     const rows = contentRows || configRows || defaultRows;
     const cols = contentCols || configCols || defaultCols;
     // contentSeprateIndexColl = data.contentSeprateIndex;
-    // console.log('set objSepIndexColl');
-    this._table.objSepIndexColl = data.contentSeprateIndex;
+    if (data.contentSeprateIndex && data.contentSeprateIndex.length) {
+      console.log('set objSepIndexColl', data.contentSeprateIndex);
+      this._table.objSepIndexColl = data.contentSeprateIndex;
+    }
 
     for (let i = 0; i < rows; i++) {
       // if (contentSeprateIndexColl.indexOf() > -1) {
@@ -1933,7 +1935,7 @@ export class TableConstructor {
       console.log("modelObj.Name", modelObj.Name);
       this._descTitle.innerHTML = '【' + '造型-' + modelObj.Name + '】';
     }
-    const fields = modelObj.Fields;
+    const fields = modelObj.Fields.trim();
     let fieldArr = fields.split(' ');
     if (fieldArr.length > 0) {
       // check table  is empty
@@ -1958,9 +1960,12 @@ export class TableConstructor {
       let isFielsRepeat = checkFiledsIsRepeat(modelObj.Fields);
       if (isFielsRepeat.isRepeat) {
         this._repeatWordsColl = isFielsRepeat.repeatWords.trim().split(' ');
+        data.contentSeprateIndex.push(this._repeatWordsColl.length - 1);
       }
       else if (this._repeat !== undefined && this._repeat === 1) {
         this._repeatWordsColl = modelObj.Fields.trim().split(' ');
+        // bug 修正初始化时，没有对表格最后一行加粗
+        data.contentSeprateIndex.push(this._repeatWordsColl.length - 1);
         // let arr = modelObj.Fields.trim();
         // if (arr.length === 1) {
         //   this._repeatWordsColl = arr;
@@ -1978,8 +1983,11 @@ export class TableConstructor {
         data.content.push(objArr);
         // fields is repeat
         if (isFielsRepeat.isRepeat && temp === isFielsRepeat.repeatWords) {
-          if (objSepIndex > 0)
-            data.contentSeprateIndex.push(objSepIndex - 1); // 上一行！！！
+          if (objSepIndex > 0) {
+            if (data.contentSeprateIndex.indexOf(objSepIndex - 1) < 0) {
+              data.contentSeprateIndex.push(objSepIndex - 1); // 上一行！！！
+            }
+          }
         }
         objSepIndex++;
       });
