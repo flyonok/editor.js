@@ -17,7 +17,7 @@ export class Table {
   /**
    * Creates
    */
-  constructor(tabConfig={}) {
+  constructor(tabConfig = {}) {
     /**
      * tabConfig: {
      * repeat:number, // 重复模式 1：全重复模式， -2：单行重复模式, -1:对象名称可修改
@@ -46,12 +46,16 @@ export class Table {
     // console.log('this._objSepIndexColl', this._objSepIndexColl);
     /** Add cell in each row */
     const rows = this._table.rows;
-    let cellConfig = { isObjSep: false, isWritable: false };
+    let cellConfig = { isObjSep: false, isWritable: false, isFirstColumn: false };
 
     for (let i = 0; i < rows.length; i++) {
       let isFirstColumn = false;
       if (rows[i].cells.length === 0) {
         isFirstColumn = true;
+        cellConfig.isFirstColumn = true;
+      }
+      else {
+        cellConfig.isFirstColumn = false;
       }
       const cell = rows[i].insertCell(index);
       // if (this._numberOfColumns === 1) {
@@ -88,8 +92,8 @@ export class Table {
     const row = this._table.insertRow(index);
     let nrows = this._numberOfRows - 1;
     let isInColl = this._tabConfig.objSepIndexColl && this._tabConfig.objSepIndexColl.indexOf(nrows) > 0;
-    let modularRow = this._tabConfig.repeat && this._tabConfig.repeat === 1 && this._numberOfRows % (this._tabConfig.objSepIndexColl[0]+1) === 0;
-    if ( isInColl || modularRow) {
+    let modularRow = this._tabConfig.repeat && this._tabConfig.repeat === 1 && this._numberOfRows % (this._tabConfig.objSepIndexColl[0] + 1) === 0;
+    if (isInColl || modularRow) {
       // console.log('isInColl', isInColl);
       // console.log('modularRow', modularRow);
       this._fillRow(row, true);
@@ -142,6 +146,15 @@ export class Table {
    */
   set tabConfig(value) {
     this._tabConfig = value;
+  }
+
+  /**
+   * 设置造型对象的重复列名集合
+   */
+  set repeatWordsColl(value) {
+    // console.log('repeatWordsColl 0', value)
+    this._tabConfig.repeatWordsColl = value;
+    // console.log('repeatWordsColl', this._tabConfig.repeatWordsColl)
   }
 
   /**
@@ -206,6 +219,24 @@ export class Table {
 
   /**
    * @private
+   * Create select option area of cell
+   */
+  _createSelectOption() {
+    // console.log('_createSelectOption',this._tabConfig.repeatWordsColl, this._tabConfig.repeat);
+    if (this._tabConfig.repeatWordsColl && this._tabConfig.repeatWordsColl.length) {
+
+      let optionColl = [];
+      this._tabConfig.repeatWordsColl.forEach(word => {
+        let option = create('option', null, { 'value': word })
+        option.innerText = word;
+        optionColl.push(option);
+      });
+      return create('select', [CSS.inputField], null, optionColl);
+    }
+  }
+
+  /**
+   * @private
    *
    * Create editable area of cell
    * @return {HTMLElement} - the area
@@ -221,14 +252,31 @@ export class Table {
    * @param {HTMLElement} cell - empty cell
    * @param {Object} cellConfig => {isObjSep:false, isWritable:false}
    */
-  _fillCell(cell, cellConfig = { isObjSep: false, isWritable: false }) {
+  _fillCell(cell, cellConfig = { isObjSep: false, isWritable: false, isFirstColumn: false }) {
     if (cellConfig.isObjSep) {
       cell.classList.add(CSS.cellWithBorder);
     }
     else {
       cell.classList.add(CSS.cell);
     }
-    if (cellConfig.isWritable) {
+    if (this._tabConfig.repeat && this._tabConfig.repeat === 2) {
+      if (cellConfig.isFirstColumn) {
+        let select = this._createSelectOption();
+        cell.appendChild(create('div', [CSS.area], null, [select]));
+      }
+      else if (cellConfig.isWritable) {
+        const content = this._createContenteditableArea();
+        // content.onpaste = this._pasteEvent;
+        content.addEventListener('paste', this._pasteEvent);
+
+        cell.appendChild(create('div', [CSS.area], null, [content]));
+      }
+      else {
+        const content = this._createContentReadOnlyArea();
+        cell.appendChild(create('div', [CSS.area], null, [content]));
+      }
+    }
+    else if (cellConfig.isWritable) {
       const content = this._createContenteditableArea();
       // content.onpaste = this._pasteEvent;
       content.addEventListener('paste', this._pasteEvent);
@@ -241,6 +289,23 @@ export class Table {
     }
   }
 
+  _pasteEvent_old(event) {
+    let clipData = event.clipboardData;
+    if (clipData.types != null) {
+      let dataContent = clipData.getData('text/plain');
+      if (dataContent && dataContent.length) {
+        clipData.clearData();
+        for (let i = 0; i < clipData.types.length; i++) {
+          // console.log("... types[" + i + "] = " + clipData.types[i]);
+          let data = clipData.getData(clipData.types[i]);
+          console.log('types: ' + clipData.types[i] + ";data: " + data);
+          clipData.setData(clipData.types[i], dataContent);
+          console.log('types1: ' + clipData.types[i] + ";data: " + clipData.getData(clipData.types[i]));
+        }
+      }
+    }
+  }
+
   /**
    * @private
    * process table input cell paste event
@@ -250,21 +315,64 @@ export class Table {
     let selection = window.getSelection();
     if (selection && selection.rangeCount) {
       let range = selection.getRangeAt(0);
+      let firstPart = '';
+      let secondPart = '';
       if (range) {
+        // if (range.startOffset !== range.endOffset) {
+        //   firstPart = event.target.innerHTML.substring(0, range.startOffset)
+        //   secondPart = event.target.innerHTML.substring(range.endOffset);
+        //   range.deleteContents();
+        // }
+        // else {
+        //   firstPart = event.target.innerHTML;
+        // }
         range.deleteContents();
-      }
-    }
-    let clipData = event.clipboardData;
-    // for debug
-    // if (clipData.types != null) {
-    //   clipData.clearData();
-    //   for (let i = 0; i < clipData.types.length; i++) {
-    //     // console.log("... types[" + i + "] = " + clipData.types[i]);
-    //     let data = clipData.getData(clipData.types[i]);
-    //     console.log('types: '  + clipData.types[i] + ";data: " + data);
+        let clipData = event.clipboardData;
+        // for debug
+        // if (clipData.types != null) {
+        //   clipData.clearData();
+        //   for (let i = 0; i < clipData.types.length; i++) {
+        //     // console.log("... types[" + i + "] = " + clipData.types[i]);
+        //     let data = clipData.getData(clipData.types[i]);
+        //     console.log('types: '  + clipData.types[i] + ";data: " + data);
 
-    //   }
-    // }
+        //   }
+        // }
+        // 只保留文本 2020/11/11
+        let dataContent = clipData.getData('text/plain');
+        if (dataContent && dataContent.length) {
+          var el = document.createElement("div");
+          el.innerHTML = dataContent;
+          el.contentEditable = true;
+          var frag = document.createDocumentFragment(),
+            node, lastNode;
+          while ((node = el.firstChild)) {
+            lastNode = frag.appendChild(node);
+          }
+          range.insertNode(frag);
+          // Preserve the selection
+          if (lastNode) {
+            range = range.cloneRange();
+            range.setStartAfter(lastNode);
+            range.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(range);
+          }
+        }
+        // console.log('dataContent', dataContent);
+        // event.target.innerHTML = firstPart + dataContent + secondPart;
+        // if (event.target.nodeName === '#text') {
+        //   range.setStart(event.target, firstPart.length);
+        //   range.setEnd(event.target, firstPart.length + dataContent.length);
+        // }
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+
+    }
+
+    /*
     let datahtml = clipData.getData('text/html')
     if (datahtml && datahtml.length) {
       // console.log('html', datahtml);
@@ -281,10 +389,10 @@ export class Table {
             spans.forEach((span) => {
               if (span.hasAttribute('style')) {
                 span.removeAttribute('style');
-                
+   
               }
             });
-
+   
           }
           event.target.appendChild(pele);
         }
@@ -303,6 +411,7 @@ export class Table {
         return;
       }
     }
+    */
     /*
     console.log('paste2', dataContent);
     if (clipData.types != null) {
@@ -320,9 +429,9 @@ export class Table {
       //   console.log('types: '  + clipData.types[i] + ";data: " + data);
       //   // clipData.setData(clipData.types[i], dataContent);
       // }
-
+   
      
-
+   
     }
     if (clipData.items != null) {
       for (var i=0; i < clipData.items.length; i++) {
@@ -386,10 +495,18 @@ export class Table {
     let cellConfig = { isObjSep: isObjSep, isWritable: true }
     for (let i = 0; i < this._numberOfColumns; i++) {
       const cell = row.insertCell();
-      if (i == 0 && this._firstColumnIsRead)
+      if (i == 0) {
+        cellConfig.isFirstColumn = true;
+      }
+      else {
+        cellConfig.isFirstColumn = false;
+      }
+      if (i == 0 && this._firstColumnIsRead) {
         cellConfig.isWritable = false;
-      else
+      }
+      else {
         cellConfig.isWritable = true;
+      }
       this._fillCell(cell, cellConfig);
       // if (i === 0) {
       //   this._fillReadOnlyCell(cell);
@@ -563,7 +680,13 @@ export class Table {
     let b = a.replace(regrex, '\r');
     const regrexall = /<br>|<\/div>|<div>/gi;
     const regrexone = /<br>|<\/div>/gi;
-    let inputs0 = inputs[0].innerHTML.trim();
+    let inputs0 = '';
+    if (this._tabConfig.repeat && this._tabConfig.repeat == 2) {
+      inputs0 = inputs[0].value.trim();
+    }
+    else {
+      inputs0 = inputs[0].innerHTML.trim();
+    }
     let keyOne = inputs0.replace(regrexone, '');
     const regrexTwo = /<div>/gi;
     let key = keyOne.replace(regrexTwo, '\r');
@@ -596,6 +719,15 @@ export class Table {
           // node.appendChild(div);
           p.parentNode.replaceChild(div, p);
         }
+      }
+
+      let divList = node.querySelectorAll('div');
+      if (divList) {
+        divList.forEach(divEle => {
+          if (divEle.hasAttribute('contenteditable')) {
+            divEle.removeAttribute('contenteditable');
+          }
+        });
       }
       // for (let j = 0; j < contentsList.length; j++) {
       //   if (j === 0) {
@@ -670,11 +802,31 @@ export class Table {
           let retObj = this._getObjectFromCells(cells);
           // 增加容错处理 xiaowy 2020/10/09
           if (retObj[0].length > 0 && retObj[1].length > 0) {
+            // if (this._tabConfig.repeat && this._tabConfig.repeat === 2 && ((i + 1) % this._tabConfig.repeatWordsColl.length === 0)) {
+            if (this._tabConfig.repeat && this._tabConfig.repeat === 2) {
+              // console.log('this._tabConfig.repeat is 2');
+              // check empty
+              for (var prop in modelParaObj) {
+                if (modelParaObj.hasOwnProperty(prop)) {
+                  listResults.push(modelParaObj);
+                  modelParaObj = {};
+                  break;
+                }
+              }
+              // modelParaObj[retObj[0]] = retObj[1];
+            }
             modelParaObj[retObj[0]] = retObj[1];
+          }
 
+        }
+        // check whether modelParaObj is empty
+        for (var prop in modelParaObj) {
+          if (modelParaObj.hasOwnProperty(prop)) {
+            listResults.push(modelParaObj);
+            break;
           }
         }
-        listResults.push(modelParaObj);
+
         // console.log('after table getJsonResult:', listResults);
         // return listResults;
       }
@@ -690,20 +842,43 @@ export class Table {
    * @private
    * check whether table is repeat
    * @param {nothing}
-   * @returns {boolean} @see checkFiledsIsRepeat
+   * @returns {isRepeat: boolean,repeatWords: string} @see checkFiledsIsRepeat
    */
   _tableIsRpeat() {
-    let rows = this._table.rows;
-    let listResults = [];
-    for (let i = 0; i < rows.length; i++) {
-      let cell = rows[i].cells[0];
-      let input = cell.querySelector('.' + CSS.inputField);
-      let key = input.innerHTML.trim();
-      listResults.push(key);
+    if (this._tabConfig.repeat && (this._tabConfig.repeat === 1 || this._tabConfig.repeat === 2)) {
+      if (this._tabConfig.repeat === 1) {
+        return {
+          'isRepeat': true,
+          'repeatWords': this._tabConfig.repeatWordsColl.join(' ')
+        }
+      }
+      else {
+        return {
+          'isRepeat': false,
+          'repeatWords': ' '
+        }
+      }
     }
-    let ret = checkFiledsIsRepeat(listResults.join(' '));
-    // console.log('_tableIsRpeat ret', ret);
-    return ret;
+    else {
+      let rows = this._table.rows;
+      let listResults = [];
+      for (let i = 0; i < rows.length; i++) {
+        let cell = rows[i].cells[0];
+        let input = cell.querySelector('.' + CSS.inputField);
+        if (this._tabConfig.repeat && this._tabConfig.repeat === 2) {
+          let key = input.value.trim();
+          listResults.push(key);
+        }
+        else {
+          let key = input.innerHTML.trim();
+          listResults.push(key);
+        }
+      }
+      // todo:以后可以根据_tabConfig.repeat的值来判断
+      let ret = checkFiledsIsRepeat(listResults.join(' '));
+      // console.log('_tableIsRpeat ret', ret);
+      return ret;
+    }
   }
 
   /**

@@ -27,10 +27,11 @@ export class TableConstructor {
   constructor(data, config, api) {
     this._api = api; // add by xiaowy
 
+    this._repeatWordsColl = [];
     let _innerData = this._cdrJsonConvert(data);
     this._repeat = _innerData.Repeat; // add by xiaowy whether can add table parameter
     // console.log('repeat:', this._repeat);
-    this._repeatWordsColl = [];
+
     this._makeModelTables(_innerData, config);
   }
 
@@ -52,8 +53,13 @@ export class TableConstructor {
           if (find !== undefined) {
             // console.log('find model thumb', data.name);
             // data.imgByteStr = find.imgByteStr;
-            data.Thumb = find.Thumb;
+            // data.Thumb = find.Thumb;
+            data.imgBase64 = find.imgBase64;
             data.Repeat = find.Repeat; // 表示是否可以增加表格参数！！！ 2020/10/07
+            if (find.Repeat && (find.Repeat === 1 || find.Repeat === 2)) {
+              this._repeatWordsColl = find.Fields.trim().split(' ');
+              console.log('mmxaiGetAllModelList2', this._repeatWordsColl);
+            }
           }
           else {
             console.log('not find model thumb', data.name);
@@ -124,7 +130,9 @@ export class TableConstructor {
         let repeatRowIndex = 0;
         let isRepeat = this._checkModelParaListsIsRepeat(arr);
         if (isRepeat) {
-          _innerData.Repeat = 1;
+          if (!_innerData.Repeat) {
+            _innerData.Repeat = 1;
+          }
         }
         arr.forEach((item, index) => {
           // console.log('item:', item);
@@ -170,7 +178,9 @@ export class TableConstructor {
       // console.log('_checkModelParaListsIsRepeat11', );
       let ret = checkFiledsIsRepeat(objNamesColl.trim());
       if (ret.isRepeat) {
-        this._repeatWordsColl = ret.repeatWords.trim().split(' ');
+        if (this._repeatWordsColl.length === 0) {
+          this._repeatWordsColl = ret.repeatWords.trim().split(' ');
+        }
       }
       // console.log('_checkModelParaListsIsRepeat', ret);
       return ret.isRepeat;
@@ -245,6 +255,7 @@ export class TableConstructor {
         // 具体的造型参数
         this._table = new Table();
         this._table.repeat = this._repeat;
+        this._table.repeatWordsColl = this._repeatWordsColl;
         // if (this._repeat === -1) {
         //   this._table.firstColumnIsRead = false;
         // }
@@ -268,7 +279,8 @@ export class TableConstructor {
         this._makeReadOnlyTable(); // 造型表格头
         this._repeat = 1;
         this._table.repeat = this._repeat;
-        this._table.firstColumnIsRead = false; // to do 这里以后要注释掉
+        this._table.repeatWordsColl = this._repeatWordsColl;
+        // this._table.firstColumnIsRead = false; // to do 这里以后要注释掉
         this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement]);
         this._initToolBarAndEvent();
       }
@@ -406,9 +418,14 @@ export class TableConstructor {
           // let b = content.replaceAll('\n', '<br/>');
           const regrex = /[\r|\n]/gi;
           // let b = content.replace(regrex, '<br/>');
-          let b = content.replace(regrex, '<div><\/div>');
+          let b = content.replace(regrex, '<div contenteditable="true"><\/div>');
           // console.log("content11", b);
-          input.innerHTML = b;
+          if (this._repeat && this._repeat === 2 && j == 0) {
+            input.value = b;
+          }
+          else {
+            input.innerHTML = b;
+          }
         }
       }
     }
@@ -1007,12 +1024,13 @@ export class TableConstructor {
       if (node.nodeName === '#text' && !node.nextSibling) {
         insertNode = node.parentNode;
       }
-      console.log('node', node);
-      let div = document.createElement('div');
+      // console.log('node', node);
+      // let div = document.createElement('div');
       // let textNode = document.createTextNode('11');
+      let div = create('div', null, {'contenteditable':true});
       let textNode = null;
       if (node.nodeName === '#text' && selection.focusOffset < node.textContent.length) {
-        console.log('for text node');
+        // console.log('for text node');
         let mmxNode = this._checkEleIsListOrSymbol(node, true);
         if (mmxNode) {
           let nodeCopy = mmxNode.cloneNode(true);
@@ -1028,9 +1046,9 @@ export class TableConstructor {
           div.appendChild(textNode);
         }
 
-        if (insertNode.nextSibling && insertNode.nextSibling.nodeName !== 'BR') {
+        if (insertNode.nextElementSibling && insertNode.nextElementSibling.nodeName !== '#text') {
           // console.log('add before sibling.');
-          input.insertBefore(div, insertNode.nextSibling);
+          input.insertBefore(div, insertNode.nextElementSibling);
           // node.appendChild(div);
           // textNode.focus();
 
@@ -1049,17 +1067,19 @@ export class TableConstructor {
         let mmxNode = this._checkEleIsListOrSymbol(node, true);
         if (mmxNode) {
           let nodeCopy = mmxNode.cloneNode(true);
+          console.log("mmxNode, nodeCopy", mmxNode, nodeCopy);
           this._modifyDigitSerialEle(nodeCopy);
           div.appendChild(nodeCopy);
           // div.appendChild(textNode);
         }
-        else {
-          let textNode = document.createElement('br');
-          div.appendChild(textNode);
-        }
-        if (insertNode.nextSibling && insertNode.nextSibling.nodeName !== 'BR') {
-          console.log('add before sibling.', insertNode.nextSibling);
-          input.insertBefore(div, insertNode.nextSibling);
+        // 不需要回车
+        // else {
+        //   let textNode = document.createElement('br');
+        //   div.appendChild(textNode);
+        // }
+        if (insertNode.nextElementSibling && insertNode.nextElementSibling.nodeName !== '#text') {
+          console.log('add before sibling.', insertNode.nextElementSibling);
+          input.insertBefore(div, insertNode.nextElementSibling);
           // node.appendChild(div);
           // textNode.focus();
 
@@ -1069,7 +1089,7 @@ export class TableConstructor {
           input.appendChild(div);
         }
         let range = selection.getRangeAt(0);
-        range.setStart(div, 1);
+        range.setStart(div, 0);
       }
       else {
         console.log('for other node type');
@@ -1082,13 +1102,14 @@ export class TableConstructor {
           div.appendChild(nodeCopy);
           // div.appendChild(textNode);
         }
-        else {
-          let textNode = document.createElement('br');
-          div.appendChild(textNode);
-        }
-        if (insertNode.nextSibling && insertNode.nextSibling.nodeName !== 'BR') {
+        // 不需要回车
+        // else {
+        //   let textNode = document.createElement('br');
+        //   div.appendChild(textNode);
+        // }
+        if (insertNode.nextElementSibling && insertNode.nextElementSibling.nodeName !== '#text') {
           // console.log('add before sibling.');
-          input.insertBefore(div, insertNode.nextSibling);
+          input.insertBefore(div, insertNode.nextElementSibling);
           // node.appendChild(div);
           // textNode.focus();
 
@@ -1098,7 +1119,7 @@ export class TableConstructor {
           input.appendChild(div);
         }
         let range = selection.getRangeAt(0);
-        range.setStart(div, 1);
+        range.setStart(div, 0);
       }
       // textNode.textContent = ' ';
       event.preventDefault();
@@ -1301,7 +1322,7 @@ export class TableConstructor {
       }
       else { // next row
         // console.log('right nex row',table_rows[currentRowIndex + 1].cells[currentCellIndex - 1]);
-        if (this._repeat !== undefined && this._repeat === -1) {
+        if (this._repeat !== undefined && this._repeat === 1) {
           let div = table_rows[currentRowIndex + 1].cells[currentCellIndex - 1];
           // console.log('right nex row', div);
           div.click();
@@ -1346,6 +1367,9 @@ export class TableConstructor {
           }
           // oldSelectCell.click();
           cells[currentCellIndex].click();
+        }
+        else if (this._repeat !== undefined && this._repeat === 2) {
+          this._table.addRow();
         }
         else {
           if (currentCellIndex < cells.length - 1) {
@@ -1751,6 +1775,8 @@ export class TableConstructor {
    */
   _getModelDataFromDbDemo() {
     let that = this;
+    // this._repeat === 1000
+    // this._repeatWordsColl = [];
     const modelDataObj = [
       {
         Name: '正文',
@@ -1877,9 +1903,20 @@ export class TableConstructor {
         Tags: '图片集 图片 logo墙 人员介绍 合作伙伴 智能 自动',
         Thumb: './assets/dog11.jpg',
         Repeat: -1,
+      },
+      {
+        Name: '卖点列表',
+        SubName: '智能选择',
+        Info: '自动选择造型',
+        Fields: '主标题 副标题 卖点 次卖点 正文',
+        Tags: '主标题 封面标题 标题 卖点 特性 优点 特征 特色 优势 口号 卖点 次卖点 副标题 智能 自动',
+        Thumb: './assets/dog11.jpg',
+        Repeat: 2,
       }
     ]
     let processModelSel = function (modelHeadCallBack = undefined) {
+      that._repeat === 1000
+      that._repeatWordsColl = [];
       if (window.mmxaiModelList !== undefined) {
         that._modelHeadCallBack = modelHeadCallBack;
         window.mmxaiModelList(that._processParentUiResultCall());
@@ -1890,9 +1927,9 @@ export class TableConstructor {
         // demo select
         alert('select ' + index);
 
-        const obj = modelDataObj[index];
+        // const obj = modelDataObj[index];
         // for debug
-        // const obj = modelDataObj[modelDataObj.length - 1];
+        const obj = modelDataObj[modelDataObj.length - 1];
         // console.log('_getModelDataFromDbDemo:', obj);
         // that._recontructParaTable(obj);
         that._makeModelTables(obj, null, false);
@@ -1962,10 +1999,19 @@ export class TableConstructor {
         this._repeatWordsColl = isFielsRepeat.repeatWords.trim().split(' ');
         data.contentSeprateIndex.push(this._repeatWordsColl.length - 1);
       }
-      else if (this._repeat !== undefined && this._repeat === 1) {
+      else if (modelObj.Repeat && (modelObj.Repeat === 1 || modelObj.Repeat === 2)) {
         this._repeatWordsColl = modelObj.Fields.trim().split(' ');
         // bug 修正初始化时，没有对表格最后一行加粗
-        data.contentSeprateIndex.push(this._repeatWordsColl.length - 1);
+        if (this._repeat === 1) {
+          data.contentSeprateIndex.push(this._repeatWordsColl.length - 1);
+        }
+      }
+      else if (this._repeat !== undefined && (this._repeat === 1 || this._repeat === 2)) {
+        this._repeatWordsColl = modelObj.Fields.trim().split(' ');
+        // bug 修正初始化时，没有对表格最后一行加粗
+        if (this._repeat === 1) {
+          data.contentSeprateIndex.push(this._repeatWordsColl.length - 1);
+        }
         // let arr = modelObj.Fields.trim();
         // if (arr.length === 1) {
         //   this._repeatWordsColl = arr;
@@ -1996,6 +2042,7 @@ export class TableConstructor {
       //   this._table.firstColumnIsRead = false;
       // }
       this._table.repeat = this._repeat;
+      this._table.repeatWordsColl = this._repeatWordsColl;
       const size = this._resizeTable(data, config);
       this._fillTable(data, size);
 

@@ -60,12 +60,14 @@ export class ModelHeadTable {
    * 创建造型缩略图
    */
   _createImageAttr(data) {
-    if (data.Thumb === undefined && data.imgByteStr === undefined) {
+    // if (data.Thumb === undefined && data.imgByteStr === undefined) {
+    if (data.imgBase64 === undefined && data.imgByteStr === undefined) {
       this._imgEle = undefined;
       return undefined;
     }
     // let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : !!data.Thumb? data.Thumb : './assets/dog1.jpg';
-    let imgUrl = !!data.Thumb ? 'file://' + data.Thumb : !!data.imgByteStr.changingThisBreaksApplicationSecurity ? data.imgByteStr.changingThisBreaksApplicationSecurity : './assets/dog1.jpg';
+    // let imgUrl = !!data.Thumb ? 'file://' + data.Thumb : !!data.imgByteStr.changingThisBreaksApplicationSecurity ? data.imgByteStr.changingThisBreaksApplicationSecurity : './assets/dog1.jpg';
+    let imgUrl = !!data.imgBase64 ? data.imgBase64 : !!data.imgByteStr.changingThisBreaksApplicationSecurity ? data.imgByteStr.changingThisBreaksApplicationSecurity : './assets/dog1.jpg';
     // let imgUrl = !!data.Thumb ? data.Thumb : './assets/dog1.jpg';
     this._imgEle = create('img', [CSS.imageRight], { alt: 'img', src: imgUrl });
     let divImg = create('div', [CSS.imageParentDiv], null, [this._imgEle]);
@@ -157,10 +159,12 @@ export class ModelHeadTable {
         // if (data.Tags) {
         //   that._labelAttrEle.innerHTML = data.Tags;
         // }
-        if (data.Thumb !== undefined || data.imgByteStr !== undefined) {
+        // if (data.Thumb !== undefined || data.imgByteStr !== undefined) {
+        if (data.imgBase64 !== undefined || data.imgByteStr !== undefined) {
           if (that._imgEle !== undefined) {
             // let imgUrl = !!data.imgByteStr ? data.imgByteStr.changingThisBreaksApplicationSecurity : data.Thumb;
-            let imgUrl = !!data.Thumb ? 'file://' + data.Thumb : data.imgByteStr.changingThisBreaksApplicationSecurity;
+            // let imgUrl = !!data.Thumb ? 'file://' + data.Thumb : data.imgByteStr.changingThisBreaksApplicationSecurity;
+            let imgUrl = !!data.imgBase64 ? data.imgBase64 : data.imgByteStr.changingThisBreaksApplicationSecurity;
             that._imgEle.src = imgUrl;
           }
           else {
@@ -170,7 +174,7 @@ export class ModelHeadTable {
           }
         }
       }
-      catch(e) {
+      catch (e) {
         alert(e);
       }
     }
