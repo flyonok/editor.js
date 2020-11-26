@@ -92,7 +92,9 @@ export class Table {
     const row = this._table.insertRow(index);
     let nrows = this._numberOfRows - 1;
     let isInColl = this._tabConfig.objSepIndexColl && this._tabConfig.objSepIndexColl.indexOf(nrows) > 0;
-    let modularRow = this._tabConfig.repeat && this._tabConfig.repeat === 1 && this._numberOfRows % (this._tabConfig.objSepIndexColl[0] + 1) === 0;
+    let isRepeat = this._tabConfig.repeat && this._tabConfig.repeat === 1;
+    let objSepCollExist = this._tabConfig.objSepIndexColl && this._tabConfig.objSepIndexColl.length;
+    let modularRow =  isRepeat && objSepCollExist && (this._numberOfRows % (this._tabConfig.objSepIndexColl[0] + 1) === 0);
     if (isInColl || modularRow) {
       // console.log('isInColl', isInColl);
       // console.log('modularRow', modularRow);
@@ -223,7 +225,9 @@ export class Table {
    */
   _createSelectOption() {
     // console.log('_createSelectOption',this._tabConfig.repeatWordsColl, this._tabConfig.repeat);
-    if (this._tabConfig.repeatWordsColl && this._tabConfig.repeatWordsColl.length) {
+    let isRepeatColl = this._tabConfig.repeatWordsColl && this._tabConfig.repeatWordsColl.length
+    let repeatIs2 = this._tabConfig.repeat && this._tabConfig.repeat === 2;
+    if (isRepeatColl || repeatIs2 ) {
 
       let optionColl = [];
       this._tabConfig.repeatWordsColl.forEach(word => {
@@ -602,7 +606,7 @@ export class Table {
     // 处理新需求，单元格跳转 xiaowy 2020/09/22
     if ((keycodes.indexOf(event.keyCode) >= 0 || leftAndRight.indexOf(event.keyCode) >= 0) &&
       !event.shiftKey && !event.ctrlKey && !event.altKey) {
-      console.log('in table ', event.keyCode);
+      // console.log('in table ', event.keyCode);
       // event.preventDefault();
       // event.stopPropagation();
     }
@@ -673,13 +677,13 @@ export class Table {
     let content = afterProcessNode.innerHTML.trim();
     // let b = content.replaceAll('<br>', '\n');
     // const regrexa = /<div>|<\/div>/gi;
-    const regrexa = /<br>|<\/div>/gi;
+    const regrexa = /<br>|<div>/gi;
     let a = content.replace(regrexa, '');
     // const regrex = /<br>/gi;
-    const regrex = /<div>/gi;
+    const regrex = /<\/div>/gi;
     let b = a.replace(regrex, '\r');
-    const regrexall = /<br>|<\/div>|<div>/gi;
-    const regrexone = /<br>|<\/div>/gi;
+    // const regrexall = /<br>|<\/div>|<div>/gi;
+    const regrexone = /<br>|<div>/gi;
     let inputs0 = '';
     if (this._tabConfig.repeat && this._tabConfig.repeat == 2) {
       inputs0 = inputs[0].value.trim();
@@ -688,7 +692,7 @@ export class Table {
       inputs0 = inputs[0].innerHTML.trim();
     }
     let keyOne = inputs0.replace(regrexone, '');
-    const regrexTwo = /<div>/gi;
+    const regrexTwo = /<\/div>/gi;
     let key = keyOne.replace(regrexTwo, '\r');
     // console.log('_getObjectFromCells', [key, b]);
     return [key, b];
@@ -754,6 +758,7 @@ export class Table {
       let rows = this._table.rows;
       let listResults = [];
       let modelParaObj = {};
+      // console.log('getJsonResult11', this._tabConfig);
       let ret = this._tableIsRpeat();
       // todo：判断表格是否符合repeat规范 xiaowy 2020/10/19
       // if (!this._checkTableFormat(ret.isRepeat)) {
@@ -775,7 +780,7 @@ export class Table {
         for (let j = 0; j < rows.length; j += repeatCnt) {
           let emptyCnt = 0;
           // let childResults = []; // child repeat objects collect
-          for (let k = j; k < j + repeatCnt; k++) {
+          for (let k = j; k < j + repeatCnt && k < rows.length; k++) {
             let cells = rows[k].cells;
             let cell1 = cells[1];
             let temp = cell1.querySelector('.' + CSS.inputField);
@@ -787,6 +792,7 @@ export class Table {
               modelParaObj[retObj[0]] = retObj[1];
             }
           }
+          console.log('table getJsonResult', emptyCnt, repeatCnt);
           if (emptyCnt < repeatCnt) {
             listResults.push(modelParaObj);
           }
@@ -847,6 +853,7 @@ export class Table {
   _tableIsRpeat() {
     if (this._tabConfig.repeat && (this._tabConfig.repeat === 1 || this._tabConfig.repeat === 2)) {
       if (this._tabConfig.repeat === 1) {
+        // console.log('_tableIsRpeat', this._tabConfig.repeatWordsColl);
         return {
           'isRepeat': true,
           'repeatWords': this._tabConfig.repeatWordsColl.join(' ')

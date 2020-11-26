@@ -150,6 +150,7 @@ export function checkFiledsIsRepeat(fields) {
             };
           }
           else {
+            console.log('firstSubStringColl--1', firstSubStringColl);
             return {
               isRepeat: true,
               repeatWords: firstSubStringColl
@@ -195,6 +196,7 @@ export function checkFiledsIsRepeat(fields) {
         };
       }
       else {
+        console.log('firstSubStringColl--2', firstSubStringColl);
         return {
           isRepeat: true,
           repeatWords: firstSubStringColl

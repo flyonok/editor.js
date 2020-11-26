@@ -45,7 +45,7 @@ export class TableConstructor {
       try {
         // console.log('enter _getModelThumbFromParent');
         let retArr = window.mmxaiGetAllModelList();
-        console.log('mmxaiGetAllModelList', retArr);
+        // console.log('mmxaiGetAllModelList', retArr);
         if (retArr) {
           let find = retArr.find((item) => {
             return item.Name === data.name;
@@ -56,9 +56,15 @@ export class TableConstructor {
             // data.Thumb = find.Thumb;
             data.imgBase64 = find.imgBase64;
             data.Repeat = find.Repeat; // 表示是否可以增加表格参数！！！ 2020/10/07
+            this._repeat = data.Repeat; // 后面不少地方用了这个成员来判断！！！ 2020/11/24
             if (find.Repeat && (find.Repeat === 1 || find.Repeat === 2)) {
-              this._repeatWordsColl = find.Fields.trim().split(' ');
-              console.log('mmxaiGetAllModelList2', this._repeatWordsColl);
+              // 以分析json数据优先 2020/11/23
+              let noRepeatWordsColl = !this._repeatWordsColl || !this._repeatWordsColl.length;
+              let fieldsColl = find.Fields.trim().split(' ');
+              if (noRepeatWordsColl || this._repeatWordsColl.length < fieldsColl.length) {
+                this._repeatWordsColl = fieldsColl;
+                // console.log('mmxaiGetAllModelList2', this._repeatWordsColl);
+              }
             }
           }
           else {
@@ -177,9 +183,20 @@ export class TableConstructor {
       });
       // console.log('_checkModelParaListsIsRepeat11', );
       let ret = checkFiledsIsRepeat(objNamesColl.trim());
+      // first must initialize 2020/11/24
       if (ret.isRepeat) {
-        if (this._repeatWordsColl.length === 0) {
-          this._repeatWordsColl = ret.repeatWords.trim().split(' ');
+        // let tempArr = ret.repeatWords.trim().split(' ');
+        // if (this._repeatWordsColl.length < tempArr.length) {
+        //   this._repeatWordsColl = tempArr;
+        // }
+        this._repeatWordsColl = ret.repeatWords.trim().split(' ');
+      }
+      else {
+        console.log('_checkModelParaListsIsRepeat1', this._repeat);
+        let isRepeatValid = this._repeat && (this._repeat === 1 || this._repeat === 2);
+        // 防止冲掉前面的数据 2020/11/24
+        if (!isRepeatValid) {
+          this._repeatWordsColl = [];
         }
       }
       // console.log('_checkModelParaListsIsRepeat', ret);
@@ -417,10 +434,34 @@ export class TableConstructor {
           // console.log("replaceAll", content.replaceAll);
           // let b = content.replaceAll('\n', '<br/>');
           const regrex = /[\r|\n]/gi;
+          // const regrex = RegExp('\r|\n', 'gi');
           // let b = content.replace(regrex, '<br/>');
-          let b = content.replace(regrex, '<div contenteditable="true"><\/div>');
+          let b = content;
+          // wrapper content in div
+          let divList = []
+          let index = 0;
+          let match;
+          while ((match = regrex.exec(content)) !== null) {
+            // console.log('index', index, match.index);
+            // check match is first character or string is empty 2020/11/24
+            if (index != match.index) {
+              let divContent = content.substring(index, match.index);
+              let result = '<div contenteditable="true">' + divContent + '</div>';
+              divList.push(result);
+            }
+            index = regrex.lastIndex;
+          }
+          // append last content 2020/11/25
+          if (content.length > index && index > 0) {
+            let lastContent = content.substr(index);
+            divList.push('<div contenteditable="true">' + lastContent + '</div>');
+          }
+          if (divList.length) {
+            b = divList.join('');
+          }
           // console.log("content11", b);
-          if (this._repeat && this._repeat === 2 && j == 0) {
+
+          if (this._repeat && this._repeat === 2 && j == 0) {// select tag
             input.value = b;
           }
           else {
@@ -826,13 +867,13 @@ export class TableConstructor {
       // Todo: process chracter move
       let leftAndRight = [37, 39];
       if (event.keyCode === 13 && !event.shiftKey && !event.ctrlKey && !event.altKey) {
-        console.log('process enter key');
+        // console.log('process enter key');
         this._containerEnterPressed(event);
       }
       // 处理新需求，单元格跳转 xiaowy 2020/09/22
       if ((keycodes.indexOf(event.keyCode) >= 0 || leftAndRight.indexOf(event.keyCode) >= 0) &&
         !event.shiftKey && !event.ctrlKey && !event.altKey) {
-        console.log('in table constructor', event.keyCode);
+        // console.log('in table constructor', event.keyCode);
         this._containerArrowKeyPressed(event);
       }
     }
@@ -1027,7 +1068,7 @@ export class TableConstructor {
       // console.log('node', node);
       // let div = document.createElement('div');
       // let textNode = document.createTextNode('11');
-      let div = create('div', null, {'contenteditable':true});
+      let div = create('div', null, { 'contenteditable': true });
       let textNode = null;
       if (node.nodeName === '#text' && selection.focusOffset < node.textContent.length) {
         // console.log('for text node');
@@ -1054,20 +1095,20 @@ export class TableConstructor {
 
         }
         else {
-          console.log('append end');
+          // console.log('append end');
           input.appendChild(div);
         }
         let range = selection.getRangeAt(0);
         range.setStart(textNode, 0);
       }
       else if (node.nodeName === '#text') {
-        console.log('for text node content length is 0');
+        // console.log('for text node content length is 0');
         // let textNode = document.createElement('br');
         // div.appendChild(textNode);
         let mmxNode = this._checkEleIsListOrSymbol(node, true);
         if (mmxNode) {
           let nodeCopy = mmxNode.cloneNode(true);
-          console.log("mmxNode, nodeCopy", mmxNode, nodeCopy);
+          // console.log("mmxNode, nodeCopy", mmxNode, nodeCopy);
           this._modifyDigitSerialEle(nodeCopy);
           div.appendChild(nodeCopy);
           // div.appendChild(textNode);
@@ -1078,7 +1119,7 @@ export class TableConstructor {
         //   div.appendChild(textNode);
         // }
         if (insertNode.nextElementSibling && insertNode.nextElementSibling.nodeName !== '#text') {
-          console.log('add before sibling.', insertNode.nextElementSibling);
+          // console.log('add before sibling.', insertNode.nextElementSibling);
           input.insertBefore(div, insertNode.nextElementSibling);
           // node.appendChild(div);
           // textNode.focus();
@@ -1092,7 +1133,7 @@ export class TableConstructor {
         range.setStart(div, 0);
       }
       else {
-        console.log('for other node type');
+        // console.log('for other node type');
         // let textNode = document.createElement('br');
         // div.appendChild(textNode);
         let mmxNode = this._checkEleIsListOrSymbol(node);
@@ -1125,7 +1166,7 @@ export class TableConstructor {
       event.preventDefault();
       event.stopPropagation();
     }
-    console.log('_containerEnterPressed finished!');
+    // console.log('_containerEnterPressed finished!');
   }
 
   /**
@@ -1259,7 +1300,7 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _containerArrowKeyPressed(event) {
-    console.log('enter _containerArrowKeyPressed');
+    // console.log('enter _containerArrowKeyPressed');
     if (!(this._table.selectedCell !== null && !event.shiftKey && !event.ctrlKey && !event.altKey)) {
       return;
     }
@@ -1299,7 +1340,7 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processRightArrowKey(event) {
-    console.log('enter _processRightArrowKey');
+    // console.log('enter _processRightArrowKey');
     if (event.keyCode !== 9) {
       let ret = this._moveCharacterInTableCellForRightArrow();
       if (ret) {
@@ -1347,7 +1388,7 @@ export class TableConstructor {
     }
     else { // bottom row
       const cells = indicativeRow.cells;
-      console.log('bottom');
+      // console.log('bottom');
       if (event.keyCode === 9) {
         // 确认造型是否可以添加新对象属性
         if (this._repeat !== undefined && this._repeat === 1) {
@@ -1414,7 +1455,7 @@ export class TableConstructor {
    * added by xiaowy 2020/09/22
    */
   _processLeftArrowKey(event) {
-    console.log('Enter _processLeftArrowKey');
+    // console.log('Enter _processLeftArrowKey');
     let ret = this._moveCharacterInTableCellForLeftArrow();
     if (ret) {
       return;
@@ -1467,16 +1508,10 @@ export class TableConstructor {
 
   /**
    * @private
-   * 处理下箭头：
-   * 如果在table中间（含顶部）右边列，下一行行的右边列获得焦点
-   * 如果在table中间（含顶部）左边列，下一行的左边列获得焦点
-   * 如果在table的底部左边列，跳到第一行的左边列
-   * 如果在table的底部右边列，跳到第一行的右边列
-   * @param {KeyboardEvent} event
-   * added by xiaowy 2020/09/22
+   * 跳转到下一行
    */
-  _processDownArrowKey(event) {
-    console.log('Enter _processDownArrowKey');
+  _gotoNextRow() {
+    console.log("enter _gotoNextRow");
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
     // console.log('currentRowIndex:' + currentRowIndex);
@@ -1493,23 +1528,125 @@ export class TableConstructor {
       const next_row = table_rows[0]
       next_row.cells[currentCellIndex].click();
     }
-    event.preventDefault();
-    event.stopPropagation();
+    console.log("leave _gotoNextRow");
+  }
+
+  /**
+   * @private
+   * 处理下箭头：
+   * 如果在table中间（含顶部）右边列，下一行行的右边列获得焦点
+   * 如果在table中间（含顶部）左边列，下一行的左边列获得焦点
+   * 如果在table的底部左边列，跳到第一行的左边列
+   * 如果在table的底部右边列，跳到第一行的右边列
+   * @param {KeyboardEvent} event
+   * added by xiaowy 2020/09/22
+   */
+  _processDownArrowKey(event) {
+    // todo 默认表格也没处理好，可能要显示设置selection对象
+    // console.log('Enter _processDownArrowKey');
+
+
+    let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
+    // let div = document.createElement('div');
+    // input.appendChild(div);
+    let selection = window.getSelection();
+    if (selection) {
+      let node = selection.focusNode;
+      // console.log('nodename', node.nodeName);
+      // console.log('nextElementSibling', node.nodeName);
+      if (node.nodeName !== '#text' && !node.nextElementSibling) {
+        // console.log('_processDownArrowKey, next row');
+        this._gotoNextRow();
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      else if (node.nodeName === '#text') {
+        let nodeContent = node.textContent;
+        // console.log('offset', selection.focusOffset, nodeContent.length);
+        // 到了行尾，但没有邻居了，一般是这个情况
+        if (!node.nextElementSibling && selection.focusOffset === nodeContent.length) {
+          let parentNode = node.parentNode;
+          // console.log('patentNode', parentNode.nextSibling, parentNode.nextElementSibling);
+          if (!parentNode || !parentNode.nextElementSibling) {
+            this._gotoNextRow();
+            // process selection again 2020/11/25
+            // let selection2 = window.getSelection();
+            // if (selection2) {
+            //   let node2 = selection2.focusNode;
+            //   let range = selection2.getRangeAt(0);
+            //   if (range && node2.nodeName === '#text') {
+            //     if (range.startOffset === 0) {
+            //       range.setStart(node2, 1);
+            //     }
+            //   }
+            // }
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          // else if (!parentNode.nextElementSibling) {
+          //   this._gotoNextRow();
+          //   event.preventDefault();
+          //   event.stopPropagation();
+          // }
+        }
+        // 下一个单元
+        else if (node.nextElementSibling && node.nextElementSibling.nodeName === '#text') {
+          return;
+        }
+        else if (node.parentNode) {
+          // console.log('process default--2!');
+          let nextFocus = node.parentNode.nextElementSibling;
+          if (nextFocus) {
+            // console.log('process default--3!');
+            return;
+          }
+          else if (selection.focusOffset === nodeContent.length){
+            this._gotoNextRow();
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          else {
+            // console.log('process default--4!',selection.focusOffset);
+            let range = selection.getRangeAt(0);
+            // console.log('range', range);
+            if (range.collapsed && range.startOffset === 0) {
+              range.setStart(node,1);
+            }
+          }
+          // else if (selection.focusOffset < nodeContent.length) {
+          //   console.log('go to line end1.');
+          //   let range = selection.getRangeAt(0);
+          //   if (range) {
+          //     range.setStart(node, nodeContent.length);
+          //     event.preventDefault();
+          //     event.stopPropagation();
+          //   }
+          // }
+        }
+        // 行尾
+        // else if (selection.focusOffset < nodeContent.length) {
+        //   console.log('go to line end2.');
+        //   let range = selection.getRangeAt(0);
+        //   if (range) {
+        //     range.setStart(node, nodeContent.length);
+        //     event.preventDefault();
+        //     event.stopPropagation();
+        //   }
+        // }
+        else {
+          console.log('process default--1!');
+        }
+      }
+    }
+
     // console.log('_processDownArrowKey finished!');
   }
 
   /**
    * @private
-   * 处理上箭头：
-   * 如果在table中间（含底部）右边列，上一行行的右边列获得焦点
-   * 如果在table中间（含底部）左边列，上一行的左边列获得焦点
-   * 如果在table的顶部左边列，跳到最后一行的左边列
-   * 如果在table的顶部右边列，跳到最后一行的右边列
-   * @param {KeyboardEvent} event
-   * added by xiaowy 2020/09/22
+   * 跳转到上一行
    */
-  _processUpArrowKey(event) {
-    console.log('Enter _processUpArrowKey');
+  _gotoPreviousRow() {
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
     // console.log('currentRowIndex:' + currentRowIndex);
@@ -1529,8 +1666,55 @@ export class TableConstructor {
       const nextRow = table_rows[nextRowIndex];
       nextRow.cells[currentCellIndex].click();
     }
-    event.preventDefault();
-    event.stopPropagation();
+  }
+
+  /**
+   * @private
+   * 处理上箭头：
+   * 如果在table中间（含底部）右边列，上一行行的右边列获得焦点
+   * 如果在table中间（含底部）左边列，上一行的左边列获得焦点
+   * 如果在table的顶部左边列，跳到最后一行的左边列
+   * 如果在table的顶部右边列，跳到最后一行的右边列
+   * @param {KeyboardEvent} event
+   * added by xiaowy 2020/09/22
+   */
+  _processUpArrowKey(event) {
+    // console.log('Enter _processUpArrowKey');
+
+    let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
+    // let div = document.createElement('div');
+    // input.appendChild(div);
+    let selection = window.getSelection();
+    if (selection) {
+      let node = selection.focusNode;
+      // console.log('nodename', node.nodeName);
+      // console.log('nextElementSibling', node.nodeName);
+      if (node.nodeName !== '#text' && !node.previousElementSibling) {
+        // console.log('_processDownArrowKey, next row');
+        this._gotoPreviousRow();
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      else if (node.nodeName === '#text') {
+        // let nodeContent = node.textContent;
+        // console.log('offset', selection.focusOffset, nodeContent.length);
+        // console.log('previousElement', node.previousElementSibling, node.previousSibling);
+        if (!node.previousElementSibling && selection.focusOffset === 0) {
+          let parentNode = node.parentNode;
+          // console.log('patentNode', parentNode.nextSibling, parentNode.nextElementSibling);
+          if (!parentNode || !parentNode.previousElementSibling) {
+            this._gotoPreviousRow();
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          // else if (!parentNode.previousElementSibling) {
+          //   this._gotoPreviousRow();
+          //   event.preventDefault();
+          //   event.stopPropagation();
+          // }
+        }
+      }
+    }
     // console.log('_processUpArrowKey finished!');
   }
 
@@ -1952,7 +2136,7 @@ export class TableConstructor {
     let that = this;
     let _processParentUiResult = function (obj) {
       // console.log('enter _processParentUiResult');
-      console.log('_processParentUiResult obj', obj);
+      // console.log('_processParentUiResult obj', obj);
       that._makeModelTables(obj, null, false);
       if (that._modelHeadCallBack !== undefined) {
         that._modelHeadCallBack(obj);
@@ -1969,7 +2153,7 @@ export class TableConstructor {
    */
   _recontructParaTable(modelObj) {
     if (modelObj.Name) {
-      console.log("modelObj.Name", modelObj.Name);
+      // console.log("modelObj.Name", modelObj.Name);
       this._descTitle.innerHTML = '【' + '造型-' + modelObj.Name + '】';
     }
     const fields = modelObj.Fields.trim();
@@ -2080,7 +2264,7 @@ export class TableConstructor {
         // let rightIndex = paraName.indexOf('】');
         // let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
         // obj['name'] = this._descTitle.innerHTML;
-        console.log("tableConstructor getJsonResult", ret);
+        // console.log("tableConstructor getJsonResult", ret);
         return ret;
       }
       catch (e) {
@@ -2089,7 +2273,7 @@ export class TableConstructor {
       }
     }
     else {
-      console.log("tableConstructor getJsonResult", ret);
+      // console.log("tableConstructor getJsonResult", ret);
       return ret;
     }
   }
