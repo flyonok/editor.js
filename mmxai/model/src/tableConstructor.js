@@ -262,7 +262,8 @@ export class TableConstructor {
     }
     try {
       if (dataNotEmpty && fromContructor) { // 初始化构造
-        this._makeModelNameTitle(data); // 造型标题
+        // comment 2021/01/11 xiaowy
+        // this._makeModelNameTitle(data); // 造型标题
         // console.log('after _makeModelNameTitle');
         this._makeModelHeadTable(data); // 造型头
         // console.log('after _makeModelHeadTable');
@@ -289,7 +290,8 @@ export class TableConstructor {
 
       }
       else if (!dataNotEmpty && fromContructor) { // 如果没有具体的造型参数数据，一般是新建造型
-        this._makeModelNameTitle(data); // 造型标题
+        // comment 2021/01/11 xiaowy
+        // this._makeModelNameTitle(data); // 造型标题
         this._makeModelHeadTable(data); // 造型头
         this._table = new Table();
         const size = this._resizeTable(data, config);
@@ -2111,9 +2113,9 @@ export class TableConstructor {
         // demo select
         alert('select ' + index);
 
-        // const obj = modelDataObj[index];
+        const obj = modelDataObj[index];
         // for debug
-        const obj = modelDataObj[modelDataObj.length - 1];
+        // const obj = modelDataObj[modelDataObj.length - 1];
         // console.log('_getModelDataFromDbDemo:', obj);
         // that._recontructParaTable(obj);
         that._makeModelTables(obj, null, false);
@@ -2152,10 +2154,11 @@ export class TableConstructor {
    * @param {modelObjectInformation} modelObj
    */
   _recontructParaTable(modelObj) {
-    if (modelObj.Name) {
-      // console.log("modelObj.Name", modelObj.Name);
-      this._descTitle.innerHTML = '【' + '造型-' + modelObj.Name + '】';
-    }
+    // commnent by xiaowy 2021/01/11
+    // if (modelObj.Name) {
+    //   // console.log("modelObj.Name", modelObj.Name);
+    //   this._descTitle.innerHTML = '【' + '造型-' + modelObj.Name + '】';
+    // }
     const fields = modelObj.Fields.trim();
     let fieldArr = fields.split(' ');
     if (fieldArr.length > 0) {

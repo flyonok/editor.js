@@ -11,6 +11,7 @@ const CSS = {
   group: 'mmxModelGroup',
   divHead: 'mmxModelHead',
   imageParentDiv: 'mmxModelImageDiv',
+  noDisplay: 'mmxModelNoDisplay',
 };
 
 /**
@@ -24,6 +25,7 @@ export class ModelHeadTable {
     this._modelSelCallBack = modelSelCallBack;
     try {
       this._element = this._createDivWrapper(data);
+      this._divHeadDisplay = true;
     }
     catch (e) {
       alert(e);
@@ -37,8 +39,10 @@ export class ModelHeadTable {
    * 创建整个造型的表头
    */
   _createDivWrapper(data) {
+    // 2021/01/11,界面整合
+    this._createModelNameTitle(data);
     this._divHead = create('div', [CSS.divHead], null, [this._createDivType(data), this._createDivTitle(data), this._createDivAttributes(data)]);
-    return create('div', [CSS.article, CSS.group], null, [this._createImageAttr(data), this._divHead]);
+    return create('div', [CSS.article, CSS.group], null, [this._titleWrapper, this._createImageAttr(data), this._divHead]);
   }
 
   /**
@@ -70,8 +74,8 @@ export class ModelHeadTable {
     let imgUrl = !!data.imgBase64 ? data.imgBase64 : !!data.imgByteStr.changingThisBreaksApplicationSecurity ? data.imgByteStr.changingThisBreaksApplicationSecurity : './assets/dog1.jpg';
     // let imgUrl = !!data.Thumb ? data.Thumb : './assets/dog1.jpg';
     this._imgEle = create('img', [CSS.imageRight], { alt: 'img', src: imgUrl });
-    let divImg = create('div', [CSS.imageParentDiv], null, [this._imgEle]);
-    return divImg;
+    this._divImg = create('div', [CSS.imageParentDiv], null, [this._imgEle]);
+    return this._divImg;
   }
 
   /**
@@ -86,10 +90,10 @@ export class ModelHeadTable {
     // this._inputTypeTxt = create('input', null, { type: 'text', name: 'modelType', readonly:'true' });
     this._inputTypeTxt = create('input', null, { type: 'text', name: 'modelType' });
     this._inputTypeTxt.value = subName;
-    this._modelSelBtn = create('input', null, { type: 'button', name: 'selectModel', value: '选择造型...' });
-    // this._modelSelBtn = inputBtn;
-    // console.log('_createDivType finished!');
-    return create('div', [CSS.table], null, [labelEle, this._inputTypeTxt, this._modelSelBtn]);
+    // comment by xiaowy 2021/01/11 for head ui together
+    // this._modelSelBtn = create('input', null, { type: 'button', name: 'selectModel', value: '选择造型...' });
+    // return create('div', [CSS.table], null, [labelEle, this._inputTypeTxt, this._modelSelBtn]);
+    return create('div', [CSS.table], null, [labelEle, this._inputTypeTxt]);
     // return divEle;
   }
   /**
@@ -109,6 +113,56 @@ export class ModelHeadTable {
     // });
     return create('div', [CSS.table, CSS.center], null, [labelEle, this._inputTitleTxt]);
   }
+
+  _createModelNameTitle(data) {
+    // add by xiaowy 把标题整理到题头中，统一管理 2021/01/08
+    // if (data && data.title) {
+    // this._titleWrapper = document.createElement('div');
+    
+    this._descTitle = document.createElement('H3');
+    // let name = undefined;
+    // for (prop in data) {
+    //   if (data.hasOwnProperty(prop)){
+    //     name = prop;
+    //     break;
+    //   }
+    // }
+    if (data.name !== undefined) {
+      this._descTitle.innerHTML = '【' + '造型-' + data.name + '】';
+      // this._descTitle.innerHTML = data.name;
+    }
+    else {
+      this._descTitle.innerHTML = '【造型】';
+    }
+    this._descTitle.classList.add('mmxModelDecsTitle');
+    // this._descTitle.appendChild(document.createElement('br'));
+    this._modelSelBtn = create('input', null, { type: 'button', name: 'selectModel', value: '更 改 ' });
+    this._svgImg = document.createElement('img');
+    var svgContent = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="80" height="40" viewBox="0 0 80 40" xml:space="preserve">
+    <desc>Created with Fabric.js 4.2.0</desc>
+    <defs>
+    </defs>
+    <rect x="0" y="0" width="100%" height="100%" fill="transparent"></rect>
+    <g transform="matrix(Infinity NaN NaN Infinity 0 0)" id="e71293ed-9ff0-42c4-98c4-c8c04bfec071"  >
+    </g>
+    <g transform="matrix(1 0 0 1 40 20)" id="7466d196-1549-41eb-bc91-7738340de544"  >
+    <rect style="stroke: none; stroke-width: 1; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(255,255,255); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  x="-40" y="-20" rx="0" ry="0" width="80" height="40" />
+    </g>
+    <g transform="matrix(0.06 0 0 0.02 40 20)" id="9c9b8676-4234-45a8-9031-3817f52165ce"  >
+      <image style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAF4AAACWCAYAAABXaT+3AAAE+UlEQVR4Xu3cTehUVRzG8a+WusllIOaiReCiFtY+bKEblUjCtBckgmhRRLuCtoK4MwURNxGEby3+ohhBRNAqKnftgkClpSsXgiXGL2ZoHOflnDvn3ufc+39mJ52Z55zPPJ378p+ZDfghEdggSXUohheVwPCGFwmIYt14w4sERLFuvOFFAqJYN97wIgFRrBtveJGAKNaNN7xIQBTrxhteJCCKdeMNLxIQxbrxhhcJiGLdeMOLBESxbrzhRQKiWDfe8CIBUawbb3iRgCjWjTe8SEAU68YbXiQginXjDS8SEMW68YYXCYhi3XjDiwREsW684UUColg33vAiAVGsG294kYAo1o03vEhAFDuv8buA14GXgeeAZ0Tz62vsX8AfwE/AN8Dv0wuZht8KnATe6+uKK533aeBT4N54fpPwTwM/As9XOvm+T+sXYA9wNxYyho+m/wrs7PvqKp//z8Bu4P4Y/iJwuPJJD2V6XwCfBPyzwJ8T7R/KAmtdx31gW8AfAz6vdZYDnddHAX8DeGmgC6x1WdcCPo6yT9U6w4HO63bAP0xYXFwAfJw4NuHlBjskPE8BLyxZ4b0YeBvYkUARZz5vGX+u1BPA18CRBMubAX8NOJAwOIYYfzZUoMetgYOJjmsB/wFwNvEJMew88HbG+PUwNEzezFjouwG/ZXQevz3jiWvAIeBBxnOGODS36WFwK248jq9c9wHXM2UuJe5nmS/bq+FNrvjjfs0PkzfJzgHvZy57vTa/SdODNu5SxtnhIz/qvGnU+r3GXyjQFP17YD/w9zR8/Nv4i1tXBH0WvPHnwxdDnwdv/Mfxi6Ivgjf+//jF0ZfBGx+eBC5nXJGO365HDqSzdq+Uz9Ws1wNuoF8ZnYnknOjF9VDcOvjv7GXeIwV+PTZ/FfTXgH+WvVOp8Kviv5EymWWT7ei/t46essdPrzW2nbhajQuBnEf875fUhJwXbWFsJ+hN4OM5nU2uBdhFL9npunK2mslJdzrJDt6AztfTFH5Ize8cvelWM6TmS9BLwPe5+TL0UvB9xJeil4TvE34Vp8SrHFxnnWzIm7TkDKjp7Y/i1yGl4WtuflP0uGAsfuXdBnyN+Kugt/Jpirbga8KvDr30wbX0nr/01mrCFW2V6F3Ar9L8pX9MaOlA2slHVtrcakpc4TbFr7bpY5Su4MfNb+XPaFPNrx69q61m0qWVPxxPBPQCXQEfmW3hx4dv4yPnvfgkXJdbTZvND/TvgFcSznQmh3RyIJ01JxV8yeb3Dl211ZRs/sa+NV1xVrNoF4jP2sf9kJzHt8Dm0e8D5Dzvwui7XDnPKT5WudWUaH4uSHyR4J0avslSC/wqe34qflVfnKsJvk38qtBrOLjOamvT8/x5za8OvVb4ks2vEr1m+BL41aLXDj/eOr4CjqYeQUfjvqz9d9VqO7jO8/0MOJ6IH2NPJI6VDesLfADFj9V9CLwKvDgl9htwFTgD3JFpZgT3CT5jWfUPNbzoPTK84UUColg33vAiAVGsG294kYAo1o03vEhAFOvGG14kIIp14w0vEhDFuvGGFwmIYt14w4sERLFuvOFFAqJYN97wIgFRrBtveJGAKNaNN7xIQBTrxhteJCCKdeMNLxIQxbrxhhcJiGLdeMOLBESxbrzhRQKiWDfe8CIBUawbb3iRgCjWjTe8SEAU68YbXiQginXjDS8SEMW68SL4fwHtoweemjCVMAAAAABJRU5ErkJggg==" x="-47" y="-75" width="94" height="150"></image>
+    </g>
+    <g transform="matrix(0.27 0 0 0.27 40 20)" id="2216f00b-85c4-4f2f-a0c5-33198357c7b9"  >
+      <image style="stroke: none; stroke-width: 0; stroke-dasharray: none; stroke-linecap: butt; stroke-dashoffset: 0; stroke-linejoin: miter; stroke-miterlimit: 4; fill: rgb(0,0,0); fill-rule: nonzero; opacity: 1;" vector-effect="non-scaling-stroke"  xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAF4AAACWCAYAAABXaT+3AAAE+UlEQVR4Xu3cTehUVRzG8a+WusllIOaiReCiFtY+bKEblUjCtBckgmhRRLuCtoK4MwURNxGEby3+ohhBRNAqKnftgkClpSsXgiXGL2ZoHOflnDvn3ufc+39mJ52Z55zPPJ378p+ZDfghEdggSXUohheVwPCGFwmIYt14w4sERLFuvOFFAqJYN97wIgFRrBtveJGAKNaNN7xIQBTrxhteJCCKdeMNLxIQxbrxhhcJiGLdeMOLBESxbrzhRQKiWDfe8CIBUawbb3iRgCjWjTe8SEAU68YbXiQginXjDS8SEMW68YYXCYhi3XjDiwREsW684UUColg33vAiAVGsG294kYAo1o03vEhAFDuv8buA14GXgeeAZ0Tz62vsX8AfwE/AN8Dv0wuZht8KnATe6+uKK533aeBT4N54fpPwTwM/As9XOvm+T+sXYA9wNxYyho+m/wrs7PvqKp//z8Bu4P4Y/iJwuPJJD2V6XwCfBPyzwJ8T7R/KAmtdx31gW8AfAz6vdZYDnddHAX8DeGmgC6x1WdcCPo6yT9U6w4HO63bAP0xYXFwAfJw4NuHlBjskPE8BLyxZ4b0YeBvYkUARZz5vGX+u1BPA18CRBMubAX8NOJAwOIYYfzZUoMetgYOJjmsB/wFwNvEJMew88HbG+PUwNEzezFjouwG/ZXQevz3jiWvAIeBBxnOGODS36WFwK248jq9c9wHXM2UuJe5nmS/bq+FNrvjjfs0PkzfJzgHvZy57vTa/SdODNu5SxtnhIz/qvGnU+r3GXyjQFP17YD/w9zR8/Nv4i1tXBH0WvPHnwxdDnwdv/Mfxi6Ivgjf+//jF0ZfBGx+eBC5nXJGO365HDqSzdq+Uz9Ws1wNuoF8ZnYnknOjF9VDcOvjv7GXeIwV+PTZ/FfTXgH+WvVOp8Kviv5EymWWT7ei/t46essdPrzW2nbhajQuBnEf875fUhJwXbWFsJ+hN4OM5nU2uBdhFL9npunK2mslJdzrJDt6AztfTFH5Ize8cvelWM6TmS9BLwPe5+TL0UvB9xJeil4TvE34Vp8SrHFxnnWzIm7TkDKjp7Y/i1yGl4WtuflP0uGAsfuXdBnyN+Kugt/Jpirbga8KvDr30wbX0nr/01mrCFW2V6F3Ar9L8pX9MaOlA2slHVtrcakpc4TbFr7bpY5Su4MfNb+XPaFPNrx69q61m0qWVPxxPBPQCXQEfmW3hx4dv4yPnvfgkXJdbTZvND/TvgFcSznQmh3RyIJ01JxV8yeb3Dl211ZRs/sa+NV1xVrNoF4jP2sf9kJzHt8Dm0e8D5Dzvwui7XDnPKT5WudWUaH4uSHyR4J0avslSC/wqe34qflVfnKsJvk38qtBrOLjOamvT8/x5za8OvVb4ks2vEr1m+BL41aLXDj/eOr4CjqYeQUfjvqz9d9VqO7jO8/0MOJ6IH2NPJI6VDesLfADFj9V9CLwKvDgl9htwFTgD3JFpZgT3CT5jWfUPNbzoPTK84UUColg33vAiAVGsG294kYAo1o03vEhAFOvGG14kIIp14w0vEhDFuvGGFwmIYt14w4sERLFuvOFFAqJYN97wIgFRrBtveJGAKNaNN7xIQBTrxhteJCCKdeMNLxIQxbrxhhcJiGLdeMOLBESxbrzhRQKiWDfe8CIBUawbb3iRgCjWjTe8SEAU68YbXiQginXjDS8SEMW68SL4fwHtoweemjCVMAAAAABJRU5ErkJggg==" x="-47" y="-75" width="94" height="150"></image>
+    </g>
+    </svg>`;
+    this._svgImg.src = "data:image/svg+xml;utf8," + svgContent;
+    
+    // this._titleWrapper.appendChild(this._descTitle);
+    // this._titleWrapper.appendChild(this._modelSelBtn);
+    // this._titleWrapper.appendChild(document.createElement('br'));
+    this._titleWrapper = create('div', [CSS.table], null, [this._descTitle, this._modelSelBtn, this._svgImg, document.createElement('br')])
+  }
+
 
   /**
    * get model type name
@@ -132,14 +186,29 @@ export class ModelHeadTable {
    */
   _hangEvents() {
     this._modelSelBtn.addEventListener('click', (event) => {
-      console.log('enter modelSelBtn click event');
+      // console.log('enter modelSelBtn click event');
       if (this._modelSelCallBack !== undefined) {
-        console.log('begin call _modelSelCallBack funtion');
+        // console.log('begin call _modelSelCallBack funtion');
         let returnData = this._modelSelCallBack(this._modifyHeadDataCall());
-        console.log('after call _modelSelCallBack funtion');
+        // console.log('after call _modelSelCallBack funtion');
         event.preventDefault();
         event.stopPropagation();
         // this._modifyHeadData(returnData);
+      }
+    });
+    this._svgImg.addEventListener('click', (evnet) => {
+      // alert('svg clicked');
+      if (this._divHeadDisplay) {
+        this._divHead.classList.add(CSS.noDisplay);
+        this._divHeadDisplay = false;
+        this._divImg.classList.remove(CSS.imageParentDiv);
+        this._divImg.classList.add(CSS.imageLeft);
+      }
+      else {
+        this._divHead.classList.remove(CSS.noDisplay);
+        this._divImg.classList.add(CSS.imageParentDiv);
+        this._divImg.classList.remove(CSS.imageLeft);
+        this._divHeadDisplay = true;
       }
     });
   }
@@ -155,6 +224,8 @@ export class ModelHeadTable {
       try {
         if (data.Name) {
           that._inputTypeTxt.value = data.Name;
+          // added by xiaowy 2021/01/11 for head ui together
+          that._descTitle.innerHTML = '【' + '造型-' + data.Name + '】'
         }
         // if (data.Tags) {
         //   that._labelAttrEle.innerHTML = data.Tags;
