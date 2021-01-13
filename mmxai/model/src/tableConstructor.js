@@ -11,6 +11,7 @@ const CSS = {
   toolBarVer: 'tc-toolbar--ver',
   inputField: 'tc-modelTable__inp',
   readOnlyTable_inputField: 'tc-readOnlyTable__inp', // for readOnlyTable
+  modelAddButton: 'mmxAddModelButton',
   // headTable_inputField:'tc-headTable__inp'
 };
 
@@ -28,8 +29,12 @@ export class TableConstructor {
     this._api = api; // add by xiaowy
 
     this._repeatWordsColl = [];
+    this._tableData = { 'content': [], 'hiddenFields': '' };
+    this._doHiddenField = false; // 默认是显示隐藏字段 2021/01/12 xiaowy
     let _innerData = this._cdrJsonConvert(data);
     this._repeat = _innerData.Repeat; // add by xiaowy whether can add table parameter
+
+
     // console.log('repeat:', this._repeat);
 
     this._makeModelTables(_innerData, config);
@@ -57,6 +62,7 @@ export class TableConstructor {
             data.imgBase64 = find.imgBase64;
             data.Repeat = find.Repeat; // 表示是否可以增加表格参数！！！ 2020/10/07
             this._repeat = data.Repeat; // 后面不少地方用了这个成员来判断！！！ 2020/11/24
+            this._tableData['hiddenFields'] = data.Hidden; // 记录隐藏字段集合 2021/01/12
             if (find.Repeat && (find.Repeat === 1 || find.Repeat === 2)) {
               // 以分析json数据优先 2020/11/23
               let noRepeatWordsColl = !this._repeatWordsColl || !this._repeatWordsColl.length;
@@ -116,6 +122,7 @@ export class TableConstructor {
       return _innerData;
     }
     this._getModelThumbFromParent(_innerData);
+    // this._tableData = _innerData
     console.log('after _getModelThumbFromParent', _innerData);
     if (cdrData['板块头'] && cdrData['板块头']['标题']) {
       _innerData.innerTitle = cdrData['板块头']['标题'];
@@ -159,6 +166,7 @@ export class TableConstructor {
           }
 
         });
+        this._tableData['content'] = JSON.parse(JSON.stringify(_innerData['content']));
       }
     }
     console.log('_innerData:', _innerData);
@@ -283,7 +291,10 @@ export class TableConstructor {
         // let tablebr = document.createElement('br');
         // 构建造型容器
         // this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
-        this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement]);
+        this._container = create('div', [CSS.editor, this._api.styles.block], null,
+                              [this._titleWrapper, this._modelHeadTable.htmlElement,
+                                this._readOnlyTable.htmlElement, this._table.htmlElement,
+                              this._createTooltipBtnForModel()]);
         // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
         // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
         this._initToolBarAndEvent();
@@ -387,7 +398,7 @@ export class TableConstructor {
   _makeReadOnlyTable() {
     // overwrite config
     let config = { rows: '1', cols: '2' };
-    this._readOnlyTable = new TableReadOnly();
+    this._readOnlyTable = new TableReadOnly(this.hiddenTableRowCallBack());
     // let data = { content: [['元素名称', '内容']] };
     let data = { content: [['对象', '内容']] };
     const size = this._resizeReadOnlyTable(data, config);
@@ -426,10 +437,19 @@ export class TableConstructor {
    */
   _fillTable(data, size) {
     if (data.content !== undefined) {
+      let hiddenFields = [];
+      if (this._tableData['hiddenFields']) {
+        hiddenFields = this._tableData['hiddenFields'].split(' ');
+      }
+      let hiddenFieldCnt = 0;
       for (let i = 0; i < size.rows && i < data.content.length; i++) {
+        if (this._doHiddenField && hiddenFields.indexOf(data.content[i][0]) > 0) {
+          hiddenFieldCnt++;
+          continue;
+        }
         for (let j = 0; j < size.cols && j < data.content[i].length; j++) {
           // get current cell and her editable part
-          const input = this._table.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
+          const input = this._table.body.rows[i - hiddenFieldCnt].cells[j].querySelector('.' + CSS.inputField);
           // 处理回车换行
           let content = data.content[i][j];
           // console.log('content', content);
@@ -527,8 +547,13 @@ export class TableConstructor {
     const cols = contentCols || configCols || defaultCols;
     // contentSeprateIndexColl = data.contentSeprateIndex;
     if (data.contentSeprateIndex && data.contentSeprateIndex.length) {
-      console.log('set objSepIndexColl', data.contentSeprateIndex);
+      // console.log('set objSepIndexColl', data.contentSeprateIndex);
       this._table.objSepIndexColl = data.contentSeprateIndex;
+    }
+
+    let hiddenFields = [];
+    if (this._tableData['hiddenFields']) {
+      hiddenFields = this._tableData['hiddenFields'].split(' ');
     }
 
     for (let i = 0; i < rows; i++) {
@@ -538,7 +563,13 @@ export class TableConstructor {
       // else {
       //   this._table.addRow();
       // }
-      this._table.addRow();
+      // debug
+      // console.log('hiddenField:', this._doHiddenField);
+      // console.log('hiddenField', hiddenFields);
+      // console.log('hiddenField', data.content[i][0]);
+      if (!this._doHiddenField || hiddenFields.indexOf(data.content[i][0]) < 0) {
+        this._table.addRow();
+      }
     }
     for (let i = 0; i < cols; i++) {
       this._table.addColumn();
@@ -590,7 +621,12 @@ export class TableConstructor {
       this._readOnlyTable.addRow();
     }
     for (let i = 0; i < cols; i++) {
-      this._readOnlyTable.addColumn();
+      if (i === cols - 1) {
+        this._readOnlyTable.addColumn(-1, true);
+      }
+      else {
+        this._readOnlyTable.addColumn();
+      }
     }
 
     return {
@@ -1602,7 +1638,7 @@ export class TableConstructor {
             // console.log('process default--3!');
             return;
           }
-          else if (selection.focusOffset === nodeContent.length){
+          else if (selection.focusOffset === nodeContent.length) {
             this._gotoNextRow();
             event.preventDefault();
             event.stopPropagation();
@@ -1612,7 +1648,7 @@ export class TableConstructor {
             let range = selection.getRangeAt(0);
             // console.log('range', range);
             if (range.collapsed && range.startOffset === 0) {
-              range.setStart(node,1);
+              range.setStart(node, 1);
             }
           }
           // else if (selection.focusOffset < nodeContent.length) {
@@ -1959,7 +1995,65 @@ export class TableConstructor {
    * added by xiaowy 2020/09/27
    * todo:使用华安的方法
    */
-  _getModelDataFromDbDemo() {
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+   _getModelDataFromDbDemo() {
     let that = this;
     // this._repeat === 1000
     // this._repeatWordsColl = [];
@@ -2230,10 +2324,76 @@ export class TableConstructor {
       // }
       this._table.repeat = this._repeat;
       this._table.repeatWordsColl = this._repeatWordsColl;
+      this._tableData['hiddenFields'] = modelObj['Hidden'];
+      this._tableData['content'] = JSON.parse(JSON.stringify(data.content));
       const size = this._resizeTable(data, config);
       this._fillTable(data, size);
 
     }
+  }
+
+  /**
+   * @public
+   * hidden table row and reconstructor table
+   */
+  hiddenTableRowCallBack() {
+    let that = this;
+    let callBack = function () {
+
+      that._doHiddenField = !that._doHiddenField;
+      if (that._table === undefined) {
+        that._table = new Table();
+        // let tablebr = document.createElement('br');
+        // this._table.htmlElement.appendChild(tablebr);
+        that._container.appendChild(that._table.htmlElement);
+      }
+      else {
+        // let paraRows = !!this._table.body.rows ? this._table.body.rows : []
+        // console.log('paraRows1:', paraRows);
+        // paraRows = !!paraRows? paraRows : []; 
+        // console.log('paraRows:', paraRows);
+        while (that._table.rows > 0) {
+          that._table.delRow();
+        }
+      }
+      let config = { rows: that._tableData.content.length, cols: 2 }
+      const size = that._resizeTable(that._tableData, config);
+      that._fillTable(that._tableData, size);
+      // console.log('test hidden callback', that._tableData.content);
+    };
+    return callBack;
+  }
+
+  /**
+   * @private
+   * add toolbar button for add model
+   */
+  _createTooltipBtnForModel() {
+    let btn = create('button', [CSS.modelAddButton]);
+    btn.innerHTML = '单击添加造型';
+    btn.addEventListener('click', (event) => {
+      // alert('111');
+      // this._api.tooltip.show(btn, '123');
+      this._api.toolbar.close();
+      this._api.caret.focus(true);
+      document.body.scrollIntoView(false);
+      this._api.caret.setToLastBlock('end', 1);
+      // let toolbars = document.querySelectorAll('.ce-toolbar')
+      // if (toolbars) {
+      //   // alert(toolbars);
+      //   let toolbar = toolbars[0];
+      //   toolbar.classList.add('ce-toolbar--opened');
+      //   let toolbarPluses = document.querySelectorAll('.ce-toolbar__plus');
+      //   if (toolbarPluses) {
+      //     let toolbarPlus = toolbarPluses[0];
+      //     toolbarPlus.classList.remove('ce-toolbar__plus--hidden');
+      //     toolbarPlus.classList.add('ce-toolbar__plus--opened');
+      //   }
+      // }
+      
+      this._api.toolbar.open();
+    });
+    return btn;
   }
 
   /**

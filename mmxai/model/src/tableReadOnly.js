@@ -1,4 +1,4 @@
-import {create, getCoords, getSideByCoords} from './documentUtils';
+import { create, getCoords, getSideByCoords } from './documentUtils';
 import './styles/tableReadOnly.pcss';
 
 const CSS = {
@@ -16,12 +16,13 @@ export class TableReadOnly {
   /**
    * Creates
    */
-  constructor() {
+  constructor(hiddenTableCallBack = undefined) {
     this._numberOfColumns = 0;
     this._numberOfRows = 0;
     this._element = this._createTableWrapper();
     this._table = this._element.querySelector('table');
-
+    this._svgBtn = undefined;
+    this._hiddenTableCallBack = hiddenTableCallBack;
     // comment by xiaowy 2020/09/21
     // this._hangEvents();
   }
@@ -29,8 +30,9 @@ export class TableReadOnly {
   /**
    * Add column in table on index place
    * @param {number} index - number in the array of columns, where new column to insert,-1 if insert at the end
+   * @param {boolean} addBtn - add icon button on column
    */
-  addColumn(index = -1) {
+  addColumn(index = -1, addBtn = false) {
     this._numberOfColumns++;
     /** Add cell in each row */
     const rows = this._table.rows;
@@ -38,7 +40,7 @@ export class TableReadOnly {
     for (let i = 0; i < rows.length; i++) {
       const cell = rows[i].insertCell(index);
 
-      this._fillCell(cell);
+      this._fillCell(cell, addBtn);
     }
   };
 
@@ -111,7 +113,7 @@ export class TableReadOnly {
   _createContenteditableArea() {
     // comment and modify by xiaowy 2020/09/21
     // return create('div', [CSS.inputField], {contenteditable: 'true'});
-    return create('div', [CSS.inputField], {contenteditable: 'false'});
+    return create('div', [CSS.inputField], { contenteditable: 'false' });
   }
 
   /**
@@ -120,11 +122,41 @@ export class TableReadOnly {
    * Fills the empty cell of the editable area
    * @param {HTMLElement} cell - empty cell
    */
-  _fillCell(cell) {
+  _fillCell(cell, addBtn = false) {
     cell.classList.add(CSS.cell);
     const content = this._createContenteditableArea();
-
-    cell.appendChild(create('div', [CSS.area], null, [content]));
+    if (addBtn) {
+      var icon = '<i class="fa fa-caret-down" aria-hidden="true"></i>'
+      var iconTag = create('i', ['fa', 'fa-caret-up'], { 'aria-hidden': 'true' })
+      this._svgBtn = create('button', null, null, [iconTag]);
+      this._svgBtn.addEventListener('click', (event) => {
+        // console.log('1111');
+        let iconTag = this._svgBtn.querySelectorAll('i')[0];
+        if (iconTag) {
+          if (iconTag.classList.contains('fa-caret-up')) {
+            iconTag.classList.remove('fa-caret-up');
+            iconTag.classList.add('fa-caret-down');
+            if (this._hiddenTableCallBack) {
+              this._hiddenTableCallBack();
+            }
+          }
+          else if (iconTag.classList.contains('fa-caret-down')) {
+            iconTag.classList.remove('fa-caret-down');
+            iconTag.classList.add('fa-caret-up');
+            if (this._hiddenTableCallBack) {
+              this._hiddenTableCallBack();
+            }
+          }
+          else {
+            console.log('model table read only button no fa-caret-down or fa-caret-up!');
+          }
+        }
+      });
+      cell.appendChild(create('div', [CSS.area], null, [content, this._svgBtn]));
+    }
+    else {
+      cell.appendChild(create('div', [CSS.area], null, [content]));
+    }
   }
 
   /**
@@ -147,28 +179,49 @@ export class TableReadOnly {
    * hang necessary events
    */
   _hangEvents() {
-    
-    this._table.addEventListener('focus', (event) => {
-      this._focusEditField(event);
-    }, true);
-    
 
-    this._table.addEventListener('blur', (event) => {
-      this._blurEditField(event);
-    }, true);
+    // comment by xiaowy 2021/01/12 for ui together
+    // this._table.addEventListener('focus', (event) => {
+    //   this._focusEditField(event);
+    // }, true);
 
-    this._table.addEventListener('keydown', (event) => {
-      this._pressedEnterInEditField(event);
-    });
 
-    this._table.addEventListener('click', (event) => {
-      this._clickedOnCell(event);
-    });
+    // this._table.addEventListener('blur', (event) => {
+    //   this._blurEditField(event);
+    // }, true);
 
-    this._table.addEventListener('mouseover', (event) => {
-      this._mouseEnterInDetectArea(event);
-      event.stopPropagation();
-    }, true);
+    // this._table.addEventListener('keydown', (event) => {
+    //   this._pressedEnterInEditField(event);
+    // });
+
+    // this._table.addEventListener('click', (event) => {
+    //   this._clickedOnCell(event);
+    // });
+
+    // this._table.addEventListener('mouseover', (event) => {
+    //   this._mouseEnterInDetectArea(event);
+    //   event.stopPropagation();
+    // }, true);
+    // comment end
+    if (this._svgBtn) {
+      this._svgBtn.addEventListener('click', (event) => {
+        console.log('1111');
+        let iconTag = this._svgBtn.querySelectorAll('i')[0];
+        if (iconTag) {
+          if (iconTag.classList.contains('fa-caret-up')) {
+            iconTag.classList.remove('fa-caret-up');
+            iconTag.classList.add('fa-caret-down');
+          }
+          else if (iconTag.classList.contains('fa-caret-down')) {
+            iconTag.classList.remove('fa-caret-down');
+            iconTag.classList.add('fa-caret-up');
+          }
+          else {
+            console.log('model table read only button no fa-caret-down or fa-caret-up!');
+          }
+        }
+      });
+    }
   }
 
   /**
