@@ -292,9 +292,9 @@ export class TableConstructor {
         // 构建造型容器
         // this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
         this._container = create('div', [CSS.editor, this._api.styles.block], null,
-                              [this._titleWrapper, this._modelHeadTable.htmlElement,
-                                this._readOnlyTable.htmlElement, this._table.htmlElement,
-                              this._createTooltipBtnForModel()]);
+          [this._titleWrapper, this._modelHeadTable.htmlElement,
+          this._readOnlyTable.htmlElement, this._table.htmlElement,
+          this._createTooltipBtnForModel()]);
         // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
         // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
         this._initToolBarAndEvent();
@@ -311,7 +311,10 @@ export class TableConstructor {
         this._table.repeat = this._repeat;
         this._table.repeatWordsColl = this._repeatWordsColl;
         // this._table.firstColumnIsRead = false; // to do 这里以后要注释掉
-        this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement]);
+        this._container = create('div', [CSS.editor, this._api.styles.block], null,
+          [this._titleWrapper, this._modelHeadTable.htmlElement,
+          this._readOnlyTable.htmlElement, this._table.htmlElement,
+          this._createTooltipBtnForModel()]);
         this._initToolBarAndEvent();
       }
       else if (dataNotEmpty && !fromContructor) {
@@ -1995,65 +1998,65 @@ export class TableConstructor {
    * added by xiaowy 2020/09/27
    * todo:使用华安的方法
    */
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-   _getModelDataFromDbDemo() {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  _getModelDataFromDbDemo() {
     let that = this;
     // this._repeat === 1000
     // this._repeatWordsColl = [];
@@ -2370,28 +2373,49 @@ export class TableConstructor {
    */
   _createTooltipBtnForModel() {
     let btn = create('button', [CSS.modelAddButton]);
-    btn.innerHTML = '单击添加造型';
+    btn.innerHTML = '单击跳转添加造型';
     btn.addEventListener('click', (event) => {
-      // alert('111');
-      // this._api.tooltip.show(btn, '123');
-      this._api.toolbar.close();
-      this._api.caret.focus(true);
-      document.body.scrollIntoView(false);
-      this._api.caret.setToLastBlock('end', 1);
-      // let toolbars = document.querySelectorAll('.ce-toolbar')
-      // if (toolbars) {
-      //   // alert(toolbars);
-      //   let toolbar = toolbars[0];
-      //   toolbar.classList.add('ce-toolbar--opened');
-      //   let toolbarPluses = document.querySelectorAll('.ce-toolbar__plus');
-      //   if (toolbarPluses) {
-      //     let toolbarPlus = toolbarPluses[0];
-      //     toolbarPlus.classList.remove('ce-toolbar__plus--hidden');
-      //     toolbarPlus.classList.add('ce-toolbar__plus--opened');
-      //   }
-      // }
-      
-      this._api.toolbar.open();
+      // this._api.toolbar.close();
+      // this._api.caret.focus(true);
+
+      // document.body.scrollIntoView(false);
+      // window.scrollTo(0,document.body.scrollHeight);
+      this._api.caret.setToLastBlock('end', 0);
+      // this._api.caret.focus(true);
+      let toolbars2 = document.querySelectorAll('.ce-paragraph.cdx-block');
+      if (toolbars2.length) {
+        let toolbar2 = toolbars2[0]
+        // alert(toolbar2);
+        // toolbar2.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+        // toolbar2.scrollIntoView();
+        // toolbar2.attributes['tabindex'] = '0';
+        toolbar2.scrollIntoViewIfNeeded();
+        toolbar2.focus();
+        toolbar2.click();
+      }
+      else {
+        let toolbars = document.querySelectorAll('.ce-toolbar')
+        if (toolbars.length) {
+          // alert(toolbars);
+          let toolbar = toolbars[0];
+          // alert(toolbar);
+          toolbar.classList.add('ce-toolbar--opened');
+          // toolbar.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+          // toolbar.scrollIntoView(false);
+          let toolbarPluses = document.querySelectorAll('.ce-toolbar__plus');
+          if (toolbarPluses.length) {
+            let toolbarPlus = toolbarPluses[0];
+            toolbarPlus.classList.remove('ce-toolbar__plus--hidden');
+            toolbarPlus.classList.add('ce-toolbar__plus--opened');
+            // this._api.toolbar.open();
+            // toolbarPlus.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
+            // toolbarPlus.scrollIntoView(false);
+            // toolbarPlus.click();
+            toolbarPlus.scrollIntoViewIfNeeded();
+          }
+        }
+      }
+      // this._api.toolbar.open();
     });
     return btn;
   }

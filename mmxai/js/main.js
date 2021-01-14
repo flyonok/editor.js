@@ -93,16 +93,16 @@ const mmxai = function (module) {
         }, onReadyCall = undefined, onChangeCall = undefined) {
         module.Global = {};
         if (onReadyCall !== undefined && onChangeCall !== undefined) {
-            module.Global.editor = new EditorJS({ holder: container, tools: toolsConfig, onReady: onReadyCall, onChage: onChangeCall });
+            module.Global.editor = new EditorJS({ holder: container, tools: toolsConfig, onReady: onReadyCall, onChage: onChangeCall, autofocus: true });
         }
         else if (onReadyCall !== undefined) {
-            module.Global.editor = new EditorJS({ holder: container, tools: toolsConfig, onReady: onReadyCall });
+            module.Global.editor = new EditorJS({ holder: container, tools: toolsConfig, onReady: onReadyCall, autofocus: true });
         }
         else if (onChangeCall !== undefined) {
-            module.Global.editor = new EditorJS({ holder: container, tools: toolsConfig, onReady: onReadyCall, onChage: onChangeCall }); module.Global.editor = new EditorJS({ holder: container, tools: toolsConfig, onChage: onChangeCall });
+            module.Global.editor = new EditorJS({ holder: container, tools: toolsConfig, onReady: onReadyCall, onChage: onChangeCall, autofocus: true }); module.Global.editor = new EditorJS({ holder: container, tools: toolsConfig, onChage: onChangeCall });
         }
         else {
-            module.Global.editor = new EditorJS({ holder: container, tools: toolsConfig });
+            module.Global.editor = new EditorJS({ holder: container, tools: toolsConfig, autofocus: true });
         }
         module.Global.loadInitData = false;
 
