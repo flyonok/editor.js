@@ -807,7 +807,7 @@ export class Table {
 
           let retObj = this._getObjectFromCells(cells);
           // 增加容错处理 xiaowy 2020/10/09
-          if (retObj[0].length > 0 && retObj[1].length > 0) {
+          if (retObj[0].length  && retObj[1].length ) {
             // if (this._tabConfig.repeat && this._tabConfig.repeat === 2 && ((i + 1) % this._tabConfig.repeatWordsColl.length === 0)) {
             if (this._tabConfig.repeat && this._tabConfig.repeat === 2) {
               // console.log('this._tabConfig.repeat is 2');
@@ -822,6 +822,12 @@ export class Table {
               // modelParaObj[retObj[0]] = retObj[1];
             }
             modelParaObj[retObj[0]] = retObj[1];
+            // alert(modelParaObj);
+          }
+          // 2021/01/21 保留repeat为0的字段空值 xiaowy
+          else if (retObj[0].length && this._tabConfig.repeat !== undefined && this._tabConfig.repeat === 0) {
+            modelParaObj[retObj[0]] = retObj[1];
+            // alert(modelParaObj);
           }
 
         }

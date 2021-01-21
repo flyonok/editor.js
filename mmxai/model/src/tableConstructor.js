@@ -325,6 +325,10 @@ export class TableConstructor {
           this._makeReadOnlyTable();
           this._container.appendChild(this._readOnlyTable.htmlElement)
         }
+        // 要重构表头 2021/01/21
+        else {
+          this._makeReadOnlyTable();
+        }
         this._repeat = data.Repeat;
         // 如果造型名称相同则不重构参数表 2020/10/07
         if (data.Name.trim() !== this._modelHeadTable.modelTypeName) {
@@ -401,7 +405,15 @@ export class TableConstructor {
   _makeReadOnlyTable() {
     // overwrite config
     let config = { rows: '1', cols: '2' };
-    this._readOnlyTable = new TableReadOnly(this.hiddenTableRowCallBack());
+    // 需要增加隐藏按钮，而每个造型有不同的要求 2021/01/21
+    if (this._readOnlyTable !== undefined) {
+      if (this._readOnlyTable.rows) {
+        this._readOnlyTable.delRow();
+      }
+    }
+    else {
+      this._readOnlyTable = new TableReadOnly(this.hiddenTableRowCallBack());
+    }
     // let data = { content: [['元素名称', '内容']] };
     let data = { content: [['对象', '内容']] };
     const size = this._resizeReadOnlyTable(data, config);
@@ -625,7 +637,13 @@ export class TableConstructor {
     }
     for (let i = 0; i < cols; i++) {
       if (i === cols - 1) {
-        this._readOnlyTable.addColumn(-1, true);
+        console.log('readonly table', this._tableData['hiddenFields']);
+        if (this._tableData['hiddenFields'] && this._tableData['hiddenFields'].length) {
+          this._readOnlyTable.addColumn(-1, true);
+        }
+        else {
+          this._readOnlyTable.addColumn(-1);
+        }
       }
       else {
         this._readOnlyTable.addColumn();
@@ -1278,14 +1296,14 @@ export class TableConstructor {
    */
   _modifyDigitSerialEle(ele) {
     let content = ele.textContent;
-    console.log('content', content);
+    // console.log('content', content);
     let index = content.indexOf('.');
     if (content.length > 0 && index >= 0 && index === content.length - 1) {
-      console.log('find number xuhao');
+      // console.log('find number xuhao');
       let numStr = content.substr(0, index);
       let newNum = parseInt(numStr) + 1;
       ele.textContent = newNum + '.';
-      console.log('new ele', ele);
+      // console.log('new ele', ele);
     }
   }
 
@@ -1552,7 +1570,7 @@ export class TableConstructor {
    * 跳转到下一行
    */
   _gotoNextRow() {
-    console.log("enter _gotoNextRow");
+    // console.log("enter _gotoNextRow");
     const indicativeRow = this._table.selectedCell.closest('TR');
     const currentRowIndex = indicativeRow.sectionRowIndex;
     // console.log('currentRowIndex:' + currentRowIndex);
@@ -1569,7 +1587,7 @@ export class TableConstructor {
       const next_row = table_rows[0]
       next_row.cells[currentCellIndex].click();
     }
-    console.log("leave _gotoNextRow");
+    // console.log("leave _gotoNextRow");
   }
 
   /**
@@ -1998,64 +2016,6 @@ export class TableConstructor {
    * added by xiaowy 2020/09/27
    * todo:使用华安的方法
    */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   _getModelDataFromDbDemo() {
     let that = this;
     // this._repeat === 1000
@@ -2068,7 +2028,8 @@ export class TableConstructor {
         Fields: '正文',
         Tags: '正文 智能 自动',
         Thumb: './assets/dog1.jpg',
-        Repeat: 1,
+        Repeat: 0,
+        Hidden: '',
       },
       {
         Name: '项目符号',
@@ -2077,7 +2038,8 @@ export class TableConstructor {
         Fields: '正文',
         Tags: '项目符号 编号 智能 自动',
         Thumb: './assets/dog2.jpg',
-        Repeat: 1,
+        Repeat: 0,
+        Hidden: '',
       },
       {
         Name: '页标题',
@@ -2086,7 +2048,8 @@ export class TableConstructor {
         Fields: '标题 副标题 引标',
         Tags: '页标题 标题 智能 自动',
         Thumb: './assets/dog3.jpg',
-        Repeat: 1,
+        Repeat: 0,
+        Hidden: '标题',
       },
       {
         Name: '封面标题',
@@ -2095,7 +2058,8 @@ export class TableConstructor {
         Fields: '标题 副标题 口号 引标',
         Tags: '封面标题 封面 标题 智能 自动',
         Thumb: './assets/dog4.jpg',
-        Repeat: 1,
+        Repeat: 0,
+        Hidden: '副标题',
       },
       {
         Name: '小节',
@@ -2104,7 +2068,8 @@ export class TableConstructor {
         Fields: '标题',
         Tags: '小节 标题 智能 自动',
         Thumb: './assets/dog4.jpg',
-        Repeat: 1,
+        Repeat: 0,
+        Hidden: '',
       },
       {
         Name: '列表',
@@ -2113,7 +2078,8 @@ export class TableConstructor {
         Fields: '标题 正文 图片',
         Tags: '列表 特性 卖点 排列 智能 自动',
         Thumb: './assets/dog5.jpg',
-        Repeat: 1,
+        Repeat: 0,
+        Hidden: '图片',
       },
       {
         Name: '编号',
@@ -2122,7 +2088,8 @@ export class TableConstructor {
         Fields: '标题 正文 图片',
         Tags: '编号 排列 数字 智能 自动',
         Thumb: './assets/dog6.jpg',
-        Repeat: 1
+        Repeat: 0,
+        Hidden: '正文',
       },
       {
         Name: '图片',
@@ -2131,7 +2098,8 @@ export class TableConstructor {
         Fields: '图片',
         Tags: '图片 智能 自动',
         Thumb: './assets/dog6.jpg',
-        Repeat: 1,
+        Repeat: 0,
+        Hidden: '',
       },
       {
         Name: 'logo',
@@ -2140,7 +2108,8 @@ export class TableConstructor {
         Fields: '图片 标题 副标题 引标',
         Tags: 'logo 公司名称 智能 自动',
         Thumb: './assets/dog7.jpg',
-        Repeat: 1,
+        Repeat: 0,
+        Hidden: '引标',
       },
       {
         Name: '二维码',
@@ -2149,7 +2118,8 @@ export class TableConstructor {
         Fields: '图片',
         Tags: '二维码 扫码 智能 自动',
         Thumb: './assets/dog8.jpg',
-        Repeat: 1,
+        Repeat: 0,
+        Hidden: '',
       },
       {
         Name: '地址',
@@ -2158,7 +2128,8 @@ export class TableConstructor {
         Fields: '图片 正文',
         Tags: '地址 联系方式 电话 公司地址 智能 自动',
         Thumb: './assets/dog9.jpg',
-        Repeat: 1,
+        Repeat: 0,
+        Hidden: '',
       },
       {
         Name: '强调',
@@ -2167,7 +2138,8 @@ export class TableConstructor {
         Fields: '正文',
         Tags: '强调 文字 智能 自动',
         Thumb: './assets/dog9.jpg',
-        Repeat: -1,
+        Repeat: 0,
+        Hidden: '',
       },
       {
         Name: '时间线',
@@ -2176,7 +2148,8 @@ export class TableConstructor {
         Fields: '图片 标题 正文',
         Tags: '时间线 智能 自动',
         Thumb: './assets/dog10.jpg',
-        Repeat: -1,
+        Repeat: 0,
+        Hidden: '正文',
       },
       {
         Name: '图片集',
@@ -2185,7 +2158,8 @@ export class TableConstructor {
         Fields: '图片 标题 正文 图片 标题 正文',
         Tags: '图片集 图片 logo墙 人员介绍 合作伙伴 智能 自动',
         Thumb: './assets/dog11.jpg',
-        Repeat: -1,
+        Repeat: 0,
+        Hidden: '标题',
       },
       {
         Name: '卖点列表',
@@ -2195,6 +2169,7 @@ export class TableConstructor {
         Tags: '主标题 封面标题 标题 卖点 特性 优点 特征 特色 优势 口号 卖点 次卖点 副标题 智能 自动',
         Thumb: './assets/dog11.jpg',
         Repeat: 2,
+        Hidden: '副标题',
       }
     ]
     let processModelSel = function (modelHeadCallBack = undefined) {
@@ -2215,6 +2190,8 @@ export class TableConstructor {
         // const obj = modelDataObj[modelDataObj.length - 1];
         // console.log('_getModelDataFromDbDemo:', obj);
         // that._recontructParaTable(obj);
+        that._repeat = obj.Repeat;
+        that._tableData['hiddenFields'] = obj.Hidden;
         that._makeModelTables(obj, null, false);
         if (modelHeadCallBack !== undefined) {
           modelHeadCallBack(obj);
@@ -2236,6 +2213,9 @@ export class TableConstructor {
     let _processParentUiResult = function (obj) {
       // console.log('enter _processParentUiResult');
       // console.log('_processParentUiResult obj', obj);
+      // added by xiaowy 2021/01/21
+      that._repeat = obj.Repeat;
+      that._tableData['hiddenFields'] = obj.Hidden;
       that._makeModelTables(obj, null, false);
       if (that._modelHeadCallBack !== undefined) {
         that._modelHeadCallBack(obj);
@@ -2325,6 +2305,9 @@ export class TableConstructor {
       // if (this._repeat === -1) {
       //   this._table.firstColumnIsRead = false;
       // }
+      // 要重构表头 2021/01/21
+      this._makeReadOnlyTable();
+      // end
       this._table.repeat = this._repeat;
       this._table.repeatWordsColl = this._repeatWordsColl;
       this._tableData['hiddenFields'] = modelObj['Hidden'];
@@ -2384,7 +2367,7 @@ export class TableConstructor {
       // this._api.caret.focus(true);
       let toolbars2 = document.querySelectorAll('.ce-paragraph.cdx-block');
       if (toolbars2.length) {
-        let toolbar2 = toolbars2[0]
+        let toolbar2 = toolbars2[0];
         // alert(toolbar2);
         // toolbar2.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
         // toolbar2.scrollIntoView();
@@ -2394,7 +2377,7 @@ export class TableConstructor {
         toolbar2.click();
       }
       else {
-        let toolbars = document.querySelectorAll('.ce-toolbar')
+        let toolbars = document.querySelectorAll('.ce-toolbar');
         if (toolbars.length) {
           // alert(toolbars);
           let toolbar = toolbars[0];

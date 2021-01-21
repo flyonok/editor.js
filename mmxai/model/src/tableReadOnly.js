@@ -67,6 +67,10 @@ export class TableReadOnly {
     if (index >= this._numberOfRows) return;
     this._table.deleteRow(index);
     this._numberOfRows--;
+    // add by xiaowy
+    if (this._numberOfRows === 0) {
+      this._numberOfColumns = 0;
+    }
   };
 
 
@@ -300,4 +304,14 @@ export class TableReadOnly {
       'bubbles': true
     }));
   }
+
+  /**
+   * get rows of table
+   * @return number
+   */
+  get rows() {
+    return this._numberOfRows;
+  }
 }
+
+
