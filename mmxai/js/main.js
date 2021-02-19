@@ -11,83 +11,88 @@ const mmxai = function (module) {
             /**
              * Each Tool is a Plugin. Pass them via 'class' option with necessary settings {@link docs/tools.md}
              */
-            header: {
-                class: Header,
-                inlineToolbar: ['link'],
-                config: {
-                    placeholder: 'Header'
-                },
-                shortcut: 'CMD+SHIFT+H'
-            },
+            // header: {
+            //     class: Header,
+            //     inlineToolbar: ['link'],
+            //     config: {
+            //         placeholder: 'Header'
+            //     },
+            //     shortcut: 'CMD+SHIFT+H'
+            // },
 
             /**
              * Or pass class directly without any configuration
              */
-            image: {
-                class: SimpleImage,
-            },
+            // image: {
+            //     class: SimpleImage,
+            // },
 
-            list: {
-                class: List,
-                inlineToolbar: true,
-                shortcut: 'CMD+SHIFT+L'
-            },
+            // list: {
+            //     class: List,
+            //     inlineToolbar: true,
+            //     shortcut: 'CMD+SHIFT+L'
+            // },
 
-            checklist: {
-                class: Checklist,
-                inlineToolbar: true,
-            },
+            // checklist: {
+            //     class: Checklist,
+            //     inlineToolbar: true,
+            // },
 
-            quote: {
-                class: Quote,
-                inlineToolbar: true,
-                config: {
-                    quotePlaceholder: 'Enter a quote',
-                    captionPlaceholder: 'Quote\'s author',
-                },
-                shortcut: 'CMD+SHIFT+O'
-            },
+            // quote: {
+            //     class: Quote,
+            //     inlineToolbar: true,
+            //     config: {
+            //         quotePlaceholder: 'Enter a quote',
+            //         captionPlaceholder: 'Quote\'s author',
+            //     },
+            //     shortcut: 'CMD+SHIFT+O'
+            // },
 
-            warning: Warning,
+            // warning: Warning,
 
-            marker: {
-                class: Marker,
-                shortcut: 'CMD+SHIFT+M'
-            },
+            // marker: {
+            //     class: Marker,
+            //     shortcut: 'CMD+SHIFT+M'
+            // },
 
-            code: {
-                class: CodeTool,
-                shortcut: 'CMD+SHIFT+C'
-            },
+            // code: {
+            //     class: CodeTool,
+            //     shortcut: 'CMD+SHIFT+C'
+            // },
 
-            delimiter: Delimiter,
+            // delimiter: Delimiter,
 
-            inlineCode: {
-                class: InlineCode,
-                shortcut: 'CMD+SHIFT+I'
-            },
+            // inlineCode: {
+            //     class: InlineCode,
+            //     shortcut: 'CMD+SHIFT+I'
+            // },
 
             // linkTool: LinkTool,
 
-            embed: Embed,
-            table: {
-                class: Table,
-                inlineToolbar: true,
-                shortcut: 'CMD+ALT+T'
-            },
+            // embed: Embed,
+            // table: {
+            //     class: Table,
+            //     inlineToolbar: true,
+            //     shortcut: 'CMD+ALT+T'
+            // },
 
             model: {
                 class: MmxModel,
                 inlineToolbar: true,
                 shortcut: 'CMD+ALT+M'
             },
-            symbol: mmxSymbol,
 
             parameter: {
                 class: MmxParameter,
                 inlineToolbar: true,
                 shortcut: 'CMD+ALT+P'
-            }
+            },
+
+            imageCombine: {
+                class: MmxImgCmbModel,
+                inlineToolbar: true,
+                shortcut: 'CMD+ALT+Y'
+            },
 
 
         }, onReadyCall = undefined, onChangeCall = undefined) {

@@ -1,0 +1,69 @@
+/* tc- project's prefix*/
+
+.tc-readOnlyTable {
+  width: 100%;
+  height: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size:12px;
+
+  &__wrap {
+    /* border: 1px solid #DBDBE2; */
+    border:none;
+    border-radius: 3px;
+    position: relative;
+    height: 100%;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 60px;
+  }
+
+  &__cell {
+    border: 1px solid #BDD6EE;
+    padding: 0;
+    vertical-align: top;
+  }
+
+  &__area {
+    padding: 10px;
+    height: 100%;
+    display: flex;
+    /* flex-direction: column; */
+    /* justify-content: center; */
+    position:relative;
+  }
+
+  &__area button {
+    float:right;
+    font-size: 1.5em;
+    margin: 5px;
+  }
+
+  &__inp {
+    outline: none;
+    flex-grow: 100;
+    min-height: 1.5em;
+    height: 100%;
+    overflow: hidden;
+    font-size:16px;
+    font-weight: bold;
+  }
+
+  tbody tr:first-child td {
+    border-top: none;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 2px solid #BDD6EE;
+  }
+
+  tbody tr td:last-child {
+    border-right: none;
+    width:75%;
+  }
+
+  tbody tr td:first-child {
+    border-left: none;
+    width:25%;
+  }
+}
