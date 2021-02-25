@@ -466,7 +466,7 @@ export class TableConstructor {
           // get current cell and her editable part
           const input = this._table.body.rows[i - hiddenFieldCnt].cells[j].querySelector('.' + CSS.inputField);
           // 处理回车换行
-          let content = data.content[i][j];
+          let content = this._convertFontTag(data.content[i][j]);
           // console.log('content', content);
           // console.log("replaceAll", content.replaceAll);
           // let b = content.replaceAll('\n', '<br/>');
@@ -506,6 +506,35 @@ export class TableConstructor {
           }
         }
       }
+    }
+  }
+
+  /**
+   * @private
+   * 把 [font]=><font> [/font] => </font>
+   */
+  _convertFontTag(content) {
+    try {
+      const regexpWithoutE = /((\[font.*?\]))/;
+      const match = content.match(regexpWithoutE);
+      if (match) {
+        var str = match[0].replace('[', '<');
+        str = str.replace(']', '>')
+        var b = content.replace(regexpWithoutE, str);
+        const regexpWithoutE2 = /\[\/font\]/ig;
+        const match2 = b.match(regexpWithoutE2);
+        var str2 = match2[0].replace('[', '<');
+        str2 = str2.replace(']', '<')
+        var b2 = b.replace(regexpWithoutE2, str2);
+        return b2
+      }
+      else {
+        return content;
+      }
+    }
+    catch (e) {
+      console.log('_convertFontTag:', e);
+      return content;
     }
   }
 
@@ -2360,25 +2389,19 @@ export class TableConstructor {
   /**
    * @private
    * add toolbar button for add model
+   * 暂时不用，看能否直接选择造型并插入
    */
   _createTooltipBtnForModel() {
     let btn = create('button', [CSS.modelAddButton]);
-    btn.innerHTML = '单击跳转添加造型';
+    btn.innerHTML = '添加造型';
     btn.addEventListener('click', (event) => {
-      // this._api.toolbar.close();
-      // this._api.caret.focus(true);
-
-      // document.body.scrollIntoView(false);
-      // window.scrollTo(0,document.body.scrollHeight);
+      this._api.blocks.insert('model');
+      // this._modelHeadTable.openModelSelelct();
+      /*
       this._api.caret.setToLastBlock('end', 0);
-      // this._api.caret.focus(true);
       let toolbars2 = document.querySelectorAll('.ce-paragraph.cdx-block');
       if (toolbars2.length) {
         let toolbar2 = toolbars2[0];
-        // alert(toolbar2);
-        // toolbar2.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-        // toolbar2.scrollIntoView();
-        // toolbar2.attributes['tabindex'] = '0';
         toolbar2.scrollIntoViewIfNeeded();
         toolbar2.focus();
         toolbar2.click();
@@ -2386,26 +2409,17 @@ export class TableConstructor {
       else {
         let toolbars = document.querySelectorAll('.ce-toolbar');
         if (toolbars.length) {
-          // alert(toolbars);
           let toolbar = toolbars[0];
-          // alert(toolbar);
           toolbar.classList.add('ce-toolbar--opened');
-          // toolbar.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-          // toolbar.scrollIntoView(false);
           let toolbarPluses = document.querySelectorAll('.ce-toolbar__plus');
           if (toolbarPluses.length) {
             let toolbarPlus = toolbarPluses[0];
             toolbarPlus.classList.remove('ce-toolbar__plus--hidden');
             toolbarPlus.classList.add('ce-toolbar__plus--opened');
-            // this._api.toolbar.open();
-            // toolbarPlus.scrollIntoView({behavior: "smooth", block: "end", inline: "nearest"});
-            // toolbarPlus.scrollIntoView(false);
-            // toolbarPlus.click();
             toolbarPlus.scrollIntoViewIfNeeded();
           }
         }
-      }
-      // this._api.toolbar.open();
+      }*/
     });
     return btn;
   }
@@ -2441,7 +2455,7 @@ export class TableConstructor {
         // let rightIndex = paraName.indexOf('】');
         // let realName = paraName.substring(leftIndex + 1, rightIndex - leftIndex);
         // obj['name'] = this._descTitle.innerHTML;
-        // console.log("tableConstructor getJsonResult", ret);
+        console.log("tableConstructor getJsonResult", ret);
         return ret;
       }
       catch (e) {

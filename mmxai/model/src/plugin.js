@@ -97,7 +97,9 @@ class MmxModel {
     // return {
     //       content: this._tableConstructor.getJsonResult()
     //     };
-    return this._tableConstructor.getJsonResult();
+    let ret = this._tableConstructor.getJsonResult()
+    console.log('save:', ret);
+    return ret;
   }
 
   /**

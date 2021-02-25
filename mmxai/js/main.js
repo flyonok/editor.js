@@ -75,7 +75,8 @@ const mmxai = function (module) {
             //     inlineToolbar: true,
             //     shortcut: 'CMD+ALT+T'
             // },
-
+            color: mmxColor,
+            size: mmxSize,
             model: {
                 class: MmxModel,
                 inlineToolbar: true,
@@ -130,7 +131,7 @@ const mmxai = function (module) {
                             },
                             "列表": [
                                 {
-                                    "图片": "logo.svg",
+                                    "图片": "[font color=\"#ff0000\"]logo.svg[/font]",
                                     "标题": "天奕设计",
                                     "副标题": "TIANYI DESIGN\r123"
                                 }
@@ -138,6 +139,7 @@ const mmxai = function (module) {
                         }
                     }
                 },
+                /*
                 {
                     "type": "model",
                     "data": {
@@ -302,7 +304,7 @@ const mmxai = function (module) {
                             ]
                         }
                     }
-                }
+                }*/
             ],
             "version": "2.18.0"
         };

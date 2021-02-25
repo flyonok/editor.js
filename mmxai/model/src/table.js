@@ -94,7 +94,7 @@ export class Table {
     let isInColl = this._tabConfig.objSepIndexColl && this._tabConfig.objSepIndexColl.indexOf(nrows) > 0;
     let isRepeat = this._tabConfig.repeat && this._tabConfig.repeat === 1;
     let objSepCollExist = this._tabConfig.objSepIndexColl && this._tabConfig.objSepIndexColl.length;
-    let modularRow =  isRepeat && objSepCollExist && (this._numberOfRows % (this._tabConfig.objSepIndexColl[0] + 1) === 0);
+    let modularRow = isRepeat && objSepCollExist && (this._numberOfRows % (this._tabConfig.objSepIndexColl[0] + 1) === 0);
     if (isInColl || modularRow) {
       // console.log('isInColl', isInColl);
       // console.log('modularRow', modularRow);
@@ -227,7 +227,7 @@ export class Table {
     // console.log('_createSelectOption',this._tabConfig.repeatWordsColl, this._tabConfig.repeat);
     let isRepeatColl = this._tabConfig.repeatWordsColl && this._tabConfig.repeatWordsColl.length
     let repeatIs2 = this._tabConfig.repeat && this._tabConfig.repeat === 2;
-    if (isRepeatColl || repeatIs2 ) {
+    if (isRepeatColl || repeatIs2) {
 
       let optionColl = [];
       this._tabConfig.repeatWordsColl.forEach(word => {
@@ -672,9 +672,12 @@ export class Table {
     //   }
     // });
     let tempInput = inputs[1].cloneNode(true);
+    // console.log('_getObjectFromCells tempInput', tempInput);
     let afterProcessNode = this._processWordContent(tempInput);
     // let content = inputs[1].innerHTML.trim();
-    let content = afterProcessNode.innerHTML.trim();
+    let htmlContent = afterProcessNode.innerHTML.trim();
+    let content = this._processFontTag(htmlContent);
+    // console.log('_getObjectFromCells content', content);
     // let b = content.replaceAll('<br>', '\n');
     // const regrexa = /<div>|<\/div>/gi;
     // const regrexa = /<br>|<div>/gi;
@@ -707,7 +710,7 @@ export class Table {
       keyOne = tmp1;
     }
     let key = keyOne.replace(regrexTwo, '\r');
-    // console.log('_getObjectFromCells', [key, b]);
+    console.log('_getObjectFromCells', [key, b]);
     return [key, b];
   }
 
@@ -759,6 +762,35 @@ export class Table {
       // }
     }
     return node;
+  }
+
+  /**
+   * @private
+   * 处理font tag
+   */
+  _processFontTag(htmlContent) {
+    try {
+      const regexpWithoutE = /((\<font.*?\>))/;
+      const match = htmlContent.match(regexpWithoutE);
+      if (match) {
+        var str = match[0].replace('<', '[');
+        str = str.replace('>', ']')
+        var b = htmlContent.replace(regexpWithoutE, str);
+        const regexpWithoutE2 = /\<\/font\>/ig;
+        const match2 = b.match(regexpWithoutE2);
+        var str2 = match2[0].replace('<', '[');
+        str2 = str2.replace('>', ']')
+        var b2 = b.replace(regexpWithoutE2, str2);
+        return b2
+      }
+      else {
+        return htmlContent;
+      }
+    }
+    catch (e) {
+      console.log('_processFontTag:', e);
+      return htmlContent;
+    }
   }
   /**
    * @public
@@ -820,7 +852,7 @@ export class Table {
 
           let retObj = this._getObjectFromCells(cells);
           // 增加容错处理 xiaowy 2020/10/09
-          if (retObj[0].length  && retObj[1].length ) {
+          if (retObj[0].length && retObj[1].length) {
             // if (this._tabConfig.repeat && this._tabConfig.repeat === 2 && ((i + 1) % this._tabConfig.repeatWordsColl.length === 0)) {
             if (this._tabConfig.repeat && this._tabConfig.repeat === 2) {
               // console.log('this._tabConfig.repeat is 2');

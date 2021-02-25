@@ -231,6 +231,15 @@ export class ModelHeadTable {
   }
 
   /**
+   * @public
+   * open model select dialog
+   */
+
+   openModelSelelct() {
+     this._modelSelBtn.click();
+   }
+
+  /**
    * @private
    * 修改造型头的各项数据
    * 闭包回调
