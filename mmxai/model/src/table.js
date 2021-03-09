@@ -770,7 +770,7 @@ export class Table {
    */
   _processFontTag(htmlContent) {
     try {
-      const regexpWithoutE = /((\<font.*?\>))/;
+      const regexpWithoutE = /((\<font.*?\>))/ig;
       const match = htmlContent.match(regexpWithoutE);
       if (match) {
         var str = match[0].replace('<', '[');
@@ -781,6 +781,7 @@ export class Table {
         var str2 = match2[0].replace('<', '[');
         str2 = str2.replace('>', ']')
         var b2 = b.replace(regexpWithoutE2, str2);
+        console.log('_processFontTag', b2);
         return b2
       }
       else {

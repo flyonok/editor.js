@@ -515,7 +515,7 @@ export class TableConstructor {
    */
   _convertFontTag(content) {
     try {
-      const regexpWithoutE = /((\[font.*?\]))/;
+      const regexpWithoutE = /((\[font.*?\]))/ig;
       const match = content.match(regexpWithoutE);
       if (match) {
         var str = match[0].replace('[', '<');
