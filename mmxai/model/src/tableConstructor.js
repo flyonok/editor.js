@@ -31,6 +31,7 @@ export class TableConstructor {
     this._repeatWordsColl = [];
     this._tableData = { 'content': [], 'hiddenFields': '' };
     this._doHiddenField = false; // 默认是显示隐藏字段 2021/01/12 xiaowy
+    this._modelJson = {}; // 保存造型的数据库记录属性 2021/04/07
     let _innerData = this._cdrJsonConvert(data);
     this._repeat = _innerData.Repeat; // add by xiaowy whether can add table parameter
 
@@ -72,6 +73,8 @@ export class TableConstructor {
                 // console.log('mmxaiGetAllModelList2', this._repeatWordsColl);
               }
             }
+
+            this._modelJson = find; // 2021/04/07 保存json数据，方便陈华安构建造型属性
           }
           else {
             console.log('not find model thumb', data.name);
@@ -81,7 +84,7 @@ export class TableConstructor {
       catch (e) {
         console.log('error', e);
       }
-      console.log('exit _getModelThumbFromParent');
+      // console.log('exit _getModelThumbFromParent');
       // retArr.forEach((item, index) => {
       //   if (item.Name === data.name) {
       //     console.log('find model thumb', data.name);
@@ -104,9 +107,9 @@ export class TableConstructor {
     let _innerData = {};
     for (let prop in data) {
       if (data.hasOwnProperty(prop)) {
-        console.log('first cdrData1', data[prop]);
+        // console.log('first cdrData1', data[prop]);
         cdrData = Object.assign({}, data[prop]);
-        console.log('first cdrData', cdrData);
+        // console.log('first cdrData', cdrData);
         _innerData.name = prop;
         break;
       }
@@ -123,7 +126,7 @@ export class TableConstructor {
     }
     this._getModelThumbFromParent(_innerData);
     // this._tableData = _innerData
-    console.log('after _getModelThumbFromParent', _innerData);
+    // console.log('after _getModelThumbFromParent', _innerData);
     if (cdrData['板块头'] && cdrData['板块头']['标题']) {
       _innerData.innerTitle = cdrData['板块头']['标题'];
     }
@@ -430,8 +433,7 @@ export class TableConstructor {
   _makeModelHeadTable(data) {
     // overwrite config
     // let config = { rows: '1', cols: '2' };
-    this._modelHeadTable = new ModelHeadTable(data, this._getModelDataFromDbDemo());
-
+    this._modelHeadTable = new ModelHeadTable(data, this._getModelDataFromDbDemo(), this._modelJson);
   }
 
   /**
@@ -2251,6 +2253,7 @@ export class TableConstructor {
       // console.log('_processParentUiResult obj', obj);
       // added by xiaowy 2021/01/21
       that._repeat = obj.Repeat;
+      that._modelJson = obj;
       that._tableData['hiddenFields'] = obj.Hidden;
       that._makeModelTables(obj, null, false);
       if (that._modelHeadCallBack !== undefined) {

@@ -22,9 +22,10 @@ export class ModelHeadTable {
   /**
    * Creates
    */
-  constructor(data, modelSelCallBack = undefined) {
+  constructor(data, modelSelCallBack = undefined, modelJson = {}) {
     this._modelSelCallBack = modelSelCallBack;
     this._newModelAttrs = {};
+    this._modelJson = modelJson
     try {
       this._element = this._createDivWrapper(data);
       this._divHeadDisplay = true;
@@ -81,7 +82,7 @@ export class ModelHeadTable {
       console.log('_createDivAttributes exception:', e);
     }
     this._attrInfoBtn = create('button', [CSS.configAttr]);
-    this._attrInfoBtn.innerHTML = '设 置 属 性';
+    this._attrInfoBtn.innerHTML = '设置造型属性';
     // console.log('_createDivAttributes end');
     // return this._attrInfoBtn;
     return create('div', [CSS.table, CSS.center], null, [this._attrInfoBtn]);
@@ -258,7 +259,9 @@ export class ModelHeadTable {
     });
     this._attrInfoBtn.addEventListener('click', (event)=>{
       if (window.mmxaiSetModelAttr) {
-        window.mmxaiSetModelAttr(this._newModelAttrs, (configObj) => {
+        console.log("test modelJson", this._modelJson);
+        // alert(this._modelJson);
+        window.mmxaiSetModelAttr(this._newModelAttrs, this._modelJson,  (configObj) => {
           this._newModelAttrs = configObj;
         }
         ); // todo: add callback function
@@ -286,6 +289,7 @@ export class ModelHeadTable {
     let that = this;
     let _modifyHeadData = function (data) {
       try {
+        this._modelJson = data;
         if (data.Name) {
           that._inputTypeTxt.value = data.Name;
           // added by xiaowy 2021/01/11 for head ui together
