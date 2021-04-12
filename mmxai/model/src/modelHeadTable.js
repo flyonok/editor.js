@@ -289,7 +289,8 @@ export class ModelHeadTable {
     let that = this;
     let _modifyHeadData = function (data) {
       try {
-        this._modelJson = data;
+        that._modelJson = data;
+        console.log('_modelJson', that._modelJson);
         if (data.Name) {
           that._inputTypeTxt.value = data.Name;
           // added by xiaowy 2021/01/11 for head ui together
