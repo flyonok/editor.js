@@ -334,11 +334,11 @@ export class ModelHeadTable {
       obj['属性'] = JSON.stringify(this._newModelAttrs);
       obj.name = this._inputTypeTxt.value.trim();
       // obj['属性'] = this._labelAttrEle.innerHTML;
-      console.log('getHeadParam', obj);
+      // console.log('getHeadParam', obj);
       return obj;
     }
     catch (e) {
-      console.log('getHeadParam exception:', e);
+      // console.log('getHeadParam exception:', e);
       alert(e);
       return undefined;
     }

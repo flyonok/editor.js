@@ -87,9 +87,15 @@ export class Table {
    * @param {number} index - number in the array of columns, where new column to insert,-1 if insert at the end
    * @return {HTMLElement} row
    */
-  addRow(index = -1) {
+  addRow(index = -1, display=true) {
     this._numberOfRows++;
     const row = this._table.insertRow(index);
+    if (display) {
+      row.hidden = false;
+    }
+    else {
+      row.hidden = true;
+    }
     let nrows = this._numberOfRows - 1;
     let isInColl = this._tabConfig.objSepIndexColl && this._tabConfig.objSepIndexColl.indexOf(nrows) > 0;
     let isRepeat = this._tabConfig.repeat && this._tabConfig.repeat === 1;
@@ -652,9 +658,10 @@ export class Table {
    * @private
    * get row cells objects pair
    * @param {Array} cells: cells array(length is 2)
+   * @param processTag : 是否需要处理div等tag
    * @return {Array}: [key, value]
    */
-  _getObjectFromCells(cells) {
+  _getObjectFromCells(cells, processTag = true) {
     if (cells.length < 2) {
       console.log('cells lenth must equals 2');
       return ['', ''];
@@ -671,47 +678,59 @@ export class Table {
     //     div1.remove();
     //   }
     // });
-    let tempInput = inputs[1].cloneNode(true);
-    // console.log('_getObjectFromCells tempInput', tempInput);
-    let afterProcessNode = this._processWordContent(tempInput);
-    // let content = inputs[1].innerHTML.trim();
-    let htmlContent = afterProcessNode.innerHTML.trim();
-    let content = this._processFontTag(htmlContent);
-    // console.log('_getObjectFromCells content', content);
-    // let b = content.replaceAll('<br>', '\n');
-    // const regrexa = /<div>|<\/div>/gi;
-    // const regrexa = /<br>|<div>/gi;
-    // 要和加载的时候反过来 xiaowy 2021/01/30
-    const regrexa = /<br>|<\/div>/gi;
-    let a = content.replace(regrexa, '');
-    // const regrex = /<br>/gi;
-    // const regrex = /<\/div>/gi;
-    const regrex = /<div>/gi;
-    let match = regrex.exec(a);
-    if (match && match.index === 0) {
-      let tmp = a.replace('<div>', '');
-      a = tmp;
-    }
-    let b = a.replace(regrex, '\r');
-    // const regrexall = /<br>|<\/div>|<div>/gi;
-    const regrexone = /<br>|<\/div>/gi;
-    let inputs0 = '';
-    if (this._tabConfig.repeat && this._tabConfig.repeat == 2) {
-      inputs0 = inputs[0].value.trim();
+    if (processTag) {
+      let tempInput = inputs[1].cloneNode(true);
+      // console.log('_getObjectFromCells tempInput', tempInput);
+      let afterProcessNode = this._processWordContent(tempInput);
+      // let content = inputs[1].innerHTML.trim();
+      let htmlContent = afterProcessNode.innerHTML.trim();
+      let content = this._processFontTag(htmlContent);
+      // console.log('_getObjectFromCells content', content);
+      // let b = content.replaceAll('<br>', '\n');
+      // const regrexa = /<div>|<\/div>/gi;
+      // const regrexa = /<br>|<div>/gi;
+      // 要和加载的时候反过来 xiaowy 2021/01/30
+      const regrexa = /<br>|<\/div>/gi;
+      let a = content.replace(regrexa, '');
+      // const regrex = /<br>/gi;
+      // const regrex = /<\/div>/gi;
+      const regrex = /<div>/gi;
+      let match = regrex.exec(a);
+      if (match && match.index === 0) {
+        let tmp = a.replace('<div>', '');
+        a = tmp;
+      }
+      let b = a.replace(regrex, '\r');
+      // const regrexall = /<br>|<\/div>|<div>/gi;
+      const regrexone = /<br>|<\/div>/gi;
+      let inputs0 = '';
+      if (this._tabConfig.repeat && this._tabConfig.repeat == 2) {
+        inputs0 = inputs[0].value.trim();
+      }
+      else {
+        inputs0 = inputs[0].innerHTML.trim();
+      }
+      let keyOne = inputs0.replace(regrexone, '');
+      const regrexTwo = /<div>/gi;
+      let match2 = regrexTwo.exec(keyOne);
+      if (match2 && match2.index === 0) {
+        let tmp1 = keyOne.replace('<div>', '');
+        keyOne = tmp1;
+      }
+      let key = keyOne.replace(regrexTwo, '\r');
+      console.log('_getObjectFromCells', [key, b]);
+      return [key, b];
     }
     else {
-      inputs0 = inputs[0].innerHTML.trim();
+      let inputs0 = '';
+      if (this._tabConfig.repeat && this._tabConfig.repeat == 2) {
+        inputs0 = inputs[0].value.trim();
+      }
+      else {
+        inputs0 = inputs[0].innerHTML.trim();
+      }
+      return [inputs0, inputs[1].innerHTML.trim()];
     }
-    let keyOne = inputs0.replace(regrexone, '');
-    const regrexTwo = /<div>/gi;
-    let match2 = regrexTwo.exec(keyOne);
-    if (match2 && match2.index === 0) {
-      let tmp1 = keyOne.replace('<div>', '');
-      keyOne = tmp1;
-    }
-    let key = keyOne.replace(regrexTwo, '\r');
-    console.log('_getObjectFromCells', [key, b]);
-    return [key, b];
   }
 
   /**
@@ -797,6 +816,7 @@ export class Table {
    * @public
    * Get the json object for this table
    * column 0 is the key and column 1 is the value
+   * @param processTag: 是否处理
    * @return {Array}
    */
   getJsonResult() {

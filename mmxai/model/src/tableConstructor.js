@@ -30,7 +30,7 @@ export class TableConstructor {
 
     this._repeatWordsColl = [];
     this._tableData = { 'content': [], 'hiddenFields': '' };
-    this._doHiddenField = false; // 默认是显示隐藏字段 2021/01/12 xiaowy
+    this._doHiddenField = true; // 默认是显示隐藏字段 2021/01/12 xiaowy
     this._modelJson = {}; // 保存造型的数据库记录属性 2021/04/07
     let _innerData = this._cdrJsonConvert(data);
     this._repeat = _innerData.Repeat; // add by xiaowy whether can add table parameter
@@ -63,7 +63,7 @@ export class TableConstructor {
             data.imgBase64 = find.imgBase64;
             data.Repeat = find.Repeat; // 表示是否可以增加表格参数！！！ 2020/10/07
             this._repeat = data.Repeat; // 后面不少地方用了这个成员来判断！！！ 2020/11/24
-            this._tableData['hiddenFields'] = data.Hidden; // 记录隐藏字段集合 2021/01/12
+            this._tableData['hiddenFields'] = find.Hidden; // 记录隐藏字段集合 2021/01/12
             if (find.Repeat && (find.Repeat === 1 || find.Repeat === 2)) {
               // 以分析json数据优先 2020/11/23
               let noRepeatWordsColl = !this._repeatWordsColl || !this._repeatWordsColl.length;
@@ -77,7 +77,7 @@ export class TableConstructor {
             this._modelJson = find; // 2021/04/07 保存json数据，方便陈华安构建造型属性
           }
           else {
-            console.log('not find model thumb', data.name);
+            console.log("Can't find model from chenhuaan api!!!!");
           }
         }
       }
@@ -93,6 +93,188 @@ export class TableConstructor {
       //     return;
       //   }
       // });
+    }
+    else {
+      // for debug
+      const modelDataObj = [
+        {
+          Name: '正文',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '正文',
+          Tags: '正文 智能 自动',
+          Thumb: './assets/dog1.jpg',
+          Repeat: 0,
+          Hidden: '',
+        },
+        {
+          Name: '项目符号',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '正文',
+          Tags: '项目符号 编号 智能 自动',
+          Thumb: './assets/dog2.jpg',
+          Repeat: 0,
+          Hidden: '',
+        },
+        {
+          Name: '页标题',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '标题 副标题 引标',
+          Tags: '页标题 标题 智能 自动',
+          Thumb: './assets/dog3.jpg',
+          Repeat: 0,
+          Hidden: '标题',
+        },
+        {
+          Name: '封面标题',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '标题 副标题 口号 引标',
+          Tags: '封面标题 封面 标题 智能 自动',
+          Thumb: './assets/dog4.jpg',
+          Repeat: 0,
+          Hidden: '副标题',
+        },
+        {
+          Name: '小节',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '标题',
+          Tags: '小节 标题 智能 自动',
+          Thumb: './assets/dog4.jpg',
+          Repeat: 0,
+          Hidden: '',
+        },
+        {
+          Name: '列表',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '标题 正文 图片',
+          Tags: '列表 特性 卖点 排列 智能 自动',
+          Thumb: './assets/dog5.jpg',
+          Repeat: 0,
+          Hidden: '图片',
+        },
+        {
+          Name: '编号',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '标题 正文 图片',
+          Tags: '编号 排列 数字 智能 自动',
+          Thumb: './assets/dog6.jpg',
+          Repeat: 0,
+          Hidden: '正文',
+        },
+        {
+          Name: '图片',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '图片',
+          Tags: '图片 智能 自动',
+          Thumb: './assets/dog6.jpg',
+          Repeat: 0,
+          Hidden: '',
+        },
+        {
+          Name: 'logo',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '图片 标题 副标题 引标',
+          Tags: 'logo 公司名称 智能 自动',
+          Thumb: './assets/dog7.jpg',
+          Repeat: 1,
+          Hidden: '引标',
+        },
+        {
+          Name: '二维码',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '图片',
+          Tags: '二维码 扫码 智能 自动',
+          Thumb: './assets/dog8.jpg',
+          Repeat: 0,
+          Hidden: '',
+        },
+        {
+          Name: '地址',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '图片 正文',
+          Tags: '地址 联系方式 电话 公司地址 智能 自动',
+          Thumb: './assets/dog9.jpg',
+          Repeat: 0,
+          Hidden: '',
+        },
+        {
+          Name: '强调',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '正文',
+          Tags: '强调 文字 智能 自动',
+          Thumb: './assets/dog9.jpg',
+          Repeat: 0,
+          Hidden: '',
+        },
+        {
+          Name: '时间线',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '图片 标题 正文',
+          Tags: '时间线 智能 自动',
+          Thumb: './assets/dog10.jpg',
+          Repeat: 0,
+          Hidden: '正文',
+        },
+        {
+          Name: '图片集',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '图片 标题 正文 图片 标题 正文',
+          Tags: '图片集 图片 logo墙 人员介绍 合作伙伴 智能 自动',
+          Thumb: './assets/dog11.jpg',
+          Repeat: 0,
+          Hidden: '标题',
+        },
+        {
+          Name: '卖点列表',
+          SubName: '智能选择',
+          Info: '自动选择造型',
+          Fields: '主标题 副标题 卖点 次卖点 正文',
+          Tags: '主标题 封面标题 标题 卖点 特性 优点 特征 特色 优势 口号 卖点 次卖点 副标题 智能 自动',
+          Thumb: './assets/dog11.jpg',
+          Repeat: 2,
+          Hidden: '副标题',
+        }
+      ]
+      let find = modelDataObj.find((item) => {
+        return item.Name === data.name;
+      })
+      console.log("find model deubg");
+      if (find !== undefined) {
+        console.log('find model thumb111', data.name);
+        // data.imgByteStr = find.imgByteStr;
+        // data.Thumb = find.Thumb;
+        data.imgBase64 = find.imgBase64;
+        data.Repeat = find.Repeat; // 表示是否可以增加表格参数！！！ 2020/10/07
+        this._repeat = data.Repeat; // 后面不少地方用了这个成员来判断！！！ 2020/11/24
+        this._tableData['hiddenFields'] = find.Hidden; // 记录隐藏字段集合 2021/01/12
+        console.log("this._tableData['hiddenFields']", this._tableData['hiddenFields']);
+        if (find.Repeat && (find.Repeat === 1 || find.Repeat === 2)) {
+          // 以分析json数据优先 2020/11/23
+          let noRepeatWordsColl = !this._repeatWordsColl || !this._repeatWordsColl.length;
+          let fieldsColl = find.Fields.trim().split(' ');
+          if (noRepeatWordsColl || this._repeatWordsColl.length < fieldsColl.length) {
+            this._repeatWordsColl = fieldsColl;
+            // console.log('mmxaiGetAllModelList2', this._repeatWordsColl);
+          }
+        }
+
+        this._modelJson = find; // 2021/04/07 保存json数据，方便陈华安构建造型属性
+
+      }
+
     }
   }
 
@@ -454,20 +636,24 @@ export class TableConstructor {
    */
   _fillTable(data, size) {
     if (data.content !== undefined) {
-      let hiddenFields = [];
-      if (this._tableData['hiddenFields']) {
-        hiddenFields = this._tableData['hiddenFields'].split(' ');
-      }
-      let hiddenFieldCnt = 0;
+      // comment 2021/04/15
+      // let hiddenFields = [];
+      // if (this._tableData['hiddenFields']) {
+      //   hiddenFields = this._tableData['hiddenFields'].split(' ');
+      // }
+      // let hiddenFieldCnt = 0;
       for (let i = 0; i < size.rows && i < data.content.length; i++) {
-        if (this._doHiddenField && hiddenFields.indexOf(data.content[i][0]) > 0) {
-          hiddenFieldCnt++;
-          continue;
-        }
+        // not necessary 2021/04/15
+        // if (this._doHiddenField && hiddenFields.indexOf(data.content[i][0]) > 0) {
+        //   hiddenFieldCnt++;
+        //   continue;
+        // }
         for (let j = 0; j < size.cols && j < data.content[i].length; j++) {
           // get current cell and her editable part
-          const input = this._table.body.rows[i - hiddenFieldCnt].cells[j].querySelector('.' + CSS.inputField);
-          // 处理回车换行
+          // display none
+          // const input = this._table.body.rows[i - hiddenFieldCnt].cells[j].querySelector('.' + CSS.inputField);
+          const input = this._table.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
+          // 处理回车换行和font标签
           let content = this._convertFontTag(data.content[i][j]);
           // console.log('content', content);
           // console.log("replaceAll", content.replaceAll);
@@ -603,17 +789,10 @@ export class TableConstructor {
     }
 
     for (let i = 0; i < rows; i++) {
-      // if (contentSeprateIndexColl.indexOf() > -1) {
-      //   this._table.addRow(-1, true);
-      // }
-      // else {
-      //   this._table.addRow();
-      // }
-      // debug
-      // console.log('hiddenField:', this._doHiddenField);
-      // console.log('hiddenField', hiddenFields);
-      // console.log('hiddenField', data.content[i][0]);
-      if (!this._doHiddenField || hiddenFields.indexOf(data.content[i][0]) < 0) {
+      if (this._doHiddenField && (data.content && data.content.length > i) && hiddenFields.indexOf(data.content[i][0]) >= 0) {
+        this._table.addRow(-1, false);
+      }
+      else {
         this._table.addRow();
       }
     }
@@ -735,7 +914,7 @@ export class TableConstructor {
         // end
         // this._clickToolbar(event);
       });
-
+ 
       // add by xiaowy test double click event 2020/09/19
       this._container.addEventListener('dblclick', (event) => {
         clearTimeout(this._clickTimeId);
@@ -1022,13 +1201,13 @@ export class TableConstructor {
     ** 这段代码目前不太稳定，暂时屏蔽，统一在表的尾部添加 xiaowy 2020/10/09
     const indicativeRow = this._hoveredCell.closest('TR');
     let index = this._getHoveredSideOfContainer();
-
+ 
     if (index === 1) {
       index = indicativeRow.sectionRowIndex;
       // if inserting after hovered cell
       index = index + this._isBottomOrRight();
     }
-
+ 
     this._table.addRow(index);
     */
     this._table.addRow(this._table.rows);
@@ -2146,7 +2325,7 @@ export class TableConstructor {
         Fields: '图片 标题 副标题 引标',
         Tags: 'logo 公司名称 智能 自动',
         Thumb: './assets/dog7.jpg',
-        Repeat: 0,
+        Repeat: 1,
         Hidden: '引标',
       },
       {
@@ -2230,6 +2409,7 @@ export class TableConstructor {
         // that._recontructParaTable(obj);
         that._repeat = obj.Repeat;
         that._tableData['hiddenFields'] = obj.Hidden;
+        console.log(that._tableData['hiddenFields']);
         that._makeModelTables(obj, null, false);
         if (modelHeadCallBack !== undefined) {
           modelHeadCallBack(obj);
@@ -2345,16 +2525,21 @@ export class TableConstructor {
       //   this._table.firstColumnIsRead = false;
       // }
       // 要重构表头 2021/01/21
+      this._tableData['hiddenFields'] = modelObj['Hidden'];
       this._makeReadOnlyTable();
       // end
       this._table.repeat = this._repeat;
       this._table.repeatWordsColl = this._repeatWordsColl;
-      this._tableData['hiddenFields'] = modelObj['Hidden'];
+      // this._tableData['hiddenFields'] = modelObj['Hidden'];
       this._tableData['content'] = JSON.parse(JSON.stringify(data.content));
       const size = this._resizeTable(data, config);
       this._fillTable(data, size);
 
     }
+  }
+
+  _collectTableData() {
+    this._tableData.content = []
   }
 
   /**
@@ -2371,19 +2556,35 @@ export class TableConstructor {
         // let tablebr = document.createElement('br');
         // this._table.htmlElement.appendChild(tablebr);
         that._container.appendChild(that._table.htmlElement);
+        let config = { rows: that._tableData.content.length, cols: 2 }
+        const size = that._resizeTable(that._tableData, config);
+        that._fillTable(that._tableData, size);
       }
       else {
         // let paraRows = !!this._table.body.rows ? this._table.body.rows : []
         // console.log('paraRows1:', paraRows);
         // paraRows = !!paraRows? paraRows : []; 
         // console.log('paraRows:', paraRows);
-        while (that._table.rows > 0) {
-          that._table.delRow();
+        let hiddenFields = [];
+        if (that._tableData['hiddenFields']) {
+          hiddenFields = that._tableData['hiddenFields'].split(' ');
         }
+        let rowsColl = that._table.body.rows;
+
+        for (let i = 0; i < rowsColl.length; i++) {
+          let row = rowsColl[i];
+          let cells = row.cells;
+          let htmlValue = cells[0].querySelector('.' + CSS.inputField).innerHTML.trim();
+          if (that._doHiddenField && hiddenFields.indexOf(htmlValue) >= 0) {
+            row.hidden = true;
+          }
+          else {
+            row.hidden = false;
+          }
+        }
+
       }
-      let config = { rows: that._tableData.content.length, cols: 2 }
-      const size = that._resizeTable(that._tableData, config);
-      that._fillTable(that._tableData, size);
+
       // console.log('test hidden callback', that._tableData.content);
     };
     return callBack;
@@ -2441,7 +2642,7 @@ export class TableConstructor {
     if (temp) {
       try {
         let obj = {};
-        obj['板块头'] = temp['板块头'];
+        // obj['板块头'] = temp['板块头'];
         obj['属性'] = temp['属性'];
         // let obj = Object.assign({}, temp['板块头']);
         // console.log("tableConstructor getJsonResult11", obj);
