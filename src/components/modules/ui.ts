@@ -331,6 +331,7 @@ export default class UI extends Module {
 
     this.Editor.Listeners.on(document, 'keydown', (event) => this.documentKeydown(event as KeyboardEvent), true);
     this.Editor.Listeners.on(document, 'click', (event) => this.documentClicked(event as MouseEvent), true);
+    this.Editor.Listeners.on(document, 'dblclick', (event) => this.Editor.InlineToolbar.tryToShow(true, event.type), true);
 
     /**
      * Handle selection change to manipulate Inline Toolbar appearance

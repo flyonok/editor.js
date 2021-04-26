@@ -72,6 +72,9 @@ export default class ItalicInlineTool implements InlineTool {
    * @param {Range} range - range to wrap
    */
   public surround(range: Range): void {
+    let childList = range.commonAncestorContainer['children'];
+    if (!childList) childList = range.commonAncestorContainer.parentElement['children'];
+    for (var i = 0; i < childList.length; i++) childList[i].removeAttribute("contenteditable");
     document.execCommand(this.commandName);
   }
 
