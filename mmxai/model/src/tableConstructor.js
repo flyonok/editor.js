@@ -516,7 +516,16 @@ export class TableConstructor {
         }
         this._repeat = data.Repeat;
         // 如果造型名称相同则不重构参数表 2020/10/07
-        if (data.Name.trim() !== this._modelHeadTable.modelTypeName) {
+        let mustRecontructParaTable = true;
+        console.log('see data subname', data.Subname);
+        console.log('see _modelJson.subname', this._modelJson.Subname);
+        if (data.Name.indexOf(this._modelJson.Subname) == 0 || data.Subname == this._modelJson.Name) {
+          mustRecontructParaTable = !mustRecontructParaTable;
+        }
+        this._modelJson = data;
+        // if (data.Name.trim() !== this._modelHeadTable.modelTypeName) {
+        if (mustRecontructParaTable) {
+          console.log('call _recontructParaTable');
           this._recontructParaTable(data);
           // 这里会重复注册事件处理，导致注册事件会处理两次
           // this._initToolBarAndEvent();
@@ -2433,7 +2442,7 @@ export class TableConstructor {
       // console.log('_processParentUiResult obj', obj);
       // added by xiaowy 2021/01/21
       that._repeat = obj.Repeat;
-      that._modelJson = obj;
+      // that._modelJson = obj;
       that._tableData['hiddenFields'] = obj.Hidden;
       that._makeModelTables(obj, null, false);
       if (that._modelHeadCallBack !== undefined) {
@@ -2593,37 +2602,27 @@ export class TableConstructor {
   /**
    * @private
    * add toolbar button for add model
-   * 暂时不用，看能否直接选择造型并插入
+   *
    */
   _createTooltipBtnForModel() {
     let btn = create('button', [CSS.modelAddButton]);
     btn.innerHTML = '添加造型';
     btn.addEventListener('click', (event) => {
       this._api.blocks.insert('model');
-      // this._modelHeadTable.openModelSelelct();
-      /*
-      this._api.caret.setToLastBlock('end', 0);
-      let toolbars2 = document.querySelectorAll('.ce-paragraph.cdx-block');
-      if (toolbars2.length) {
-        let toolbar2 = toolbars2[0];
-        toolbar2.scrollIntoViewIfNeeded();
-        toolbar2.focus();
-        toolbar2.click();
-      }
-      else {
-        let toolbars = document.querySelectorAll('.ce-toolbar');
-        if (toolbars.length) {
-          let toolbar = toolbars[0];
-          toolbar.classList.add('ce-toolbar--opened');
-          let toolbarPluses = document.querySelectorAll('.ce-toolbar__plus');
-          if (toolbarPluses.length) {
-            let toolbarPlus = toolbarPluses[0];
-            toolbarPlus.classList.remove('ce-toolbar__plus--hidden');
-            toolbarPlus.classList.add('ce-toolbar__plus--opened');
-            toolbarPlus.scrollIntoViewIfNeeded();
-          }
-        }
-      }*/
+    });
+    return btn;
+  }
+
+  /**
+   * @private
+   * copy toolbar button for add model
+   * 
+   */
+   _createCopyBtnForModel() {
+    let btn = create('button', [CSS.modelAddButton]);
+    btn.innerHTML = '复制造型';
+    btn.addEventListener('click', (event) => {
+      this._api.blocks.insert('model');
     });
     return btn;
   }

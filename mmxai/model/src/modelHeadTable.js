@@ -165,7 +165,7 @@ export class ModelHeadTable {
     }
     this._descTitle.classList.add('mmxModelDecsTitle');
     // this._descTitle.appendChild(document.createElement('br'));
-    this._modelSelBtn = create('input', null, { type: 'button', name: 'selectModel', value: '更 改 ' });
+    this._modelSelBtn = create('input', null, { type: 'button', name: 'mmxSelectModel', value: '更 改 ' });
     // var icon = '<i class="fa fa-caret-down" aria-hidden="true"></i>'
     var iconTag = create('i', ['fa', 'fa-caret-up'], { 'aria-hidden': 'true'})
     // this._svgImg = document.createElement('img');
