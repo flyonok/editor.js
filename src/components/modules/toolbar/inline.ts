@@ -179,8 +179,8 @@ export default class InlineToolbar extends Module {
    * @param {boolean} [needToClose] - pass true to close toolbar if it is not allowed.
    *                                  Avoid to use it just for closing IT, better call .close() clearly.
    */
-  public tryToShow(needToClose = false): void {
-    if (!this.allowedToShow()) {
+  public tryToShow(needToClose = false, eventType=""): void {
+    if (!this.allowedToShow(eventType)) {
       if (needToClose) {
         this.close();
       }
@@ -320,7 +320,7 @@ export default class InlineToolbar extends Module {
   /**
    * Need to show Inline Toolbar or not
    */
-  private allowedToShow(): boolean {
+  private allowedToShow(eventType=""): boolean {
     /**
      * Tags conflicts with window.selection function.
      * Ex. IMG tag returns null (Firefox) or Redactors wrapper (Chrome)
@@ -335,7 +335,7 @@ export default class InlineToolbar extends Module {
     }
 
     // empty selection
-    if (currentSelection.isCollapsed || selectedText.length < 1) {
+    if (eventType!="dblclick" && (currentSelection.isCollapsed || selectedText.length < 1)) {
       return false;
     }
 
