@@ -29,8 +29,8 @@ export class TableConstructor {
     this._api = api; // add by xiaowy
 
     this._repeatWordsColl = [];
-    this._tableData = { 'content': [], 'hiddenFields': '' };
-    this._doHiddenField = true; // 默认是显示隐藏字段 2021/01/12 xiaowy
+    this._tableData = { 'content': [], 'hiddenFields': '', 'fields': [] };  // 添加fields保存数据记录
+    this._doHiddenField = true; // 默认是隐藏不显示的字段 2021/04/29 xiaowy
     this._modelJson = {}; // 保存造型的数据库记录属性 2021/04/07
     let _innerData = this._cdrJsonConvert(data);
     this._repeat = _innerData.Repeat; // add by xiaowy whether can add table parameter
@@ -64,6 +64,7 @@ export class TableConstructor {
             data.Repeat = find.Repeat; // 表示是否可以增加表格参数！！！ 2020/10/07
             this._repeat = data.Repeat; // 后面不少地方用了这个成员来判断！！！ 2020/11/24
             this._tableData['hiddenFields'] = find.Hidden; // 记录隐藏字段集合 2021/01/12
+            this._tableData['fields'] = find.Fields.trim().split(' '); // 修正初始化table丢失列 2021/04/29
             if (find.Repeat && (find.Repeat === 1 || find.Repeat === 2)) {
               // 以分析json数据优先 2020/11/23
               let noRepeatWordsColl = !this._repeatWordsColl || !this._repeatWordsColl.length;
@@ -260,6 +261,7 @@ export class TableConstructor {
         data.Repeat = find.Repeat; // 表示是否可以增加表格参数！！！ 2020/10/07
         this._repeat = data.Repeat; // 后面不少地方用了这个成员来判断！！！ 2020/11/24
         this._tableData['hiddenFields'] = find.Hidden; // 记录隐藏字段集合 2021/01/12
+        this._tableData['fields'] = find.Fields.trim().split(' '); // 修正初始化table丢失列 2021/04/29
         console.log("this._tableData['hiddenFields']", this._tableData['hiddenFields']);
         if (find.Repeat && (find.Repeat === 1 || find.Repeat === 2)) {
           // 以分析json数据优先 2020/11/23
@@ -470,7 +472,16 @@ export class TableConstructor {
         // if (this._repeat === -1) {
         //   this._table.firstColumnIsRead = false;
         // }
-        const size = this._resizeTable(data, config);
+        // const size = this._resizeTable(data, config);
+        // config['rows'] = this._tableData['fields'].length >0 ? this._tableData['fields'].length: 3;
+        var size;
+        if (this._tableData['fields'].length) {
+          config['rows'] = this._tableData['fields'].length; 
+          size = this._resizeTable(this._tableData['fields'], config); // 修正丢失列bug 2021/04/29
+        }
+        else {
+          size = this._resizeTable(data, config); // 修正丢失列bug 2021/04/29
+        }
 
         this._fillTable(data, size);
         // let tablebr = document.createElement('br');
@@ -529,6 +540,10 @@ export class TableConstructor {
           this._recontructParaTable(data);
           // 这里会重复注册事件处理，导致注册事件会处理两次
           // this._initToolBarAndEvent();
+        }
+        else { // show all rows
+          console.log('call this._displayAllTableRows()');
+          this._displayAllTableRows();
         }
       }
       else {
@@ -651,59 +666,141 @@ export class TableConstructor {
       //   hiddenFields = this._tableData['hiddenFields'].split(' ');
       // }
       // let hiddenFieldCnt = 0;
-      for (let i = 0; i < size.rows && i < data.content.length; i++) {
-        // not necessary 2021/04/15
-        // if (this._doHiddenField && hiddenFields.indexOf(data.content[i][0]) > 0) {
-        //   hiddenFieldCnt++;
-        //   continue;
-        // }
-        for (let j = 0; j < size.cols && j < data.content[i].length; j++) {
-          // get current cell and her editable part
-          // display none
-          // const input = this._table.body.rows[i - hiddenFieldCnt].cells[j].querySelector('.' + CSS.inputField);
-          const input = this._table.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
-          // 处理回车换行和font标签
-          let content = this._convertFontTag(data.content[i][j]);
-          // console.log('content', content);
-          // console.log("replaceAll", content.replaceAll);
-          // let b = content.replaceAll('\n', '<br/>');
-          const regrex = /[\r|\n]/gi;
-          // const regrex = RegExp('\r|\n', 'gi');
-          // let b = content.replace(regrex, '<br/>');
-          let b = content;
-          // wrapper content in div
-          let divList = []
-          let index = 0;
-          let match;
-          while ((match = regrex.exec(content)) !== null) {
-            // console.log('index', index, match.index);
-            // check match is first character or string is empty 2020/11/24
-            if (index != match.index) {
-              let divContent = content.substring(index, match.index);
-              let result = '<div contenteditable="true">' + divContent + '</div>';
-              divList.push(result);
+      if (size.rows == data.content.length) { // 有隐藏列
+        for (let i = 0; i < size.rows && i < data.content.length; i++) {
+          // not necessary 2021/04/15
+          // if (this._doHiddenField && hiddenFields.indexOf(data.content[i][0]) > 0) {
+          //   hiddenFieldCnt++;
+          //   continue;
+          // }
+          for (let j = 0; j < size.cols && j < data.content[i].length; j++) {
+            // get current cell and her editable part
+            // display none
+            // const input = this._table.body.rows[i - hiddenFieldCnt].cells[j].querySelector('.' + CSS.inputField);
+            const input = this._table.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
+            // 处理回车换行和font标签
+            var b;
+            if (j == 0) {
+              b = data.content[i][j]
             }
-            index = regrex.lastIndex;
-          }
-          // append last content 2020/11/25
-          if (content.length > index && index > 0) {
-            let lastContent = content.substr(index);
-            divList.push('<div contenteditable="true">' + lastContent + '</div>');
-          }
-          if (divList.length) {
-            b = divList.join('');
-          }
-          // console.log("content11", b);
+            else {
+              b = this._convertFromTag(data.content[i][j])
+            }
+            // console.log("content11", b);
 
-          if (this._repeat && this._repeat === 2 && j == 0) {// select tag
-            input.value = b;
+            if (this._repeat && this._repeat === 2 && j == 0) {// select tag
+              input.value = b;
+            }
+            else {
+              input.innerHTML = b;
+            }
           }
-          else {
-            input.innerHTML = b;
+        }
+      }
+      else {
+        for (let i = 0; i < size.rows; i++) {
+          // not necessary 2021/04/15
+          // if (this._doHiddenField && hiddenFields.indexOf(data.content[i][0]) > 0) {
+          //   hiddenFieldCnt++;
+          //   continue;
+          // }
+          for (let j = 0; j < size.cols; j++) {
+            // get current cell and her editable part
+            // display none
+            // const input = this._table.body.rows[i - hiddenFieldCnt].cells[j].querySelector('.' + CSS.inputField);
+            const input = this._table.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
+            if (this._doHiddenField && this._tableData['hiddenFields'].length) {
+              let hiddenFields = this._tableData['hiddenFields'].split(' ');
+              if (hiddenFields.indexOf(this._tableData['fields'][i]) >= 0) {
+                this._table.body.rows[i].hidden = true;
+              }
+            }
+            // 处理回车换行和font标签
+            var b;
+            if (j == 0) {
+              b = this._tableData['fields'][i];
+            }
+            else {
+              let findContent = this._findColumnContentFromTableData(data.content, this._tableData['fields'][i])
+              if (findContent.length) {
+                b = this._convertFromTag(findContent)
+              }
+              else {
+                b = findContent;
+              }
+            }
+            // console.log("content11", b);
+
+            if (this._repeat && this._repeat === 2 && j == 0) {// select tag
+              input.value = b;
+            }
+            else {
+              input.innerHTML = b;
+            }
           }
         }
       }
     }
+  }
+
+  /**
+   * @private
+   * find correct content from table data array
+   */
+  _findColumnContentFromTableData(dataArr, columName) {
+    // dataArr.forEach(element => {
+    //   console.log('_findColumnContentFromTableData', columName);
+    //   console.log('_findColumnContentFromTableData1', element);
+    //   if (element[0].normalize() === columName.normalize()) {
+    //     return element[1];
+    //   }
+    // });
+    for (let i = 0; i < dataArr.length; i++) {
+      if (dataArr[i][0].normalize() === columName.normalize()) {
+        return dataArr[i][1];
+      }
+    }
+    console.log('not find column:' + columName);
+    // throw Error('not find column:' + columName);
+    return '';
+  }
+
+  /**
+   * @private
+   * convert div and font tag data to html5
+   */
+  _convertFromTag(tagContent) {
+    let content = this._convertFontTag(tagContent);
+    // console.log('content', content);
+    // console.log("replaceAll", content.replaceAll);
+    // let b = content.replaceAll('\n', '<br/>');
+    const regrex = /[\r|\n]/gi;
+    // const regrex = RegExp('\r|\n', 'gi');
+    // let b = content.replace(regrex, '<br/>');
+    let b = content;
+    // wrapper content in div
+    let divList = []
+    let index = 0;
+    let match;
+    while ((match = regrex.exec(content)) !== null) {
+      // console.log('index', index, match.index);
+      // check match is first character or string is empty 2020/11/24
+      if (index != match.index) {
+        let divContent = content.substring(index, match.index);
+        let result = '<div contenteditable="true">' + divContent + '</div>';
+        divList.push(result);
+      }
+      index = regrex.lastIndex;
+    }
+    // append last content 2020/11/25
+    if (content.length > index && index > 0) {
+      let lastContent = content.substr(index);
+      divList.push('<div contenteditable="true">' + lastContent + '</div>');
+    }
+    if (divList.length) {
+      b = divList.join('');
+    }
+    return b;
   }
 
   /**
@@ -766,8 +863,9 @@ export class TableConstructor {
   * @param {number|string} config.cols - number of cols in configuration
   * @return {{rows: number, cols: number}} - number of cols and rows
   */
-  _resizeTable(data, config) {
+  _resizeTable(dataContent, config) {
     // console.log('_resizeTable', data.contentSeprateIndex);
+    let data = dataContent;
     const isValidArray = Array.isArray(data.content);
     const isNotEmptyArray = isValidArray ? data.content.length : false;
     const contentRows = isValidArray ? data.content.length : undefined;
@@ -798,7 +896,10 @@ export class TableConstructor {
     }
 
     for (let i = 0; i < rows; i++) {
-      if (this._doHiddenField && (data.content && data.content.length > i) && hiddenFields.indexOf(data.content[i][0]) >= 0) {
+      if (this._doHiddenField && (isNotEmptyArray && data.content.length > i) && hiddenFields.indexOf(data.content[i][0]) >= 0) {
+        this._table.addRow(-1, false);
+      }
+      else if (this._doHiddenField && data.length > i && hiddenFields.indexOf(data[i]) >= 0) { // 初始化时可能传的fileds数组
         this._table.addRow(-1, false);
       }
       else {
@@ -2552,6 +2653,25 @@ export class TableConstructor {
   }
 
   /**
+   * @private
+   * 防止用户在选择造型族时有些造型不需要隐藏列
+   * 2021/04/29
+   */
+  _displayAllTableRows() {
+    if (this._doHiddenField && !this._tableData['hiddenFields'].length) {
+      let rowsColl = this._table.body.rows;
+
+      for (let i = 0; i < rowsColl.length; i++) {
+        let row = rowsColl[i];
+        if (row.hidden) {
+          row.hidden = false;
+        }
+      }
+      this._doHiddenField = false;
+    }
+  }
+
+  /**
    * @public
    * hidden table row and reconstructor table
    */
@@ -2618,7 +2738,7 @@ export class TableConstructor {
    * copy toolbar button for add model
    * 
    */
-   _createCopyBtnForModel() {
+  _createCopyBtnForModel() {
     let btn = create('button', [CSS.modelAddButton]);
     btn.innerHTML = '复制造型';
     btn.addEventListener('click', (event) => {

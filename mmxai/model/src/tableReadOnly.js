@@ -130,8 +130,9 @@ export class TableReadOnly {
     cell.classList.add(CSS.cell);
     const content = this._createContenteditableArea();
     if (addBtn) {
-      var icon = '<i class="fa fa-caret-down" aria-hidden="true"></i>'
-      var iconTag = create('i', ['fa', 'fa-caret-up'], { 'aria-hidden': 'true' })
+      // var icon = '<i class="fa fa-caret-down" aria-hidden="true"></i>'
+      // var iconTag = create('i', ['fa', 'fa-caret-up'], { 'aria-hidden': 'true' })
+      var iconTag = create('i', ['fa', 'fa-caret-down'], { 'aria-hidden': 'true' })
       this._svgBtn = create('button', null, null, [iconTag]);
       this._svgBtn.addEventListener('click', (event) => {
         // console.log('1111');
