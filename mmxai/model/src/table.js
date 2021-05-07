@@ -180,6 +180,13 @@ export class Table {
   get rows() {
     return this._numberOfRows;
   }
+  /**
+   * get cells of table
+   * @return number
+   */
+  get columns() {
+    return this._numberOfColumns;
+  }
 
   set firstColumnIsRead(value) {
     this._firstColumnIsRead = value;

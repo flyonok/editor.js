@@ -474,10 +474,23 @@ export class TableConstructor {
         // }
         // const size = this._resizeTable(data, config);
         // config['rows'] = this._tableData['fields'].length >0 ? this._tableData['fields'].length: 3;
-        var size;
+        var size = {'rows':0, 'cols':0};
         if (this._tableData['fields'].length) {
-          config['rows'] = this._tableData['fields'].length; 
-          size = this._resizeTable(this._tableData['fields'], config); // 修正丢失列bug 2021/04/29
+          // 修正循环列表丢失的问题 2021/05/07
+          if (data.content && data.content.length > this._tableData['fields'].length) {
+            let rowCnt = this._tableData.content.length / (this._tableData['fields'].length - this._tableData['hiddenFields'].split().length);
+            // console.log('rowCnt:', rowCnt);
+            for (var i = 0; i < rowCnt; i++) {
+              config['rows'] = this._tableData['fields'].length; 
+              var size1 = this._resizeTable(this._tableData['fields'], config); // 修正丢失列bug 2021/04/29
+              size.rows += size1.rows;
+              size.cols = size1.cols;
+            }
+          }
+          else {
+            config['rows'] = this._tableData['fields'].length; 
+            size = this._resizeTable(this._tableData['fields'], config); // 修正丢失列bug 2021/04/29
+          }
         }
         else {
           size = this._resizeTable(data, config); // 修正丢失列bug 2021/04/29
@@ -666,7 +679,7 @@ export class TableConstructor {
       //   hiddenFields = this._tableData['hiddenFields'].split(' ');
       // }
       // let hiddenFieldCnt = 0;
-      if (size.rows == data.content.length) { // 有隐藏列
+      if (size.rows == data.content.length) { 
         for (let i = 0; i < size.rows && i < data.content.length; i++) {
           // not necessary 2021/04/15
           // if (this._doHiddenField && hiddenFields.indexOf(data.content[i][0]) > 0) {
@@ -697,13 +710,16 @@ export class TableConstructor {
           }
         }
       }
-      else {
+      else {// 有隐藏列
         for (let i = 0; i < size.rows; i++) {
           // not necessary 2021/04/15
           // if (this._doHiddenField && hiddenFields.indexOf(data.content[i][0]) > 0) {
           //   hiddenFieldCnt++;
           //   continue;
           // }
+          let fieldIndex = i % this._tableData['fields'].length;
+          var rowCnt = this._tableData['fields'].length - this._tableData['hiddenFields'].split().length
+          let isRepeat = i >= rowCnt ? true: false;
           for (let j = 0; j < size.cols; j++) {
             // get current cell and her editable part
             // display none
@@ -711,17 +727,18 @@ export class TableConstructor {
             const input = this._table.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
             if (this._doHiddenField && this._tableData['hiddenFields'].length) {
               let hiddenFields = this._tableData['hiddenFields'].split(' ');
-              if (hiddenFields.indexOf(this._tableData['fields'][i]) >= 0) {
+              if (hiddenFields.indexOf(this._tableData['fields'][fieldIndex]) >= 0) {
                 this._table.body.rows[i].hidden = true;
               }
             }
             // 处理回车换行和font标签
             var b;
             if (j == 0) {
-              b = this._tableData['fields'][i];
+              b = this._tableData['fields'][fieldIndex];
             }
             else {
-              let findContent = this._findColumnContentFromTableData(data.content, this._tableData['fields'][i])
+              let findContent = this._findColumnContentFromTableData(data.content, this._tableData['fields'][fieldIndex], isRepeat)
+              // console.log('findContent', findContent);
               if (findContent.length) {
                 b = this._convertFromTag(findContent)
               }
@@ -729,13 +746,14 @@ export class TableConstructor {
                 b = findContent;
               }
             }
-            // console.log("content11", b);
+            console.log("cell content11", b);
 
             if (this._repeat && this._repeat === 2 && j == 0) {// select tag
               input.value = b;
             }
             else {
               input.innerHTML = b;
+              console.log('input.innerHTML', input.innerHTML);
             }
           }
         }
@@ -747,7 +765,7 @@ export class TableConstructor {
    * @private
    * find correct content from table data array
    */
-  _findColumnContentFromTableData(dataArr, columName) {
+  _findColumnContentFromTableData(dataArr, columName, isRepeat = false) {
     // dataArr.forEach(element => {
     //   console.log('_findColumnContentFromTableData', columName);
     //   console.log('_findColumnContentFromTableData1', element);
@@ -755,7 +773,14 @@ export class TableConstructor {
     //     return element[1];
     //   }
     // });
-    for (let i = 0; i < dataArr.length; i++) {
+    var i;
+    if (isRepeat) {
+      i = this._tableData['fields'].length - this._tableData['hiddenFields'].split().length - 1;
+    }
+    else {
+      i = 0;
+    }
+    for (; i < dataArr.length; i++) {
       if (dataArr[i][0].normalize() === columName.normalize()) {
         return dataArr[i][1];
       }
@@ -818,7 +843,7 @@ export class TableConstructor {
         const regexpWithoutE2 = /\[\/font\]/ig;
         const match2 = b.match(regexpWithoutE2);
         var str2 = match2[0].replace('[', '<');
-        str2 = str2.replace(']', '<')
+        str2 = str2.replace(']', '>')
         var b2 = b.replace(regexpWithoutE2, str2);
         return b2
       }
@@ -906,7 +931,7 @@ export class TableConstructor {
         this._table.addRow();
       }
     }
-    for (let i = 0; i < cols; i++) {
+    for (let i = this._table.columns; i < cols; i++) {
       this._table.addColumn();
     }
 
