@@ -478,18 +478,24 @@ export class TableConstructor {
         if (this._tableData['fields'].length) {
           // 修正循环列表丢失的问题 2021/05/07
           if (data.content && data.content.length > this._tableData['fields'].length) {
-            let rowCnt = this._tableData.content.length / (this._tableData['fields'].length - this._tableData['hiddenFields'].split().length);
-            // console.log('rowCnt:', rowCnt);
-            for (var i = 0; i < rowCnt; i++) {
+            let hiddenFields = [];
+            if (this._tableData['hiddenFields']) {
+              hiddenFields = this._tableData['hiddenFields'].split(' ');
+            }
+            let repeatCnt = this._tableData.content.length / (this._tableData['fields'].length - hiddenFields.length);
+            console.log('repeatCnt:', repeatCnt);
+            for (var i = 0; i < repeatCnt; i++) {
               config['rows'] = this._tableData['fields'].length; 
-              var size1 = this._resizeTable(this._tableData['fields'], config); // 修正丢失列bug 2021/04/29
+              var size1 = this._resizeTable({'fields': this._tableData['fields'],
+                                'contentSeprateIndex':data.contentSeprateIndex}, config); // 修正丢失列bug 2021/04/29
               size.rows += size1.rows;
               size.cols = size1.cols;
             }
           }
           else {
             config['rows'] = this._tableData['fields'].length; 
-            size = this._resizeTable(this._tableData['fields'], config); // 修正丢失列bug 2021/04/29
+            size = this._resizeTable({'fields': this._tableData['fields'],
+                                      'contentSeprateIndex':data.contentSeprateIndex}, config); // 修正丢失列bug 2021/04/29
           }
         }
         else {
@@ -541,8 +547,8 @@ export class TableConstructor {
         this._repeat = data.Repeat;
         // 如果造型名称相同则不重构参数表 2020/10/07
         let mustRecontructParaTable = true;
-        console.log('see data subname', data.Subname);
-        console.log('see _modelJson.subname', this._modelJson.Subname);
+        // console.log('see data subname', data.Subname);
+        // console.log('see _modelJson.subname', this._modelJson.Subname);
         if (data.Name.indexOf(this._modelJson.Subname) == 0 || data.Subname == this._modelJson.Name) {
           mustRecontructParaTable = !mustRecontructParaTable;
         }
@@ -718,15 +724,19 @@ export class TableConstructor {
           //   continue;
           // }
           let fieldIndex = i % this._tableData['fields'].length;
-          var rowCnt = this._tableData['fields'].length - this._tableData['hiddenFields'].split().length
+          let hiddenFields = [];
+          if (this._tableData['hiddenFields']) {
+            hiddenFields = this._tableData['hiddenFields'].split(' ');
+          }
+          var rowCnt = this._tableData['fields'].length - hiddenFields.length
           let isRepeat = i >= rowCnt ? true: false;
           for (let j = 0; j < size.cols; j++) {
             // get current cell and her editable part
             // display none
             // const input = this._table.body.rows[i - hiddenFieldCnt].cells[j].querySelector('.' + CSS.inputField);
             const input = this._table.body.rows[i].cells[j].querySelector('.' + CSS.inputField);
-            if (this._doHiddenField && this._tableData['hiddenFields'].length) {
-              let hiddenFields = this._tableData['hiddenFields'].split(' ');
+            if (this._doHiddenField && hiddenFields.length) {
+              // let hiddenFields = this._tableData['hiddenFields'].split(' ');
               if (hiddenFields.indexOf(this._tableData['fields'][fieldIndex]) >= 0) {
                 this._table.body.rows[i].hidden = true;
               }
