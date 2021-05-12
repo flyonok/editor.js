@@ -2539,7 +2539,7 @@ export class TableConstructor {
       that._repeatWordsColl = [];
       if (window.mmxaiModelList !== undefined) {
         that._modelHeadCallBack = modelHeadCallBack;
-        window.mmxaiModelList(that._processParentUiResultCall());
+        window.mmxaiModelList(that._processParentUiResultCall(), that._modelJson);
       }
       else {
         let rnd = Math.random() * 11
