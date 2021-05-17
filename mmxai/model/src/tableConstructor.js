@@ -718,6 +718,8 @@ export class TableConstructor {
       }
       else {// 有隐藏列
         for (let i = 0; i < size.rows; i++) {
+          console.log('size.rows:', size.rows);
+          console.log('hiddenFields', this._tableData['hiddenFields']);
           // not necessary 2021/04/15
           // if (this._doHiddenField && hiddenFields.indexOf(data.content[i][0]) > 0) {
           //   hiddenFieldCnt++;
@@ -785,7 +787,12 @@ export class TableConstructor {
     // });
     var i;
     if (isRepeat) {
-      i = this._tableData['fields'].length - this._tableData['hiddenFields'].split().length - 1;
+      if (this._tableData['hiddenFields']) {
+        i = this._tableData['fields'].length - this._tableData['hiddenFields'].split().length - 1;
+      }
+      else {
+        i = this._tableData['fields'].length
+      }
     }
     else {
       i = 0;
