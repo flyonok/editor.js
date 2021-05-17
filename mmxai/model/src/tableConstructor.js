@@ -474,28 +474,32 @@ export class TableConstructor {
         // }
         // const size = this._resizeTable(data, config);
         // config['rows'] = this._tableData['fields'].length >0 ? this._tableData['fields'].length: 3;
-        var size = {'rows':0, 'cols':0};
-        if (this._tableData['fields'].length) {
+        var size = { 'rows': 0, 'cols': 0 };
+        let hiddenFields = [];
+        if (this._tableData['hiddenFields']) {
+          hiddenFields = this._tableData['hiddenFields'].split(' ');
+        }
+        if (this._tableData['fields'].length && hiddenFields.length) {
           // 修正循环列表丢失的问题 2021/05/07
           if (data.content && data.content.length > this._tableData['fields'].length) {
-            let hiddenFields = [];
-            if (this._tableData['hiddenFields']) {
-              hiddenFields = this._tableData['hiddenFields'].split(' ');
-            }
-            let repeatCnt = this._tableData.content.length / (this._tableData['fields'].length - hiddenFields.length);
+            let repeatCnt = data.content.length / (this._tableData['fields'].length - hiddenFields.length);
             console.log('repeatCnt:', repeatCnt);
             for (var i = 0; i < repeatCnt; i++) {
-              config['rows'] = this._tableData['fields'].length; 
-              var size1 = this._resizeTable({'fields': this._tableData['fields'],
-                                'contentSeprateIndex':data.contentSeprateIndex}, config); // 修正丢失列bug 2021/04/29
+              config['rows'] = this._tableData['fields'].length;
+              var size1 = this._resizeTable({
+                'fields': this._tableData['fields'],
+                'contentSeprateIndex': data.contentSeprateIndex
+              }, config); // 修正丢失列bug 2021/04/29
               size.rows += size1.rows;
               size.cols = size1.cols;
             }
           }
           else {
-            config['rows'] = this._tableData['fields'].length; 
-            size = this._resizeTable({'fields': this._tableData['fields'],
-                                      'contentSeprateIndex':data.contentSeprateIndex}, config); // 修正丢失列bug 2021/04/29
+            config['rows'] = this._tableData['fields'].length;
+            size = this._resizeTable({
+              'fields': this._tableData['fields'],
+              'contentSeprateIndex': data.contentSeprateIndex
+            }, config); // 修正丢失列bug 2021/04/29
           }
         }
         else {
@@ -680,12 +684,12 @@ export class TableConstructor {
   _fillTable(data, size) {
     if (data.content !== undefined) {
       // comment 2021/04/15
-      // let hiddenFields = [];
-      // if (this._tableData['hiddenFields']) {
-      //   hiddenFields = this._tableData['hiddenFields'].split(' ');
-      // }
+      let hiddenFields = [];
+      if (this._tableData['hiddenFields']) {
+        hiddenFields = this._tableData['hiddenFields'].split(' ');
+      }
       // let hiddenFieldCnt = 0;
-      if (size.rows == data.content.length) { 
+      if (size.rows == data.content.length || hiddenFields.length == 0) {
         for (let i = 0; i < size.rows && i < data.content.length; i++) {
           // not necessary 2021/04/15
           // if (this._doHiddenField && hiddenFields.indexOf(data.content[i][0]) > 0) {
@@ -726,12 +730,12 @@ export class TableConstructor {
           //   continue;
           // }
           let fieldIndex = i % this._tableData['fields'].length;
-          let hiddenFields = [];
-          if (this._tableData['hiddenFields']) {
-            hiddenFields = this._tableData['hiddenFields'].split(' ');
-          }
+          // let hiddenFields = [];
+          // if (this._tableData['hiddenFields']) {
+          //   hiddenFields = this._tableData['hiddenFields'].split(' ');
+          // }
           var rowCnt = this._tableData['fields'].length - hiddenFields.length
-          let isRepeat = i >= rowCnt ? true: false;
+          let isRepeat = i >= rowCnt ? true : false;
           for (let j = 0; j < size.cols; j++) {
             // get current cell and her editable part
             // display none
