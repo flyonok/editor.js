@@ -132,7 +132,7 @@ const mmxai = function (module) {
                             "列表": [
                                 {
                                     "图片": "[font color=\"#ff0000\"]logo.svg[/font]",
-                                    "标题": "天奕设计",
+                                    "标题": "天奕|设计",
                                     "副标题": "TIANYI [font size=\"6\"]DESIGN[/font]\n[font size=\"6\"]123[/font]",
                                     
                                 },

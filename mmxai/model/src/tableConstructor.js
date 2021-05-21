@@ -698,7 +698,7 @@ export class TableConstructor {
                         } else {
                             b = this._convertFromTag(data.content[i][j])
                         }
-                        // console.log("content11", b);
+                        console.log("content111", b);
 
                         if (this._repeat && this._repeat === 2 && j == 0) { // select tag
                             input.value = b;
@@ -743,7 +743,7 @@ export class TableConstructor {
                                 b = findContent;
                             }
                         }
-                        // console.log("cell content11", b);
+                        console.log("cell content112", b);
 
                         if (this._repeat && this._repeat === 2 && j == 0) { // select tag
                             input.value = b;
@@ -798,7 +798,7 @@ export class TableConstructor {
         // console.log('content', content);
         // console.log("replaceAll", content.replaceAll);
         // let b = content.replaceAll('\n', '<br/>');
-        const regrex = /[\r|\n]/gi;
+        const regrex = /[\r\n]/gi;
         // const regrex = RegExp('\r|\n', 'gi');
         // let b = content.replace(regrex, '<br/>');
         let b = content;
