@@ -343,9 +343,13 @@ export class TableConstructor {
                             repeatRowIndex++;
                         }
                     }
-                    if (isRepeat && repeatRowIndex > 0 && index < arr.length - 1) {
+                    // if ( isRepeat && repeatRowIndex > 0 && index < arr.length - 1) {
+                    if ( (!this._repeat && this._repeat != 1) && isRepeat && repeatRowIndex > 0 && index < arr.length - 1) { // 2021/06/10
                         let temp = repeatRowIndex - 1;
                         _innerData['contentSeprateIndex'].push(temp);
+                    }
+                    else if (_innerData.Repeat == 1) { // 修改不含多个模型数据的bug 2021/06/10
+                        _innerData['contentSeprateIndex'].push(this._repeatWordsColl.length - 1);
                     }
 
                 });
@@ -695,6 +699,13 @@ export class TableConstructor {
                         var b;
                         if (j == 0) {
                             b = data.content[i][j]
+                            // 处理隐藏列有空数据的情况 2021/06/11
+                            if (size.rows == data.content.length && hiddenFields.length > 0) {
+                                if (hiddenFields.indexOf(b) >= 0) {
+                                    this._table.body.rows[i].hidden = true;
+                                }
+                            }
+
                         } else {
                             b = this._convertFromTag(data.content[i][j])
                         }
@@ -977,7 +988,7 @@ export class TableConstructor {
         }
         for (let i = 0; i < cols; i++) {
             if (i === cols - 1) {
-                console.log('readonly table', this._tableData['hiddenFields']);
+                // console.log('readonly table', this._tableData['hiddenFields']);
                 if (this._tableData['hiddenFields'] && this._tableData['hiddenFields'].length) {
                     this._readOnlyTable.addColumn(-1, true);
                 } else {
@@ -1745,7 +1756,25 @@ export class TableConstructor {
         const currentCellIndex = this._table.selectedCell.cellIndex;
         const table = this._table.body;
         const table_rows = table.rows;
-        if (currentRowIndex < table_rows.length - 1) {
+        // 考虑隐藏行的情况 2021/06/10
+        var isBottom  = false;
+        var hiddenFields = [];
+        if (currentRowIndex == table_rows.length - 1) {
+            isBottom = true;
+        }
+
+        if (this._doHiddenField && this._tableData['hiddenFields'].length > 0)
+        {
+            hiddenFields = this._tableData['hiddenFields'].split(' ')
+            let hiddenCnt = hiddenFields.length;
+            if ((currentRowIndex + hiddenCnt) == table_rows.length - 1) {
+                isBottom = true;  
+            }
+        }
+
+        // end
+        // if (currentRowIndex < table_rows.length - 1) { comment on 2021/06/10
+        if (!isBottom) {
             const cells = indicativeRow.cells;
             // current row left cell
             if (currentCellIndex < cells.length - 1) {
@@ -1791,7 +1820,12 @@ export class TableConstructor {
                         let row = this._table.body.rows[j];
                         let cell = row.cells[0];
                         const input = cell.querySelector('.' + CSS.inputField);
-                        input.innerHTML = this._repeatWordsColl[j - rowIndexBegin];
+                        // 要处理隐藏行的情况 2021/06/10
+                        let value = this._repeatWordsColl[j - rowIndexBegin];
+                        input.innerHTML = value;
+                        if (this._doHiddenField && hiddenFields.length && hiddenFields.indexOf(value) >= 0) {
+                            row.hidden = true;
+                        }
                     }
                     // oldSelectCell.click();
                     cells[currentCellIndex].click();
