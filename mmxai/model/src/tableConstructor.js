@@ -95,155 +95,155 @@ export class TableConstructor {
         } else {
             // for debug
             const modelDataObj = [{
-                    Name: '正文',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '正文',
-                    Tags: '正文 智能 自动',
-                    Thumb: './assets/dog1.jpg',
-                    Repeat: 0,
-                    Hidden: '',
-                },
-                {
-                    Name: '项目符号',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '正文',
-                    Tags: '项目符号 编号 智能 自动',
-                    Thumb: './assets/dog2.jpg',
-                    Repeat: 0,
-                    Hidden: '',
-                },
-                {
-                    Name: '页标题',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '标题 副标题 引标',
-                    Tags: '页标题 标题 智能 自动',
-                    Thumb: './assets/dog3.jpg',
-                    Repeat: 0,
-                    Hidden: '标题',
-                },
-                {
-                    Name: '封面标题',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '标题 副标题 口号 引标',
-                    Tags: '封面标题 封面 标题 智能 自动',
-                    Thumb: './assets/dog4.jpg',
-                    Repeat: 0,
-                    Hidden: '副标题',
-                },
-                {
-                    Name: '小节',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '标题',
-                    Tags: '小节 标题 智能 自动',
-                    Thumb: './assets/dog4.jpg',
-                    Repeat: 0,
-                    Hidden: '',
-                },
-                {
-                    Name: '列表',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '标题 正文 图片',
-                    Tags: '列表 特性 卖点 排列 智能 自动',
-                    Thumb: './assets/dog5.jpg',
-                    Repeat: 0,
-                    Hidden: '图片',
-                },
-                {
-                    Name: '编号',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '标题 正文 图片',
-                    Tags: '编号 排列 数字 智能 自动',
-                    Thumb: './assets/dog6.jpg',
-                    Repeat: 0,
-                    Hidden: '正文',
-                },
-                {
-                    Name: '图片',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '图片',
-                    Tags: '图片 智能 自动',
-                    Thumb: './assets/dog6.jpg',
-                    Repeat: 0,
-                    Hidden: '',
-                },
-                {
-                    Name: 'logo',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '图片 标题 副标题 引标',
-                    Tags: 'logo 公司名称 智能 自动',
-                    Thumb: './assets/dog7.jpg',
-                    Repeat: 1,
-                    Hidden: '引标',
-                },
-                {
-                    Name: '二维码',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '图片',
-                    Tags: '二维码 扫码 智能 自动',
-                    Thumb: './assets/dog8.jpg',
-                    Repeat: 0,
-                    Hidden: '',
-                },
-                {
-                    Name: '地址',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '图片 正文',
-                    Tags: '地址 联系方式 电话 公司地址 智能 自动',
-                    Thumb: './assets/dog9.jpg',
-                    Repeat: 0,
-                    Hidden: '',
-                },
-                {
-                    Name: '强调',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '正文',
-                    Tags: '强调 文字 智能 自动',
-                    Thumb: './assets/dog9.jpg',
-                    Repeat: 0,
-                    Hidden: '',
-                },
-                {
-                    Name: '时间线',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '图片 标题 正文',
-                    Tags: '时间线 智能 自动',
-                    Thumb: './assets/dog10.jpg',
-                    Repeat: 0,
-                    Hidden: '正文',
-                },
-                {
-                    Name: '图片集',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '图片 标题 正文 图片 标题 正文',
-                    Tags: '图片集 图片 logo墙 人员介绍 合作伙伴 智能 自动',
-                    Thumb: './assets/dog11.jpg',
-                    Repeat: 0,
-                    Hidden: '标题',
-                },
-                {
-                    Name: '卖点列表',
-                    SubName: '智能选择',
-                    Info: '自动选择造型',
-                    Fields: '主标题 副标题 卖点 次卖点 正文',
-                    Tags: '主标题 封面标题 标题 卖点 特性 优点 特征 特色 优势 口号 卖点 次卖点 副标题 智能 自动',
-                    Thumb: './assets/dog11.jpg',
-                    Repeat: 2,
-                    Hidden: '副标题',
-                }
+                Name: '正文',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '正文',
+                Tags: '正文 智能 自动',
+                Thumb: './assets/dog1.jpg',
+                Repeat: 0,
+                Hidden: '',
+            },
+            {
+                Name: '项目符号',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '正文',
+                Tags: '项目符号 编号 智能 自动',
+                Thumb: './assets/dog2.jpg',
+                Repeat: 0,
+                Hidden: '',
+            },
+            {
+                Name: '页标题',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '标题 副标题 引标',
+                Tags: '页标题 标题 智能 自动',
+                Thumb: './assets/dog3.jpg',
+                Repeat: 0,
+                Hidden: '标题',
+            },
+            {
+                Name: '封面标题',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '标题 副标题 口号 引标',
+                Tags: '封面标题 封面 标题 智能 自动',
+                Thumb: './assets/dog4.jpg',
+                Repeat: 0,
+                Hidden: '副标题',
+            },
+            {
+                Name: '小节',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '标题',
+                Tags: '小节 标题 智能 自动',
+                Thumb: './assets/dog4.jpg',
+                Repeat: 0,
+                Hidden: '',
+            },
+            {
+                Name: '列表',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '标题 正文 图片',
+                Tags: '列表 特性 卖点 排列 智能 自动',
+                Thumb: './assets/dog5.jpg',
+                Repeat: 0,
+                Hidden: '图片',
+            },
+            {
+                Name: '编号',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '标题 正文 图片',
+                Tags: '编号 排列 数字 智能 自动',
+                Thumb: './assets/dog6.jpg',
+                Repeat: 0,
+                Hidden: '正文',
+            },
+            {
+                Name: '图片',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '图片',
+                Tags: '图片 智能 自动',
+                Thumb: './assets/dog6.jpg',
+                Repeat: 0,
+                Hidden: '',
+            },
+            {
+                Name: 'logo',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '图片 标题 副标题 引标',
+                Tags: 'logo 公司名称 智能 自动',
+                Thumb: './assets/dog7.jpg',
+                Repeat: 1,
+                Hidden: '引标',
+            },
+            {
+                Name: '二维码',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '图片',
+                Tags: '二维码 扫码 智能 自动',
+                Thumb: './assets/dog8.jpg',
+                Repeat: 0,
+                Hidden: '',
+            },
+            {
+                Name: '地址',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '图片 正文',
+                Tags: '地址 联系方式 电话 公司地址 智能 自动',
+                Thumb: './assets/dog9.jpg',
+                Repeat: 0,
+                Hidden: '',
+            },
+            {
+                Name: '强调',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '正文',
+                Tags: '强调 文字 智能 自动',
+                Thumb: './assets/dog9.jpg',
+                Repeat: 0,
+                Hidden: '',
+            },
+            {
+                Name: '时间线',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '图片 标题 正文',
+                Tags: '时间线 智能 自动',
+                Thumb: './assets/dog10.jpg',
+                Repeat: 0,
+                Hidden: '正文',
+            },
+            {
+                Name: '图片集',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '图片 标题 正文 图片 标题 正文',
+                Tags: '图片集 图片 logo墙 人员介绍 合作伙伴 智能 自动',
+                Thumb: './assets/dog11.jpg',
+                Repeat: 0,
+                Hidden: '标题',
+            },
+            {
+                Name: '卖点列表',
+                SubName: '智能选择',
+                Info: '自动选择造型',
+                Fields: '主标题 副标题 卖点 次卖点 正文',
+                Tags: '主标题 封面标题 标题 卖点 特性 优点 特征 特色 优势 口号 卖点 次卖点 副标题 智能 自动',
+                Thumb: './assets/dog11.jpg',
+                Repeat: 2,
+                Hidden: '副标题',
+            }
             ]
             let find = modelDataObj.find((item) => {
                 return item.Name === data.name;
@@ -344,7 +344,7 @@ export class TableConstructor {
                         }
                     }
                     // if ( isRepeat && repeatRowIndex > 0 && index < arr.length - 1) {
-                    if ( (!this._repeat && this._repeat != 1) && isRepeat && repeatRowIndex > 0 && index < arr.length - 1) { // 2021/06/10
+                    if ((!this._repeat && this._repeat != 1) && isRepeat && repeatRowIndex > 0 && index < arr.length - 1) { // 2021/06/10
                         let temp = repeatRowIndex - 1;
                         _innerData['contentSeprateIndex'].push(temp);
                     }
@@ -481,7 +481,8 @@ export class TableConstructor {
                 if (this._tableData['fields'].length && hiddenFields.length) {
                     // 修正循环列表丢失的问题 2021/05/07
                     if (data.content && data.content.length > this._tableData['fields'].length) {
-                        let repeatCnt = data.content.length / (this._tableData['fields'].length - hiddenFields.length);
+                        // let repeatCnt = data.content.length / (this._tableData['fields'].length - hiddenFields.length);
+                        let repeatCnt = data.content.length / (this._tableData['fields'].length);
                         console.log('repeatCnt:', repeatCnt);
                         for (var i = 0; i < repeatCnt; i++) {
                             config['rows'] = this._tableData['fields'].length;
@@ -508,8 +509,8 @@ export class TableConstructor {
                 // 构建造型容器
                 // this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
                 this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement,
-                    this._readOnlyTable.htmlElement, this._table.htmlElement,
-                    this._createTooltipBtnForModel()
+                this._readOnlyTable.htmlElement, this._table.htmlElement,
+                this._createTooltipBtnForModel()
                 ]);
                 // this._container = create('div', [CSS.editor, api.styles.block], null, [this._titleWrapper, this._readOnlyTable.htmlElement, this._table.htmlElement, tablebr]);
                 // this._container = create('div', [CSS.editor, api.styles.block], null, [this._title, this._table.htmlElement]);
@@ -527,8 +528,8 @@ export class TableConstructor {
                 this._table.repeatWordsColl = this._repeatWordsColl;
                 // this._table.firstColumnIsRead = false; // to do 这里以后要注释掉
                 this._container = create('div', [CSS.editor, this._api.styles.block], null, [this._titleWrapper, this._modelHeadTable.htmlElement,
-                    this._readOnlyTable.htmlElement, this._table.htmlElement,
-                    this._createTooltipBtnForModel()
+                this._readOnlyTable.htmlElement, this._table.htmlElement,
+                this._createTooltipBtnForModel()
                 ]);
                 this._initToolBarAndEvent();
             } else if (dataNotEmpty && !fromContructor) {
@@ -747,7 +748,7 @@ export class TableConstructor {
                             b = this._tableData['fields'][fieldIndex];
                         } else {
                             let findContent = this._findColumnContentFromTableData(data.content, this._tableData['fields'][fieldIndex], isRepeat, i)
-                                // console.log('findContent', findContent);
+                            // console.log('findContent', findContent);
                             if (findContent.length) {
                                 b = this._convertFromTag(findContent)
                             } else {
@@ -900,7 +901,7 @@ export class TableConstructor {
         // console.log('_resizeTable', data.contentSeprateIndex);
         let data = dataContent;
         const isValidArray = Array.isArray(data.content);
-        const isNotEmptyArray = isValidArray ? data.content.length : false;        
+        const isNotEmptyArray = isValidArray ? data.content.length : false;
         const contentRows = isValidArray ? data.content.length : undefined;
         const contentCols = isNotEmptyArray ? data.content[0].length : undefined;
         const parsedRows = Number.parseInt(config.rows);
@@ -1436,7 +1437,7 @@ export class TableConstructor {
             } else {
                 let table = this._table.body;
                 let row = table.rows[currentRowIndex + 1]
-                    // console.log(row);
+                // console.log(row);
                 if (row !== null && row !== undefined) {
                     row.cells[0].click();
                 }
@@ -1454,124 +1455,124 @@ export class TableConstructor {
      * added by xiaowy 2020/09/23
      */
     _containerEnterPressed(event) {
-            // console.log('Enter _containerEnterPressed');
-            try {
-                if (!(this._table.selectedCell !== null && !event.shiftKey)) {
-                    // console.log('this._table.selectedCell', this._table.selectedCell);
-                    return;
-                }
-                // this._processDownArrowKey(event);
-                let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
-                // let div = document.createElement('div');
-                // input.appendChild(div);
-                let selection = window.getSelection();
-                if (selection) {
-                    let node = selection.focusNode;
-                    let insertNode = node;
-                    if (node.nodeName === '#text' && !node.nextSibling) {
-                        insertNode = node.parentNode;
-                    }
-                    // console.log('node', node);
-                    // let div = document.createElement('div');
-                    // let textNode = document.createTextNode('11');
-                    let div = create('div', null, { 'contenteditable': true });
-                    let textNode = null;
-                    if (node.nodeName === '#text' && selection.focusOffset < node.textContent.length) {
-                        // console.log('for text node');
-                        let mmxNode = this._checkEleIsListOrSymbol(node, true);
-                        if (mmxNode) {
-                            let nodeCopy = mmxNode.cloneNode(true);
-                            this._modifyDigitSerialEle(nodeCopy);
-                            div.appendChild(nodeCopy);
-                            textNode = document.createTextNode(node.textContent.substr(selection.focusOffset));
-                            node.textContent = node.textContent.substr(0, selection.focusOffset);
-                            div.appendChild(textNode);
-                        } else {
-                            textNode = document.createTextNode(node.textContent.substr(selection.focusOffset));
-                            node.textContent = node.textContent.substr(0, selection.focusOffset);
-                            div.appendChild(textNode);
-                        }
-
-                        if (insertNode.nextElementSibling && insertNode.nextElementSibling.nodeName !== '#text') {
-                            // console.log('add before sibling.');
-                            input.insertBefore(div, insertNode.nextElementSibling);
-                            // node.appendChild(div);
-                            // textNode.focus();
-
-                        } else {
-                            // console.log('append end');
-                            input.appendChild(div);
-                        }
-                        let range = selection.getRangeAt(0);
-                        range.setStart(textNode, 0);
-                    } else if (node.nodeName === '#text') {
-                        // console.log('for text node content length is 0');
-                        // let textNode = document.createElement('br');
-                        // div.appendChild(textNode);
-                        let mmxNode = this._checkEleIsListOrSymbol(node, true);
-                        if (mmxNode) {
-                            let nodeCopy = mmxNode.cloneNode(true);
-                            // console.log("mmxNode, nodeCopy", mmxNode, nodeCopy);
-                            this._modifyDigitSerialEle(nodeCopy);
-                            div.appendChild(nodeCopy);
-                            // div.appendChild(textNode);
-                        }
-                        // 不需要回车
-                        // else {
-                        //   let textNode = document.createElement('br');
-                        //   div.appendChild(textNode);
-                        // }
-                        if (insertNode.nextElementSibling && insertNode.nextElementSibling.nodeName !== '#text') {
-                            // console.log('add before sibling.', insertNode.nextElementSibling);
-                            input.insertBefore(div, insertNode.nextElementSibling);
-                            // node.appendChild(div);
-                            // textNode.focus();
-
-                        } else {
-                            // console.log('append end');
-                            input.appendChild(div);
-                        }
-                        let range = selection.getRangeAt(0);
-                        range.setStart(div, 0);
-                    } else {
-                        // console.log('for other node type');
-                        // let textNode = document.createElement('br');
-                        // div.appendChild(textNode);
-                        let mmxNode = this._checkEleIsListOrSymbol(node);
-                        if (mmxNode) {
-                            let nodeCopy = mmxNode.cloneNode(true);
-                            this._modifyDigitSerialEle(nodeCopy);
-                            div.appendChild(nodeCopy);
-                            // div.appendChild(textNode);
-                        }
-                        // 不需要回车
-                        // else {
-                        //   let textNode = document.createElement('br');
-                        //   div.appendChild(textNode);
-                        // }
-                        if (insertNode.nextElementSibling && insertNode.nextElementSibling.nodeName !== '#text') {
-                            // console.log('add before sibling.');
-                            input.insertBefore(div, insertNode.nextElementSibling);
-                            // node.appendChild(div);
-                            // textNode.focus();
-
-                        } else {
-                            // console.log('append end');
-                            input.appendChild(div);
-                        }
-                        let range = selection.getRangeAt(0);
-                        range.setStart(div, 0);
-                    }
-                    // textNode.textContent = ' ';
-                    event.preventDefault();
-                    event.stopPropagation();
-                }
-            } catch (e) {
-                console.log('_containerEnterPressed occur exception:');
-                console.log(e);
+        // console.log('Enter _containerEnterPressed');
+        try {
+            if (!(this._table.selectedCell !== null && !event.shiftKey)) {
+                // console.log('this._table.selectedCell', this._table.selectedCell);
+                return;
             }
+            // this._processDownArrowKey(event);
+            let input = this._table.selectedCell.querySelector('.' + CSS.inputField);
+            // let div = document.createElement('div');
+            // input.appendChild(div);
+            let selection = window.getSelection();
+            if (selection) {
+                let node = selection.focusNode;
+                let insertNode = node;
+                if (node.nodeName === '#text' && !node.nextSibling) {
+                    insertNode = node.parentNode;
+                }
+                // console.log('node', node);
+                // let div = document.createElement('div');
+                // let textNode = document.createTextNode('11');
+                let div = create('div', null, { 'contenteditable': true });
+                let textNode = null;
+                if (node.nodeName === '#text' && selection.focusOffset < node.textContent.length) {
+                    // console.log('for text node');
+                    let mmxNode = this._checkEleIsListOrSymbol(node, true);
+                    if (mmxNode) {
+                        let nodeCopy = mmxNode.cloneNode(true);
+                        this._modifyDigitSerialEle(nodeCopy);
+                        div.appendChild(nodeCopy);
+                        textNode = document.createTextNode(node.textContent.substr(selection.focusOffset));
+                        node.textContent = node.textContent.substr(0, selection.focusOffset);
+                        div.appendChild(textNode);
+                    } else {
+                        textNode = document.createTextNode(node.textContent.substr(selection.focusOffset));
+                        node.textContent = node.textContent.substr(0, selection.focusOffset);
+                        div.appendChild(textNode);
+                    }
+
+                    if (insertNode.nextElementSibling && insertNode.nextElementSibling.nodeName !== '#text') {
+                        // console.log('add before sibling.');
+                        input.insertBefore(div, insertNode.nextElementSibling);
+                        // node.appendChild(div);
+                        // textNode.focus();
+
+                    } else {
+                        // console.log('append end');
+                        input.appendChild(div);
+                    }
+                    let range = selection.getRangeAt(0);
+                    range.setStart(textNode, 0);
+                } else if (node.nodeName === '#text') {
+                    // console.log('for text node content length is 0');
+                    // let textNode = document.createElement('br');
+                    // div.appendChild(textNode);
+                    let mmxNode = this._checkEleIsListOrSymbol(node, true);
+                    if (mmxNode) {
+                        let nodeCopy = mmxNode.cloneNode(true);
+                        // console.log("mmxNode, nodeCopy", mmxNode, nodeCopy);
+                        this._modifyDigitSerialEle(nodeCopy);
+                        div.appendChild(nodeCopy);
+                        // div.appendChild(textNode);
+                    }
+                    // 不需要回车
+                    // else {
+                    //   let textNode = document.createElement('br');
+                    //   div.appendChild(textNode);
+                    // }
+                    if (insertNode.nextElementSibling && insertNode.nextElementSibling.nodeName !== '#text') {
+                        // console.log('add before sibling.', insertNode.nextElementSibling);
+                        input.insertBefore(div, insertNode.nextElementSibling);
+                        // node.appendChild(div);
+                        // textNode.focus();
+
+                    } else {
+                        // console.log('append end');
+                        input.appendChild(div);
+                    }
+                    let range = selection.getRangeAt(0);
+                    range.setStart(div, 0);
+                } else {
+                    // console.log('for other node type');
+                    // let textNode = document.createElement('br');
+                    // div.appendChild(textNode);
+                    let mmxNode = this._checkEleIsListOrSymbol(node);
+                    if (mmxNode) {
+                        let nodeCopy = mmxNode.cloneNode(true);
+                        this._modifyDigitSerialEle(nodeCopy);
+                        div.appendChild(nodeCopy);
+                        // div.appendChild(textNode);
+                    }
+                    // 不需要回车
+                    // else {
+                    //   let textNode = document.createElement('br');
+                    //   div.appendChild(textNode);
+                    // }
+                    if (insertNode.nextElementSibling && insertNode.nextElementSibling.nodeName !== '#text') {
+                        // console.log('add before sibling.');
+                        input.insertBefore(div, insertNode.nextElementSibling);
+                        // node.appendChild(div);
+                        // textNode.focus();
+
+                    } else {
+                        // console.log('append end');
+                        input.appendChild(div);
+                    }
+                    let range = selection.getRangeAt(0);
+                    range.setStart(div, 0);
+                }
+                // textNode.textContent = ' ';
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        } catch (e) {
+            console.log('_containerEnterPressed occur exception:');
+            console.log(e);
         }
-        // console.log('_containerEnterPressed finished!');
+    }
+    // console.log('_containerEnterPressed finished!');
 
 
     /**
@@ -1757,18 +1758,18 @@ export class TableConstructor {
         const table = this._table.body;
         const table_rows = table.rows;
         // 考虑隐藏行的情况 2021/06/10
-        var isBottom  = false;
+        var isBottom = false;
         var hiddenFields = [];
         if (currentRowIndex == table_rows.length - 1) {
             isBottom = true;
         }
 
-        if (this._doHiddenField && this._tableData['hiddenFields'].length > 0)
-        {
+        // 增加判断否则会失败 2021/06/18
+        if (this._doHiddenField && this._tableData['hiddenFields'] && this._tableData['hiddenFields'].length > 0) {
             hiddenFields = this._tableData['hiddenFields'].split(' ')
             let hiddenCnt = hiddenFields.length;
             if ((currentRowIndex + hiddenCnt) == table_rows.length - 1) {
-                isBottom = true;  
+                isBottom = true;
             }
         }
 
@@ -2352,157 +2353,157 @@ export class TableConstructor {
         // this._repeat === 1000
         // this._repeatWordsColl = [];
         const modelDataObj = [{
-                Name: '正文',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '正文',
-                Tags: '正文 智能 自动',
-                Thumb: './assets/dog1.jpg',
-                Repeat: 0,
-                Hidden: '',
-            },
-            {
-                Name: '项目符号',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '正文',
-                Tags: '项目符号 编号 智能 自动',
-                Thumb: './assets/dog2.jpg',
-                Repeat: 0,
-                Hidden: '',
-            },
-            {
-                Name: '页标题',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '标题 副标题 引标',
-                Tags: '页标题 标题 智能 自动',
-                Thumb: './assets/dog3.jpg',
-                Repeat: 0,
-                Hidden: '标题',
-            },
-            {
-                Name: '封面标题',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '标题 副标题 口号 引标',
-                Tags: '封面标题 封面 标题 智能 自动',
-                Thumb: './assets/dog4.jpg',
-                Repeat: 0,
-                Hidden: '副标题',
-            },
-            {
-                Name: '小节',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '标题',
-                Tags: '小节 标题 智能 自动',
-                Thumb: './assets/dog4.jpg',
-                Repeat: 0,
-                Hidden: '',
-            },
-            {
-                Name: '列表',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '标题 正文 图片',
-                Tags: '列表 特性 卖点 排列 智能 自动',
-                Thumb: './assets/dog5.jpg',
-                Repeat: 0,
-                Hidden: '图片',
-            },
-            {
-                Name: '编号',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '标题 正文 图片',
-                Tags: '编号 排列 数字 智能 自动',
-                Thumb: './assets/dog6.jpg',
-                Repeat: 0,
-                Hidden: '正文',
-            },
-            {
-                Name: '图片',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '图片',
-                Tags: '图片 智能 自动',
-                Thumb: './assets/dog6.jpg',
-                Repeat: 0,
-                Hidden: '',
-            },
-            {
-                Name: 'logo',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '图片 标题 副标题 引标',
-                Tags: 'logo 公司名称 智能 自动',
-                Thumb: './assets/dog7.jpg',
-                Repeat: 1,
-                Hidden: '引标',
-            },
-            {
-                Name: '二维码',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '图片',
-                Tags: '二维码 扫码 智能 自动',
-                Thumb: './assets/dog8.jpg',
-                Repeat: 0,
-                Hidden: '',
-            },
-            {
-                Name: '地址',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '图片 正文',
-                Tags: '地址 联系方式 电话 公司地址 智能 自动',
-                Thumb: './assets/dog9.jpg',
-                Repeat: 0,
-                Hidden: '',
-            },
-            {
-                Name: '强调',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '正文',
-                Tags: '强调 文字 智能 自动',
-                Thumb: './assets/dog9.jpg',
-                Repeat: 0,
-                Hidden: '',
-            },
-            {
-                Name: '时间线',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '图片 标题 正文',
-                Tags: '时间线 智能 自动',
-                Thumb: './assets/dog10.jpg',
-                Repeat: 0,
-                Hidden: '正文',
-            },
-            {
-                Name: '图片集',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '图片 标题 正文 图片 标题 正文',
-                Tags: '图片集 图片 logo墙 人员介绍 合作伙伴 智能 自动',
-                Thumb: './assets/dog11.jpg',
-                Repeat: 0,
-                Hidden: '标题',
-            },
-            {
-                Name: '卖点列表',
-                SubName: '智能选择',
-                Info: '自动选择造型',
-                Fields: '主标题 副标题 卖点 次卖点 正文',
-                Tags: '主标题 封面标题 标题 卖点 特性 优点 特征 特色 优势 口号 卖点 次卖点 副标题 智能 自动',
-                Thumb: './assets/dog11.jpg',
-                Repeat: 2,
-                Hidden: '副标题',
-            }
+            Name: '正文',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '正文',
+            Tags: '正文 智能 自动',
+            Thumb: './assets/dog1.jpg',
+            Repeat: 0,
+            Hidden: '',
+        },
+        {
+            Name: '项目符号',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '正文',
+            Tags: '项目符号 编号 智能 自动',
+            Thumb: './assets/dog2.jpg',
+            Repeat: 0,
+            Hidden: '',
+        },
+        {
+            Name: '页标题',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '标题 副标题 引标',
+            Tags: '页标题 标题 智能 自动',
+            Thumb: './assets/dog3.jpg',
+            Repeat: 0,
+            Hidden: '标题',
+        },
+        {
+            Name: '封面标题',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '标题 副标题 口号 引标',
+            Tags: '封面标题 封面 标题 智能 自动',
+            Thumb: './assets/dog4.jpg',
+            Repeat: 0,
+            Hidden: '副标题',
+        },
+        {
+            Name: '小节',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '标题',
+            Tags: '小节 标题 智能 自动',
+            Thumb: './assets/dog4.jpg',
+            Repeat: 0,
+            Hidden: '',
+        },
+        {
+            Name: '列表',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '标题 正文 图片',
+            Tags: '列表 特性 卖点 排列 智能 自动',
+            Thumb: './assets/dog5.jpg',
+            Repeat: 0,
+            Hidden: '图片',
+        },
+        {
+            Name: '编号',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '标题 正文 图片',
+            Tags: '编号 排列 数字 智能 自动',
+            Thumb: './assets/dog6.jpg',
+            Repeat: 0,
+            Hidden: '正文',
+        },
+        {
+            Name: '图片',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '图片',
+            Tags: '图片 智能 自动',
+            Thumb: './assets/dog6.jpg',
+            Repeat: 0,
+            Hidden: '',
+        },
+        {
+            Name: 'logo',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '图片 标题 副标题 引标',
+            Tags: 'logo 公司名称 智能 自动',
+            Thumb: './assets/dog7.jpg',
+            Repeat: 1,
+            Hidden: '引标',
+        },
+        {
+            Name: '二维码',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '图片',
+            Tags: '二维码 扫码 智能 自动',
+            Thumb: './assets/dog8.jpg',
+            Repeat: 0,
+            Hidden: '',
+        },
+        {
+            Name: '地址',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '图片 正文',
+            Tags: '地址 联系方式 电话 公司地址 智能 自动',
+            Thumb: './assets/dog9.jpg',
+            Repeat: 0,
+            Hidden: '',
+        },
+        {
+            Name: '强调',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '正文',
+            Tags: '强调 文字 智能 自动',
+            Thumb: './assets/dog9.jpg',
+            Repeat: 0,
+            Hidden: '',
+        },
+        {
+            Name: '时间线',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '图片 标题 正文',
+            Tags: '时间线 智能 自动',
+            Thumb: './assets/dog10.jpg',
+            Repeat: 0,
+            Hidden: '正文',
+        },
+        {
+            Name: '图片集',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '图片 标题 正文 图片 标题 正文',
+            Tags: '图片集 图片 logo墙 人员介绍 合作伙伴 智能 自动',
+            Thumb: './assets/dog11.jpg',
+            Repeat: 0,
+            Hidden: '标题',
+        },
+        {
+            Name: '卖点列表',
+            SubName: '智能选择',
+            Info: '自动选择造型',
+            Fields: '主标题 副标题 卖点 次卖点 正文',
+            Tags: '主标题 封面标题 标题 卖点 特性 优点 特征 特色 优势 口号 卖点 次卖点 副标题 智能 自动',
+            Thumb: './assets/dog11.jpg',
+            Repeat: 2,
+            Hidden: '副标题',
+        }
         ]
-        let processModelSel = function(modelHeadCallBack = undefined) {
+        let processModelSel = function (modelHeadCallBack = undefined) {
             that._repeat === 1000
             that._repeatWordsColl = [];
             if (window.mmxaiModelList !== undefined) {
@@ -2511,7 +2512,7 @@ export class TableConstructor {
             } else {
                 let rnd = Math.random() * 11
                 const index = Math.floor(rnd)
-                    // demo select
+                // demo select
                 alert('select ' + index);
 
                 const obj = modelDataObj[index];
@@ -2540,7 +2541,7 @@ export class TableConstructor {
      */
     _processParentUiResultCall() {
         let that = this;
-        let _processParentUiResult = function(obj) {
+        let _processParentUiResult = function (obj) {
             // console.log('enter _processParentUiResult');
             // console.log('_processParentUiResult obj', obj);
             // added by xiaowy 2021/01/21
@@ -2630,10 +2631,10 @@ export class TableConstructor {
                 objSepIndex++;
             });
             let config = { rows: fieldArr.length, cols: 2 }
-                // if (this._repeat === -1) {
-                //   this._table.firstColumnIsRead = false;
-                // }
-                // 要重构表头 2021/01/21
+            // if (this._repeat === -1) {
+            //   this._table.firstColumnIsRead = false;
+            // }
+            // 要重构表头 2021/01/21
             this._tableData['hiddenFields'] = modelObj['Hidden'];
             this._makeReadOnlyTable();
             // end
@@ -2667,6 +2668,8 @@ export class TableConstructor {
                 }
             }
             this._doHiddenField = false;
+        } else if (this._doHiddenField && this._tableData['hiddenFields'].length) { // 增加造型族的隐藏列的不同设置处理 2021/06/18
+            this._processTableRowVisible();
         }
     }
 
@@ -2676,7 +2679,7 @@ export class TableConstructor {
      */
     hiddenTableRowCallBack() {
         let that = this;
-        let callBack = function() {
+        let callBack = function () {
 
             that._doHiddenField = !that._doHiddenField;
             if (that._table === undefined) {
@@ -2688,43 +2691,42 @@ export class TableConstructor {
                 const size = that._resizeTable(that._tableData, config);
                 that._fillTable(that._tableData, size);
             } else {
-                // let paraRows = !!this._table.body.rows ? this._table.body.rows : []
-                // console.log('paraRows1:', paraRows);
-                // paraRows = !!paraRows? paraRows : []; 
-                // console.log('paraRows:', paraRows);
-                let hiddenFields = [];
-                if (that._tableData['hiddenFields']) {
-                    hiddenFields = that._tableData['hiddenFields'].split(' ');
-                }
-                let rowsColl = that._table.body.rows;
-
-                for (let i = 0; i < rowsColl.length; i++) {
-                    let row = rowsColl[i];
-                    let cells = row.cells;
-                    let htmlValue = ''
-                        // 2021/05/17 增加下拉列表框的处理
-                    if (that._repeat && that._repeat === 2) { // select tag
-                        let selectNode = cells[0].querySelector('.' + CSS.inputField);
-                        // let selectNode = cellNode.querySelector('select');
-                        htmlValue = selectNode.value;
-
-                    } else {
-                        htmlValue = cells[0].querySelector('.' + CSS.inputField).innerHTML.trim();
-                    }
-                    // console.log('hidden row', htmlValue);
-                    if (that._doHiddenField && hiddenFields.indexOf(htmlValue) >= 0) {
-                        row.hidden = true;
-                    } else {
-                        row.hidden = false;
-                    }
-                }
-
+                that._processTableRowVisible(); // make old code to a function 2021/06/18
             }
             // that._doHiddenField = !that._doHiddenField;
 
             // console.log('test hidden callback', that._tableData.content);
         };
         return callBack;
+    }
+
+    _processTableRowVisible() {
+        let hiddenFields = [];
+        if (this._tableData['hiddenFields']) {
+            hiddenFields = this._tableData['hiddenFields'].split(' ');
+        }
+        let rowsColl = this._table.body.rows;
+
+        for (let i = 0; i < rowsColl.length; i++) {
+            let row = rowsColl[i];
+            let cells = row.cells;
+            let htmlValue = ''
+            // 2021/05/17 增加下拉列表框的处理
+            if (this._repeat && this._repeat === 2) { // select tag
+                let selectNode = cells[0].querySelector('.' + CSS.inputField);
+                // let selectNode = cellNode.querySelector('select');
+                htmlValue = selectNode.value;
+
+            } else {
+                htmlValue = cells[0].querySelector('.' + CSS.inputField).innerHTML.trim();
+            }
+            // console.log('hidden row', htmlValue);
+            if (this._doHiddenField && hiddenFields.indexOf(htmlValue) >= 0) {
+                row.hidden = true;
+            } else {
+                row.hidden = false;
+            }
+        }
     }
 
     /**
