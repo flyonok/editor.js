@@ -2570,6 +2570,9 @@ export class TableConstructor {
         // }
         const fields = modelObj.Fields.trim();
         let fieldArr = fields.split(' ');
+        // 处理造型字段的缺省值
+        const defaultFieldsValues = modelObj.Default || '';
+        let defaultFieldsValuesObj = JSON.parse(defaultFieldsValues);
         if (fieldArr.length > 0) {
             // check table  is empty
             if (this._table === undefined) {
@@ -2618,7 +2621,13 @@ export class TableConstructor {
                 }
                 let objArr = [];
                 objArr.push(temp);
-                objArr.push(' ');
+                // 处理字段的默认值 2021/06/21
+                if (defaultFieldsValuesObj[temp]) {
+                    objArr.push(defaultFieldsValuesObj[temp]);
+                }
+                else {
+                    objArr.push(' ');
+                }
                 data.content.push(objArr);
                 // fields is repeat
                 if (isFielsRepeat.isRepeat && temp === isFielsRepeat.repeatWords) {
