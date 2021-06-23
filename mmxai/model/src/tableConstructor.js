@@ -2571,7 +2571,8 @@ export class TableConstructor {
         const fields = modelObj.Fields.trim();
         let fieldArr = fields.split(' ');
         // 处理造型字段的缺省值
-        const defaultFieldsValues = modelObj.Default || '';
+        // console.log('modelObj.Default', modelObj.Default);
+        const defaultFieldsValues = modelObj.Default || '{}';
         let defaultFieldsValuesObj = JSON.parse(defaultFieldsValues);
         if (fieldArr.length > 0) {
             // check table  is empty
